@@ -1,0 +1,15 @@
+{
+open Parse_tree
+let dyp_merge = Dyp.keep_all
+}
+
+%token <int> INT PLUS EOL
+%start <Parse_tree.tree> main
+
+%%
+
+main : expr EOL { $1 }
+
+expr :
+  | INT            { Int $1 }
+  | expr PLUS expr { Node ($1,$3) }

@@ -1,0 +1,75 @@
+
+################
+# User Options #
+################
+
+# cache files parsed by DRuby
+dr-cache = false
+
+# Execute and instrument the ruby file to gain insight into its uses
+# of dynamic features.
+dr-profile = false
+
+# The name of the file to store profiles gathered by --dr-profile
+dr-profile-db = druby_profile.db
+
+# The location of the base_types.rb file and other stub files
+dr-stub-dir = @DRUBYLIB@
+
+# After analysis, execute the given file with the ruby interpreter
+dr-run-ruby = false 
+
+
+#########################################
+#    Debugging / development options    #
+#                                       #
+# These options should not be modified  #
+# unless you are hacking on DRuby       #
+#########################################
+
+# Create casts.rb to implement runtime casts
+dr-emit-runtime-casts = false
+
+# Verify method bodies match their annotations
+dr-check-annotations = true
+
+# produce (lots) of debugging info for the constraint solver
+dr-debug-constraints = false 
+
+# controls the amount of debugging information, 0 => none
+dr-debug-level = 0 
+
+# Never print the same error twice
+dr-no-dup-errors = true
+
+# Print additional context in error messages
+dr-print-error-ctx = true
+
+# print out filenames as they are parsed
+dr-print-filenames = false  
+
+# statically resolve the scope of all constants
+dr-resolve-scopes = true
+
+# display timing messages
+dr-show-time = false
+
+# Attempt to detect and skip main like functions outside of the main
+# file
+dr-single-entry = true
+
+# Allow annotations within Ruby code
+dr-use-annotations = true
+
+# Preload the base_types.rb file
+dr-use-base-types = true
+
+# warn when a method has no body and no annotation
+dr-warn-empty-body = false
+
+# Do not remove temporary files created in /tmp that were used for
+# profiling
+dr-save-temps = false
+
+# Run the type inference algorithm
+dr-type-inference = true

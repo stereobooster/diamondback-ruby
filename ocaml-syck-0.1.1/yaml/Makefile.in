@@ -1,0 +1,22 @@
+# -*- Mode: Makefile -*-
+# Copyright (c) 2007 Christopher R. Waterson
+
+DEPTH		:= ..
+srcdir		:= @srcdir@
+topsrcdir	:= @top_srcdir@
+
+include $(DEPTH)/config.mk
+
+TARGETS		:= yaml.$(LIB)
+LDFLAGS		+= -lsyck
+DISTGARBAGE	:= META config.h
+
+include $(topsrcdir)/rules.mk
+
+yaml.$(LIB):			\
+	parser.o		\
+	yamlNode.$(OBJ)		\
+	yamlParser.$(OBJ)	\
+	$(NULL)
+
+

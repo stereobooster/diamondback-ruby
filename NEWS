@@ -1,0 +1,130 @@
+
+Diamondback Ruby -- high level history of changes
+
+This file describes changes visible to end users of Diamondback Ruby.
+For a more extensive description of the code-level changes, see the
+ChangeLog file.  This file has been written in Emacs' outline-mode and
+may be more easily browsed using outline major mode.
+
+* Changes for 0.20090726
+
+** Experimental support for treating hashes as record types
+
+DRuby now tries to type hashes with only literals as keys as a record
+type.  For example:
+
+a = {
+  :color => "blue",
+  :size => 3,
+}
+
+a[:size] / 3
+a[:color].concat "\n"
+a[:szie] # [ERROR] This record contains no field named :"szie"
+
+Like tuples, records are promoted to hashes when a method other than
+[] is invoked on the type.  For example, the following are not
+treated as record types:
+
+a = {1 => 2, 3 => 4}.reject! {true} # method call
+a = {:x => 2, (if true then :y else :z end) => 3} # non-literal key
+
+** Tuples can now be indexed using []
+
+Similar to records, tuples may now be indexed using [] with Fixnum
+literals.  For example, the following is now well-typed:
+
+a = [1,"hi",/end/]
+a[0] - 3
+a[1].concat "\n"
+a[2] =~ "spend"
+
+Also, width mismatches on parallel assignment cause the tuple to be
+promoted to an array.  However, * acts like as a row variable and may
+match tuples of arbitrary width:
+
+# a is typed as an array:
+a = [1,"hi",3]
+x,y = a
+
+# b is typed as a tuple
+b = [1,"hi",3]
+w,* = b # still tuple 
+
+Better support for ensuring that an array (resp hash) is always
+treated as a tuple (resp record) will be forthcoming in a later
+release, so that users don't have to guess at when the promotion
+happens.
+
+** Classes are considered non-abstract by default
+
+Previously, a definition like:
+class A
+  def foo() 
+    bar() 
+  end
+end
+
+was not considered an error since it is possible that A is an abstract
+base class, and calls to foo() come from subclasses that properly
+define the bar() method.  However, DRuby now assumes classes are
+non-abstract by default and thus will consider the above to be an
+error.  This can changed via an annotation:
+
+class A
+  ##% foo<self> ; self <= [bar: () -> Fixnum] : () -> Fixnum
+  def foo() 
+    bar() 
+  end
+end
+
+Thus, every method's self type is assumed to be a subtype of the
+enclosing class unless it is explicitly quantified over in the method
+signature.
+
+** Changes to the dynamic analysis module 
+
+DRuby's dynamic analysis engine is now split into two steps so that
+arbitrary executions can be used to mine runtime profiles.  The
+expected usage scenario is now:
+
+ 1. druby --dr-profile --dr-type-inference=false tests/test_foo.rb
+ 2. druby --dr-transform lib/foo.rb
+
+In step 1, DRuby executes the test suite of a program and merely
+observes its behavior, storing any profiled information in the file
+"druby_profile.db" in the current working directory.  Note the example
+explicitly disables the type inference pass at this point.
+
+In step 2, DRuby then transforms lib/foo.rb using the information
+gained in druby_profile.rb and performs its static analysis.  Note
+that, currently DRuby does not consistency checks to ensure that the
+db file is up to date with the current source files (this will be
+handled in a future release).
+ 
+** The empty object annotation is now Top
+
+The object annotation "[]" is now considered to be the Top type in
+DRuby's type system.  Specifically, it is a supertype of every other
+type, not just objects (e.g., Tuples are subtypes of []).  If a method
+is not intended to return a value, it should be given type [] instead
+of NilClass as the former can not be sent any messages.  Similarly,
+some methods don't care about the return type of blocks, where this
+type is also useful.  Some examples:
+
+##% ignore_num : Fixnum -> []
+def ignore_num(x) end
+
+# error
+ignore_num(3).nil? 
+
+##% apply<t>: t {t -> []} -> t
+def apply(x)
+  yield(x) # using the yield's return value would be an error
+  x
+end
+
+##% initialize: Fixnum -> []
+def initialize(val) 
+  @x = {:key => val} 
+end

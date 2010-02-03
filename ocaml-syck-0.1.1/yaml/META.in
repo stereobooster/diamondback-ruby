@@ -1,0 +1,6 @@
+# Copyright (c) 2007 Christopher R. Waterson
+name="ocaml-syck"
+version="0.1"
+description="OCaml Wrappers for the Syck Yaml Parser"
+archive(byte) = "yaml.cma"
+archive(native) = "yaml.cmxa"

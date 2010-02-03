@@ -1,0 +1,29 @@
+
+CFLAGS += -O2 -fPIC -I $(shell ocamlc -where) -Wall -Werror
+
+if $(defined SYCK_PREFIX)
+  CFLAGS += -I$(SYCK_PREFIX)/include
+  LDFLAGS += -L$(SYCK_PREFIX)/lib
+  export
+
+OFILES[]= 
+    yamlNode
+    yamlParser
+    yamlEmitter
+
+FILES=
+TARGETS=
+if $(NATIVE_ENABLED)
+    FILES += $(addsuffix .cmx, $(OFILES))
+    TARGETS += yaml.cmxa yaml.a
+    export
+
+if $(BYTE_ENABLED)
+    FILES += $(addsuffix .cmo, $(OFILES))
+    TARGETS += yaml.cma dllyaml.so
+    export
+
+$(TARGETS): emitter.o parser.o $(FILES)
+	ocamlmklib -o yaml $+ $(LDFLAGS) -lsyck
+
+.DEFAULT: $(TARGETS)

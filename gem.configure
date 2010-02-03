@@ -1,0 +1,9 @@
+#!/bin/sh
+
+LIBDIR=`echo $1 | sed 's/--prefix=//'`
+STUBDIR=${LIBDIR}/../stubs/1.8
+
+sed "s|@DRUBYLIB@|${STUBDIR}|" druby.conf.in > druby.conf
+
+echo "install:" > Makefile
+

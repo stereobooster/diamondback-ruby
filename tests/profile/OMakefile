@@ -1,0 +1,12 @@
+
+OCAMLINCLUDES += ../common
+
+FILES[] += 
+	profile/profile_suite
+
+SUCC_CHECKS = $(valid_rubycode_directory $(dir succeed))
+FAIL_CHECKS = $(valid_rubycode_directory $(dir fail))
+
+../unit_tests.results: 	\
+	$(SUCC_CHECKS) $(FAIL_CHECKS)
+

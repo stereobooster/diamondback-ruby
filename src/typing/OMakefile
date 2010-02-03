@@ -1,0 +1,42 @@
+
+OCAMLINCLUDES += ../cfg ../parser .. $(OCAMLGRAPH_DIR)
+
+
+#XXX Hack to work around problem where omake assumes that since (ocaml)graph.cmx
+# exists, then so must graph.o, but ocamlgraph only installs the former (allows
+# code inlining optimizations), but not the later (of no use)
+
+.SCANNER: skip-graph-o-%.ml: %.ml :exists: %.mli
+   $(OCamlScanner $<) | sed "s|$(file $(OCAMLGRAPH_DIR)/graph.o)||"
+
+.SCANNER: skip-graph-o-%.mli: %.mli
+   $(OCamlScanner $<) | sed "s|$(file $(OCAMLGRAPH_DIR)/graph.o)||"
+
+rType.cmi: rType.mli :scanner: skip-graph-o-rType.mli
+  $(OCamlOpt) -c $<
+
+rType.o rType.cmx: rType.ml rType.cmi :scanner: skip-graph-o-rType.ml
+  $(OCamlOpt) -c $<
+
+rType.cmo: rType.ml rType.cmi :scanner: skip-graph-o-rType.ml
+  $(OCamlC) -c $<
+
+constraintGraph.cmi constraintGraph.o constraintGraph.cmx: \
+     constraintGraph.ml :scanner: skip-graph-o-constraintGraph.ml
+  $(OCamlOpt) -c $<
+
+constraintGraph.cmi constraintGraph.cmo: \
+     constraintGraph.ml :scanner: skip-graph-o-constraintGraph.ml
+  $(OCamlC) -c $<
+
+FILES[] +=
+	typing/typing
+	typing/unify
+	typing/rType
+	typing/variable
+	typing/constraintGraph
+	typing/contracts
+
+#TYPE_LIB = $(OCamlLibrary typing, $(FILES))
+
+#.DEFAULT: $(TYPE_LIB)

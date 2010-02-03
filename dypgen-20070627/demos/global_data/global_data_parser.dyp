@@ -1,0 +1,22 @@
+{
+open Dyp
+let global_data = ref 0
+let global_data_equal = (=)
+}
+
+%token <int> INT PLUS TIMES EOL
+
+%relation pi<pt<pp
+
+%start <int> main
+
+%%
+
+main: expr EOL { Printf.printf "The parser made %d reductions for this interpretation.\n" dyp.global_data; $1 }
+
+expr:
+  | INT { dyp.global_data <- dyp.global_data+1; $1 }    pi
+  | expr(<=pp) PLUS expr(<pp)
+      { dyp.global_data <- dyp.global_data+1; $1 + $3 } pp
+  | expr(<=pt) TIMES expr(<pt)
+      { dyp.global_data <- dyp.global_data+1; $1 * $3 } pt

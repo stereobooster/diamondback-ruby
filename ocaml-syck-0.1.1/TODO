@@ -1,0 +1,8 @@
+- Add an "install" target to install via ocamlfind.
+
+- Add ocamldoc and build options to create it.
+
+- Expand the test harness to run through a bunch of tests.
+
+- Add code to run the Syck emitter.
+

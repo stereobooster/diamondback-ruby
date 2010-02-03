@@ -1,0 +1,15 @@
+OCAMLINCLUDES += ../common
+
+FILES[] += 
+	cfg/printer_tests
+	cfg/cfg_suite
+	cfg/refactor_tests
+	cfg/scope_cfg_tests
+	cfg/cfg_test_helper
+	cfg/cfg_locals_test
+	cfg/iface_to_cfg_test
+	cfg/iface_progs
+
+../unit_tests.results:	\
+	$(glob iface_succeed/*/*)	\
+	$(glob iface_fail iface_succeed/*/*)

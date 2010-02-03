@@ -1,0 +1,8 @@
+#!/usr/bin/env ruby
+
+require 'pathname'
+
+SAFE_EVAL=Pathname.new(__FILE__).dirname + "safe_eval.real"
+exec("#{SAFE_EVAL}",*ARGV)
+
+

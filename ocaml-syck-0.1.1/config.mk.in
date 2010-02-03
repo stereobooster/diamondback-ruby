@@ -1,0 +1,27 @@
+# -*- Mode: Makefile -*-
+# Copyright (c) 2007 Christopher R. Waterson
+
+# Various programs
+OCAMLFIND	:= @OCAMLFIND@
+OCAMLDEP	:= @OCAMLDEP@
+OCAMLC		:= @OCAMLC@
+OCAMLMKLIB      := @OCAMLMKLIB@
+
+# Flags for compiling C executables with ocamlc
+OCAMLCFLAGS	:= @OCAMLCFLAGS@
+
+# General flags for ocamlc
+OCAMLFLAGS	:= @OCAMLDEBUGFLAGS@ @OCAMLPROFFLAGS@
+
+# Flags for linking Ocaml libraries and executables
+OCAMLLDFLAGS	:= @OCAMLLDFLAGS@
+
+# Raw flags for the C preprocessor, compiler, and linker.
+CPPFLAGS	:= @CPPFLAGS@
+CFLAGS		:= @CFLAGS@
+LDFLAGS		:= @LDFLAGS@
+
+# Appropriate suffixes for Ocaml object files.
+LIB		:= @LIB@
+OBJ		:= @OBJ@
+

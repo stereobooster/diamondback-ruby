@@ -1,0 +1,73 @@
+
+include config.omake
+
+VERSION=0.20090726
+
+OCAMLFLAGS += -dtypes
+
+#OCAMLOPTFLAGS += -p
+#OCAML_NATIVE_LINK_FLAGS += -p
+
+if $(defined BISECT)
+  OCAMLINCLUDES += $(BISECT)
+  OCAML_OTHER_LIBS += bisect
+  export
+
+#OCAMLOPTFLAGS += -g
+#OCAML_NATIVE_LINK_FLAGS += -g
+#OCAMLCFLAGS += -g
+#OCAML_BYTE_LINK_FLAGS += -g
+
+.PHONY: install uninstall clean config
+
+.SUBDIRS: src tests dypgen-20070627 ocaml-syck-0.1.1
+
+druby.conf: druby.conf.in :value: $(DRUBYLIB)
+	sed "s|@DRUBYLIB@|$(DRUBYLIB)|" druby.conf.in > druby.conf
+
+config:
+  print-conf-directories()
+
+.PHONY: install_site install_lib install_conf
+
+SITE_FILES = $`(ls R, lib/druby) # `
+install_site: $(SITE_FILES)
+	mkdir -p $(DESTDIR)$(DRUBYSITELIB)
+        # OMake's cp doesn't handling existing directories
+	/bin/cp -rf lib/druby/* $(DESTDIR)$(DRUBYSITELIB)
+
+LIB_FILES = $`(ls R, stubs) #`
+install_lib: $(LIB_FILES)
+	mkdir -p $(DESTDIR)$(DRUBYLIB)
+	/bin/cp -rf stubs/$(RUBYVERSION)/* $(DESTDIR)$(DRUBYLIB)
+
+install_conf: druby.conf
+	mkdir -p $(DESTDIR)$(SYSCONFDIR)
+	install -m 0644 druby.conf $(DESTDIR)$(SYSCONFDIR)
+
+install: install_site install_lib install_conf
+
+uninstall: 
+	rm -f $(SYSCONFDIR)/druby.conf 
+	rm -rf $(DRUBYSITELIB)
+	rm -rf $(DRUBYTOPLIB)
+
+
+.PHONY: build_gem
+
+build_gem: gem.configure src/druby src/safe_eval 
+	cp src/druby gem_bin/druby.real
+	cp src/safe_eval gem_bin/safe_eval.real
+	cp gem.configure configure
+	gem build druby.gemspec
+
+
+ALL_FILES = $`(ls R, .) #`
+ALL_TARGETS = $`(filter-targets $(ALL_FILES))) #`
+TARGETS = $`(filter-proper-targets $(ALL_TARGETS)) #`
+ANNOTS = $`(filter-exists $(replacesuffixes .ml, .annot, \
+	                      $(filter %.ml, $(ALL_TARGETS)))) #`
+clean:
+	rm -f $(TARGETS)
+	rm -f $(ANNOTS)
+

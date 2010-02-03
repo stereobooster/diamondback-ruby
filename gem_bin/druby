@@ -1,0 +1,13 @@
+#!/usr/bin/env ruby
+
+require 'pathname'
+
+ROOT=Pathname.new(__FILE__).dirname.parent
+BIN=ROOT + "gem_bin"
+LIB=ROOT + "lib"
+DCONFIG = "#{ROOT}/druby.conf"
+ENV['PATH'] = BIN + ":" + ENV['PATH']
+
+exec("#{BIN}/druby.real","--dr-config=#{DCONFIG}","-I#{LIB}",*ARGV)
+
+

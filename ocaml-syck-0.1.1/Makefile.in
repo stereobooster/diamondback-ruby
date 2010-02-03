@@ -1,0 +1,14 @@
+# -*- Mode: Makefile -*-
+# Copyright (c) 2007 Christopher R. Waterson
+
+srcdir		:= @srcdir@
+topsrcdir	:= @top_srcdir@
+DEPTH		:= .
+
+include $(DEPTH)/config.mk
+
+SUBDIRS		:= yaml t
+DISTGARBAGE	:= config.mk autom4te.cache config.log config.status
+
+include $(topsrcdir)/rules.mk
+
