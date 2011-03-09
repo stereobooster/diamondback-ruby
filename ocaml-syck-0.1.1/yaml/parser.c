@@ -59,7 +59,7 @@ static struct custom_operations parser_ops = {
 /* ---------------------------------------------------------------------- */
 
 static void Noreturn
-raise_error(char *msg)
+raise_error(const char *msg)
 {
     caml_raise_with_string(*caml_named_value("YamlParser_Error"), msg);
 }
@@ -189,13 +189,13 @@ parser_handler(SyckParser *parser, SyckNode *node)
 }
 
 static void Noreturn
-error_handler(SyckParser *parser, char *msg)
+error_handler(SyckParser *parser, const char *msg)
 {
     raise_error(msg);
 }
 
 static SyckNode * Noreturn
-bad_anchor_handler(SyckParser *parser, char *anchor)
+bad_anchor_handler(SyckParser *parser, const char *anchor)
 {
 #if defined(HAVE_SNPRINTF)
     char buf[128];

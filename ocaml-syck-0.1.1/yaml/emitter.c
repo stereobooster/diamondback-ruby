@@ -36,7 +36,7 @@ value yamlEmitter_create(value unit)
   CAMLreturn(em_v);
 }
 
-void caml_output_handler(SyckEmitter *e, char *ptr, long len)
+void caml_output_handler(SyckEmitter *e, const char *ptr, long len)
 {
   CAMLparam0();
   CAMLlocal2(cb,buf);
