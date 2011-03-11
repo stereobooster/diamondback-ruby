@@ -1,3 +1,14 @@
+2011-03-10  Mike Furr  <michael.furr@gmail.com>
+
+	* src/cfg/cfg_refactor.ml: Don't add explicit return in begin
+	blocks with an else (Thanks to Adam Doupe).  Also fixed a bug with
+	refactoring methods on the lhs of an assignment.
+
+2011-03-08  Mike Furr  <michael.furr@gmail.com>
+
+	* ocaml-syck-0.1.1/yaml/parser.c: Updates to syck 0.70.  Thanks to
+	Adam Doupe for the patch
+
 2009-08-03  Mike Furr  <furr@cs.umd.edu>
 
 	* src/cfg/cfg.ml: Fix for bug in compute_cfg_vtor
