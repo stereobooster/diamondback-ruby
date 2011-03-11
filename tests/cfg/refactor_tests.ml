@@ -1131,6 +1131,32 @@ end
      ),
    "def m(x) x.y = 2+3 end"
   );
+
+  ("elide explicit return when begin/else is present",
+   defm [] (mk (ExnBlock {
+	       exn_body = mk (Expression (`Lit_FixNum 1));
+	       exn_rescue = [
+		 { rescue_guards = [];
+		   rescue_body = mk (Return (Some (`Lit_FixNum 2)));
+                 }];
+	       exn_ensure = None;
+	       exn_else = Some (mk (Return (Some (`Lit_FixNum 3))));
+             })),
+   "def m(); begin 1; rescue; 2; else; 3; end; end"
+  );
+
+  ("method calls on lhs don't refactor target",
+   mk (Seq [
+         mk (Assign(id "a", `Lit_Array [num 1; num 2]));
+           mc (Some (fvar 1)) (Some (id "a")) (`ID_Operator Op_ARef) [num 1];
+           mc (Some (fvar 2)) (Some (id "a")) (`ID_Operator Op_ARef) [num 0];
+           mk (Assign(`Tuple [fvar 3; fvar 4], `Tuple [fvar 1; fvar 2]));
+           mc None (Some (id "a")) (`ID_Operator Op_ASet) [num 0; fvar 3];
+           mc None (Some (id "a")) (`ID_Operator Op_ASet) [num 1; fvar 4];
+       ]),
+   "a = [1,2]; a[0],a[1] = a[1],a[0]"
+  );
+
 ]
 
 let suite = "Refactor suite" >:::
