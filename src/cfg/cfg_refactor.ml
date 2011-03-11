@@ -352,7 +352,11 @@ let rec convert_to_return (add_f : tuple_expr -> stmt_node) acc stmt = match stm
       let convert_rescue rb = 
         {rb with rescue_body = q_to_stmt (convert_to_return add_f acc rb.rescue_body)}
       in
-      let body = q_to_stmt (convert_to_return add_f acc eb.exn_body) in
+      (* body doesn't return if there's an else stmt *)
+      let body = match eb.exn_else with
+	| Some(_) -> eb.exn_body
+	| None -> q_to_stmt (convert_to_return add_f acc eb.exn_body)
+      in
       let rescue = List.map convert_rescue eb.exn_rescue in
       let ensure = eb.exn_ensure in (* ensure doesn't return a value *)
       let eelse = map_opt q_to_stmt
@@ -405,7 +409,7 @@ let rec convert_to_return (add_f : tuple_expr -> stmt_node) acc stmt = match stm
   | Yield(None,args) ->
       (* we don't need to track v here since its immediately dead
          after the return *)
-      let acc, v = fresh (acc_empty acc) in
+      let _, v = fresh (acc_emptyq acc) in
       let yield = C.yield ~lhs:v ~args stmt.pos in
       let ret = mkstmt (add_f v) stmt.pos in
       let q = DQueue.enqueue yield DQueue.empty in
@@ -414,7 +418,7 @@ let rec convert_to_return (add_f : tuple_expr -> stmt_node) acc stmt = match stm
   | MethodCall(None,mc) ->
       (* we don't need to track v here since its immediately dead
          after the return *)
-      let acc, v = fresh (acc_empty acc) in
+      let _, v = fresh (acc_emptyq acc) in
       let meth = mkstmt (MethodCall(Some v,mc)) stmt.pos in
       let ret = mkstmt (add_f v) stmt.pos in
       let q = DQueue.enqueue meth DQueue.empty in
@@ -937,12 +941,12 @@ and refactor_lhs acc e : (stmt acc * lhs * stmt acc) =
               let es = DQueue.enqueue e lst in
                 work (acc,es,after) tl
         in
-        let acc,l',after = work (acc,DQueue.empty,acc_empty acc) l in
+        let acc,l',after = work (acc,DQueue.empty,acc_emptyq acc) l in
           acc, `Tuple((DQueue.to_list l')), after
             
     | Ast.E_UOperator(Ast.Op_UStar,pos) ->
         let acc, v = fresh acc in
-          acc, (`Star v), acc_empty acc
+          acc, (`Star v), acc_emptyq acc
           
     | Ast.E_Unary(Ast.Op_UStar, e, pos) -> 
         let acc, e',after = refactor_lhs acc e in
@@ -954,17 +958,17 @@ and refactor_lhs acc e : (stmt acc * lhs * stmt acc) =
 
     | Ast.E_Identifier(Ast.ID_Lowercase,s, pos)  -> 
         if is_literal s then Log.fatal Log.empty "lhs literal?"
-        else acc, `ID_Var(`Var_Local, s), acc_empty acc
+        else acc, `ID_Var(`Var_Local, s), acc_emptyq acc
 
     | Ast.E_Identifier(ik,s, pos) -> 
         if is_literal s then Log.fatal Log.empty "lhs literal?"
-        else acc, `ID_Var(refactor_id_kind pos ik, s), acc_empty acc
+        else acc, `ID_Var(refactor_id_kind pos ik, s), acc_emptyq acc
           
     | Ast.E_Binop(e1,Ast.Op_DOT,e2,pos) ->
         Log.fatal Log.empty "dot expression on lhs?"
 
     | Ast.E_MethodCall(Ast.E_Binop(targ,Ast.Op_DOT,msg,_),args,None,pos) ->
-        let after = acc_empty acc in
+        let after = acc_emptyq acc in
         let after,targ' = refactor_expr after targ in
         let after,msg' = refactor_msg after msg in
         let msg' = make_assignable_msg msg' in
@@ -980,7 +984,7 @@ and refactor_lhs acc e : (stmt acc * lhs * stmt acc) =
 
     | _ -> 
         match refactor_expr acc e with
-          | acc, (#identifier as id) -> acc, id, acc_empty acc
+          | acc, (#identifier as id) -> acc, id, acc_emptyq acc
           | acc, #literal -> Log.fatal Log.empty "lhs literal?"
   in
   let acc = seen_lhs acc lhs in

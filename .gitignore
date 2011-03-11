@@ -16,3 +16,4 @@ configure
 *.cmt
 *.cmti
 tests/**/*.checked
+tests/*.results

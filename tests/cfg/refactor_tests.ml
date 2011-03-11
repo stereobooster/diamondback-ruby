@@ -16,7 +16,7 @@ let id x =
       | _ -> raise (Invalid_argument "id")
     in
       `ID_Var(kind, x)
-	  
+
 let fvar x = id (Printf.sprintf "__tmp_%d" x)
 let num i = `Lit_FixNum i
 let str s = `Lit_String s
@@ -28,7 +28,7 @@ let nil = mk (Expression `ID_Nil)
 let defm args body =
   mk (Method(Instance_Method(`ID_MethodName "m"), args, body))
 
-let mc ret targ msg args = 
+let mc ret targ msg args =
   mk (MethodCall(ret,
 		{mc_target=targ;
 		 mc_msg=msg;
@@ -38,8 +38,8 @@ let mc ret targ msg args =
 let mc_n ?targ msg = mc None targ (`ID_MethodName msg)
 let mc_s s ?targ msg = mc (Some s) targ (`ID_MethodName msg)
 
-	 
-let tests = [  
+
+let tests = [
     ("hash",
     mk (Expression (`Lit_Hash [ (num 1, num 2) ])),
     "{1 => 2}"
@@ -51,10 +51,10 @@ let tests = [
     );
 
     ("nested hash",
-    mk (Expression 
+    mk (Expression
 	   (`Lit_Hash [
 	       (`Lit_Hash [
-		   (num 1), 
+		   (num 1),
 		   (num 2)
 		 ]),
 	       (num 3)])
@@ -109,14 +109,14 @@ let tests = [
     ("assign lone id methodcall",
      mc_s (id "f") "x" [],
     "f = x");
-    
+
     ("nested method",
      mk (Seq [
 	   mc_s (fvar 1) "f" [];
 	   mc_n ~targ:(fvar 1) "x" [];
 	 ]),
     "f.x");
-    
+
     ("assign method",
      mk
        (Seq[
@@ -140,7 +140,7 @@ let tests = [
     );
 
     ("&& into ifs",
-     mk(Seq [mk (If(id "@a", 
+     mk(Seq [mk (If(id "@a",
 		     mk (Assign(fvar 1, id "@c")),
 		     mk (Assign(fvar 1, id "@a"))
 		     ));
@@ -151,7 +151,7 @@ let tests = [
     );
 
     ("|| into ifs",
-     mk(Seq [mk (If(id "@a", 
+     mk(Seq [mk (If(id "@a",
 		     mk (Assign(fvar 1, id "@a")),
 		     mk (Assign(fvar 1, id "@c"))
 		     ));
@@ -162,7 +162,7 @@ let tests = [
     );
 
     ("! into if",
-     mk(Seq [mk (If(id "@y", 
+     mk(Seq [mk (If(id "@y",
 		      (mk (Assign(fvar 1,`ID_False))),
 		      (mk (Assign(fvar 1,`ID_True)))));
 	       mk (Assign(id "x", fvar 1))
@@ -229,7 +229,7 @@ let tests = [
     );
 
     ("expr seq becomes return",
-    defm [] 
+    defm []
       (mk (Seq [
 	  mk (Expression (id "@x"));
 	  mk (Expression (id "@y"));
@@ -273,7 +273,7 @@ let tests = [
       ),
     "def m() yield() end"
     );
-    
+
     ("assign yield becomes return",
     defm []
       (mk (Seq [
@@ -322,7 +322,7 @@ let tests = [
     );
 
     ("While doesn't nest return",
-    defm [] 
+    defm []
       (mk (Seq [
 	  mk (While(`ID_True,
 		   mk (Expression (id "@y"))
@@ -371,7 +371,7 @@ let tests = [
     );
 
     ("for returns guard",
-    defm [] 
+    defm []
       (mk (Seq [
 	  mc_s (fvar 1) ~targ:(id "@f") "g" [];
 	  mk (For([`Formal_block_id(`Var_Local, "x")],
@@ -389,7 +389,7 @@ let tests = [
 	   mk (Expression (id "x")))
        ),
      "for x in @y do; x end");
-	     
+
     ("case nests return",
     defm []
       (mk (Case {
@@ -497,7 +497,7 @@ let tests = [
       (mk
 	  (ExnBlock {
 	      exn_body = mk (Expression (num 1));
-	      exn_rescue = 
+	      exn_rescue =
 	      [
 		{ rescue_guards = [Rescue_Bind(id "Object", id "y")];
 		  rescue_body = mk (Expression (id "y"));
@@ -514,7 +514,7 @@ let tests = [
       (mk
 	  (ExnBlock {
 	      exn_body = mk (Expression (num 1));
-	      exn_rescue = 
+	      exn_rescue =
 	      [
 		{ rescue_guards = [Rescue_Bind(id "StandardError", id "y")];
 		  rescue_body = mk (Expression (id "y"));
@@ -531,7 +531,7 @@ let tests = [
       (mk
 	  (ExnBlock {
 	      exn_body = mk (Expression (num 1));
-	      exn_rescue = 
+	      exn_rescue =
 	      [
 		{ rescue_guards = [Rescue_Expr(id "Fixnum")];
 		  rescue_body = mk (Expression (num 2));
@@ -564,7 +564,7 @@ let tests = [
       ),
     "def m(); return (@x.f+3)/2 end"
     );
-    
+
     ("||=",
      mk (If(id "@x",mk (Expression (id "@x")), mk (Assign(id "@x", id "@y")))),
      "@x ||= @y"
@@ -623,13 +623,13 @@ let tests = [
 
    ("local intro in block",
    mk (Seq [
-         C.call "x" [] 
+         C.call "x" []
            ~cb:(CB_Block([],mk (Seq [
 				  mk (Assign(id "y", num 2));
 				  mk (Next(Some(id "y")));
 				]))) dp;
          mc_n "y" [];
-     ]),   
+     ]),
    "x() {|| y = 2}; y"
    );
 
@@ -648,7 +648,7 @@ let tests = [
 			       mk (Next(Some(id "y")));
 			     ]))) dp;
        mc_n "y" [];
-     ]),   
+     ]),
    "x() {|y| y = 2}; y"
    );
 
@@ -782,19 +782,19 @@ DELIM");
   ("__LINE__",
    (mk (Expression (`Lit_FixNum 1))),
    "__LINE__"
-  );     
+  );
 
   ("__FILE__",
    (* should return the actual file, since its a string (not a file),
       it returns the string itself *)
    (mk (Expression (str "__FILE__"))),
    "__FILE__"
-  );     
+  );
 
   ("meta-class",
    (mk (Seq [
 	  mk (Assign(id "x", str "s"));
-	  mk (Class(None,MetaClass(id "x"), 
+	  mk (Class(None,MetaClass(id "x"),
 		    mk (Method(Instance_Method(`ID_MethodName "m"),[],
 			       mk (Return (Some `ID_Nil)))))
 	     );
@@ -889,7 +889,7 @@ EOF");
     defm [`Formal_meth_id "y"]
       (mk (Seq [
 	     mk (If(id "@x",
-		    nil, 
+		    nil,
 		    mk (Assign(id "@x", id "@y"))
 		   ));
 	     (*mc (Some (fvar 1)) `No_Targ `ID_Super [num 1];*)
@@ -906,7 +906,7 @@ EOF");
    mc None (Some (id "@x")) (`ID_Assign "m") [`Lit_Array([num 2; num 3])],
    "@x.m = 2,3"
   );
-   
+
 
   ("class body assign outer",
    mk (Seq [
@@ -1005,9 +1005,9 @@ end
   );
 
   ("type annot",
-   begin let stmt = 
+   begin let stmt =
      mk (Class(None,NominalClass(id "A",None),empty_stmt ()))
-   in 
+   in
    let annot = Annotation.ClassType("A",[Annotation.QVar "t",None],[]) in
      add_annotation stmt annot
    end,
@@ -1022,7 +1022,7 @@ end
   ("assign result of while",
    mk (Seq [
          mk(Assign(fvar 1, `ID_Nil));
-         mk(While(id "@y", 
+         mk(While(id "@y",
                   mk(Seq [mk(Assign(fvar 1,num 5));
                           mk(Break None)])));
          mk(Assign(id "z", fvar 1))
@@ -1073,7 +1073,7 @@ end
        ]),
    "w.f = y.h"
   );
-  
+
   ("multi assign method order",
    mk (Seq [
          mc_s (fvar 2) "y" [];
@@ -1116,6 +1116,42 @@ end
          mc None (Some (fvar 8)) (`ID_Operator Op_ASet) [fvar 9; fvar 10; fvar 11];
        ]),
    "w[a(1)], x[a(2),a(3)] = y.h, z.i"
+  );
+
+  ("method-assign binop",
+   defm [`Formal_meth_id "x"]
+     (mk (Seq [
+            mc (Some (fvar 1)) (Some (num 2)) (`ID_Operator Op_Plus) [num 3];
+            mc (Some (fvar 2)) (Some (id "x")) (`ID_Assign "y") [fvar 1];
+            mk (Return (Some (fvar 2)))
+          ])
+     ),
+   "def m(x) x.y = 2+3 end"
+  );
+
+  ("elide explicit return when begin/else is present",
+   defm [] (mk (ExnBlock {
+	       exn_body = mk (Expression (`Lit_FixNum 1));
+	       exn_rescue = [
+		 { rescue_guards = [];
+		   rescue_body = mk (Return (Some (`Lit_FixNum 2)));
+                 }];
+	       exn_ensure = None;
+	       exn_else = Some (mk (Return (Some (`Lit_FixNum 3))));
+             })),
+   "def m(); begin 1; rescue; 2; else; 3; end; end"
+  );
+
+  ("method calls on lhs don't refactor target",
+   mk (Seq [
+         mk (Assign(id "a", `Lit_Array [num 1; num 2]));
+           mc (Some (fvar 1)) (Some (id "a")) (`ID_Operator Op_ARef) [num 1];
+           mc (Some (fvar 2)) (Some (id "a")) (`ID_Operator Op_ARef) [num 0];
+           mk (Assign(`Tuple [fvar 3; fvar 4], `Tuple [fvar 1; fvar 2]));
+           mc None (Some (id "a")) (`ID_Operator Op_ASet) [num 0; fvar 3];
+           mc None (Some (id "a")) (`ID_Operator Op_ASet) [num 1; fvar 4];
+       ]),
+   "a = [1,2]; a[0],a[1] = a[1],a[0]"
   );
 ]
 
