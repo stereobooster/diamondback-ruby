@@ -1,12 +1,5 @@
 # DRuby
 
-## 0 TODO
-
-- describe how to install dependencies with opam see how [flow does it](https://github.com/facebook/flow#installing-flow-globally)
-- use brew instead of macports in instructions
-- create stubs for Ruby 2.3/2.4
-
-
 ## 1 Introduction
 
 Ruby is a dynamically typed, object oriented scripting language. Dynamic typing keeps the language flexible, allowing small, expressive programs to be written with little effort. However, software never stands still. As these programs evolve, the lack of static typing makes it increasingly difficult to maintain, extend, and reason about. Diamondback (DRuby) is a tool that augments Ruby with a static type system. DRuby’s type system was designed to handle common idioms used by Ruby programmers so that programs would not need to be changed in order to gain the benefits of static checks.
