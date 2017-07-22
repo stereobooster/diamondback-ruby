@@ -1,6 +1,10 @@
-sudo: false
+# sudo: false
+sudo: required
 
-language: generic
+language: ruby
+rvm:
+  - 2.3.3
+
 matrix:
   include:
     - os: linux
@@ -8,11 +12,8 @@ matrix:
 
     - os: osx
       env: OCAML_VERSION=4.03.0 OPAM_VERSION=1.2.2
-
-addons:
-  apt:
-    packages:
-    - syck
+  allow_failures:
+    - os: linux
 
 before_install: bash -e resources/travis/before_install.sh
 install: bash -e resources/travis/install_deps.sh

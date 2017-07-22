@@ -1,4 +1,4 @@
-# DRuby
+# DRuby [![Travis](https://img.shields.io/travis/stereobooster/diamondback-ruby.svg)](https://travis-ci.org/stereobooster/diamondback-ruby)
 
 ## 1 Introduction
 
