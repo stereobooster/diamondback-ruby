@@ -1,0 +1,130 @@
+type token =
+  | T_EOF
+  | T_EOL
+  | T_INTERP_END of (string * Lexing.position)
+  | T_INTERP_STR of (string * Lexing.position)
+  | T_ATOM_BEG of (Lexing.position)
+  | T_REGEXP of (Ast.interp_string * string * Lexing.position)
+  | T_REGEXP_MOD of (string)
+  | T_REGEXP_BEG of (Lexing.position)
+  | T_USER_BEG of (string * Lexing.position)
+  | T_TICK_BEG of (Lexing.position)
+  | T_DOUBLE_BEG of (Lexing.position)
+  | T_USER_STRING of (string * Ast.interp_string * Lexing.position)
+  | T_DOUBLE_STRING of (Ast.interp_string * Lexing.position)
+  | T_SINGLE_STRING of (string * Lexing.position)
+  | K_FALSE of (Lexing.position)
+  | K_TRUE of (Lexing.position)
+  | K_SELF of (Lexing.position)
+  | K_YIELD of (Lexing.position)
+  | K_NIL of (Lexing.position)
+  | K_lEND of (Lexing.position)
+  | K_lBEGIN of (Lexing.position)
+  | K_NOT of (Lexing.position)
+  | K_OR of (Lexing.position)
+  | K_AND of (Lexing.position)
+  | K_RETURN of (Lexing.position)
+  | K_DO of (Lexing.position)
+  | K_IN of (Lexing.position)
+  | K_FOR of (Lexing.position)
+  | K_UNTIL of (Lexing.position)
+  | K_WHILE of (Lexing.position)
+  | K_WHEN of (Lexing.position)
+  | K_CASE of (Lexing.position)
+  | K_ELSE of (Lexing.position)
+  | K_ELSIF of (Lexing.position)
+  | K_THEN of (Lexing.position)
+  | K_UNLESS of (Lexing.position)
+  | K_IF of (Lexing.position)
+  | K_ENSURE of (Lexing.position)
+  | K_RESCUE of (Lexing.position)
+  | K_BEGIN of (Lexing.position)
+  | K_UNDEF of (Lexing.position)
+  | K_ALIAS of (Lexing.position)
+  | K_END of (Lexing.position)
+  | K_DEF of (string*Lexing.position)
+  | K_MODULE of (string*Lexing.position)
+  | K_CLASS of (string*Lexing.position)
+  | T_BUILTIN_VAR of (string * Lexing.position)
+  | T_FLOAT of (string * float * Lexing.position)
+  | T_BIGNUM of (Big_int.big_int * Lexing.position)
+  | T_FIXNUM of (int * Lexing.position)
+  | T_ATOM of (Ast.interp_string * Lexing.position)
+  | T_CLASS_VAR of (string * Lexing.position)
+  | T_INST_VAR of (string * Lexing.position)
+  | T_GLOBAL_VAR of (string * Lexing.position)
+  | T_LID of (string * Lexing.position)
+  | T_UID of (string * Lexing.position)
+  | T_CAST of (string * string * Lexing.position)
+  | T_USCOPE of (Lexing.position)
+  | T_SCOPE of (Lexing.position)
+  | T_SEMICOLON of (Lexing.position)
+  | T_UAMPER of (Lexing.position)
+  | T_AMPER of (Lexing.position)
+  | T_TILDE of (Lexing.position)
+  | T_BANG of (Lexing.position)
+  | T_VBAR of (Lexing.position)
+  | T_CARROT of (Lexing.position)
+  | T_COLON of (Lexing.position)
+  | T_QUESTION of (Lexing.position)
+  | T_PERCENT of (Lexing.position)
+  | T_SLASH of (Lexing.position)
+  | T_USTAR of (Lexing.position)
+  | T_STAR of (Lexing.position)
+  | T_RBRACE of (Lexing.position)
+  | T_LBRACE_ARG of (Lexing.position)
+  | T_LBRACE of (Lexing.position)
+  | T_RBRACK of (Lexing.position)
+  | T_LBRACK of (Lexing.position)
+  | T_LBRACK_ARG of (Lexing.position)
+  | T_RPAREN of (Lexing.position)
+  | T_LPAREN_ARG of (Lexing.position)
+  | T_LPAREN of (Lexing.position)
+  | T_ASSOC of (Lexing.position)
+  | T_OP_ASGN of (string*Lexing.position)
+  | T_RSHFT of (Lexing.position)
+  | T_LSHFT of (Lexing.position)
+  | T_DOT3 of (Lexing.position)
+  | T_DOT2 of (Lexing.position)
+  | T_NMATCH of (Lexing.position)
+  | T_MATCH of (Lexing.position)
+  | T_OROP of (Lexing.position)
+  | T_ANDOP of (Lexing.position)
+  | T_GT of (Lexing.position)
+  | T_LT of (Lexing.position)
+  | T_LEQ of (Lexing.position)
+  | T_GEQ of (Lexing.position)
+  | T_NEQ of (Lexing.position)
+  | T_EQQ of (Lexing.position)
+  | T_EQ of (Lexing.position)
+  | T_ASSIGN of (Lexing.position)
+  | T_CMP of (Lexing.position)
+  | T_POW of (Lexing.position)
+  | T_UMINUS of (Lexing.position)
+  | T_MINUS of (Lexing.position)
+  | T_UPLUS of (Lexing.position)
+  | T_PLUS of (Lexing.position)
+  | T_COMMA of (Lexing.position)
+  | T_DOT of (Lexing.position)
+
+module Dyp_priority_data :
+sig
+  val priority_data : Dyp.priority_data
+  val default_priority : Dyp.priority
+end
+
+val main : (Lexing.lexbuf -> token) -> Lexing.lexbuf -> ((Ast.expr list) * Dyp.priority) list
+
+# 1387 "newParser.dyp"
+      
+  module Env : Set.S with type t = Utils.StrSet.t
+  val assigned_id : string -> bool
+  val clear_env : unit -> unit
+  val env : unit -> Env.t
+  val set_env : Env.t -> unit
+  val begin_override : unit -> bool
+  module Dyp_symbols : sig
+    val str_token : token -> string
+  end
+
+# 1315               "newParser.ml"

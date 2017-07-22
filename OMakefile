@@ -3,7 +3,8 @@ include config.omake
 
 VERSION=0.20090726
 
-OCAMLFLAGS += -dtypes
+#OCAMLFLAGS += -dtypes
+OCAMLFLAGS = -dtypes
 
 #OCAMLOPTFLAGS += -p
 #OCAML_NATIVE_LINK_FLAGS += -p
@@ -20,7 +21,8 @@ if $(defined BISECT)
 
 .PHONY: install uninstall clean config
 
-.SUBDIRS: src tests dypgen-20070627 ocaml-syck-0.1.1
+# .SUBDIRS: src tests dypgen-20070627 ocaml-syck-0.1.1
+.SUBDIRS: src dypgen-20070627 ocaml-syck-0.1.1
 
 druby.conf: druby.conf.in :value: $(DRUBYLIB)
 	sed "s|@DRUBYLIB@|$(DRUBYLIB)|" druby.conf.in > druby.conf
@@ -70,4 +72,3 @@ ANNOTS = $`(filter-exists $(replacesuffixes .ml, .annot, \
 clean:
 	rm -f $(TARGETS)
 	rm -f $(ANNOTS)
-

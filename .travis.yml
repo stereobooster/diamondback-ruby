@@ -1,0 +1,27 @@
+sudo: false
+
+language: generic
+matrix:
+  include:
+    - os: linux
+      env: OCAML_VERSION=4.03.0 OPAM_VERSION=1.2.2
+
+    - os: osx
+      env: OCAML_VERSION=4.03.0 OPAM_VERSION=1.2.2
+
+addons:
+  apt:
+    packages:
+    - syck
+
+before_install: bash -e resources/travis/before_install.sh
+install: bash -e resources/travis/install_deps.sh
+script: bash -e resources/travis/build.sh
+before_deploy: bash -e resources/travis/before_deploy.sh
+
+cache:
+  directories:
+  - $HOME/.diamondback-ruby_cache
+
+before_cache:
+  - rm -rf $HOME/.diamondback-ruby_cache/ocaml-*/.opam/log

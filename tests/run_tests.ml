@@ -10,7 +10,9 @@ let suite = "Whole project test suite" >:::
    Contracts_suite.suite;
   ]
 
-let _ = 
-  if OUnit_success.was_successful (run_test_tt suite)
+let _ = run_test_tt suite
+
+(* let _ =
+  if OUnitResultSummary.was_successful (run_test_tt suite)
   then ()
-  else exit 1
+  else exit 1 *)
