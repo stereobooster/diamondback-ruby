@@ -1,20 +1,20 @@
 
-ruby_succeed(x) = 
+ruby_succeed(x) =
   if $(not $(shell-success-null ruby $(x)))
     println("ruby test file $(x) should have run, but 'ruby' command failed")
     exit(1)
 
-ruby_syntax_succeed(x) = 
+ruby_syntax_succeed(x) =
   if $(not $(shell-success-null ruby -c $(x)))
     println("$(x) has syntax errors")
     exit(1)
 
-ruby_fail(x) = 
+ruby_fail(x) =
   if $(shell-success-null ruby $(x))
     println("ruby test file $(x) should have caused 'ruby' to fail")
     exit 1
 
-validate_directory(f,dir) = 
+validate_directory(f,dir) =
   files = $(glob $(dir)/*.rb)
   checked_files = $(replacesuffixes .rb, .checked, $(files))
   local_files = $(foreach $(fun x, $(basename $(x))), $(checked_files))
@@ -54,7 +54,7 @@ OCAMLINCLUDES += \
 	$(OCAMLGRAPH_DIR) \
 	$(YAML_DIR)
 
-OCAML_LIBS[] = 
+OCAML_LIBS[] =
 	$(YAML_DIR)/yaml
 	$(DYP_LIB)/dyp
 	$(ROOT)/src/druby
@@ -64,7 +64,7 @@ OCAML_OTHER_LIBS += str nums unix oUnit getopt graph
 
 TEST_PROGRAM = run_tests
 
-FILES[] = 
+FILES[] =
 
 .SUBDIRS: $(SUBDIRS)
 	include OMakefile
@@ -74,7 +74,7 @@ TEST_LIB = $(OCamlLibrary test_lib, $(FILES))
 
 CACHE_BASE_CFG = $(OCamlProgram cache_base_cfg, cache_base_cfg)
 
-base_types.cfg: $(CACHE_BASE_CFG) $(ROOT)/stubs/1.8/base_types.rb
+base_types.cfg: $(CACHE_BASE_CFG) $(ROOT)/stubs/2.3/base_types.rb
 	./cache_base_cfg
 
 RUN_TEST_FILES[] = run_tests oUnit_success

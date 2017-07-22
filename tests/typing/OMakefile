@@ -1,7 +1,7 @@
 
 OCAMLINCLUDES += ../common
 
-FILES[] += 
+FILES[] +=
 	typing/typing_suite
 	typing/type_progs
 	typing/access_tests
@@ -14,7 +14,7 @@ FAIL_CHECKS = $(invalid_rubycode_directory $(dir fail))
 
 ../unit_tests.results: 	\
 	nanotypes.rb \
-	$(ROOT)/stubs/1.8/base_types.rb \
+	$(ROOT)/stubs/2.3/base_types.rb \
 	$(SUCC_CHECKS) $(FAIL_CHECKS) \
 	$(ANNOT_SUCC) $(ANNOT_FAIL)
 
