@@ -1,0 +1,33 @@
+
+OCAMLINCLUDES += $(DYP_LIB) ../ $(GETOPT_DIR)
+
+OCAMLFLAGS = $(filter-out -dtypes, $(OCAMLFLAGS))
+
+newParser.ml newParser.mli: newParser.dyp $(DYPGEN)
+	$(DYPGEN)  newParser.dyp 
+
+typeAnnotParser.ml typeAnnotParser.mli: typeAnnotParser.mly
+  ocamlyacc typeAnnotParser.mly
+
+FILES[] +=
+   parser/typeAnnotParser
+   parser/typeAnnotLexer
+   parser/newParser
+   parser/newLexer
+   parser/rubyLexerState
+   parser/parse_helper
+   parser/ast
+   parser/ast_printer
+   parser/annotation
+
+TEST[] = 
+   rat_test
+
+
+OCAML_OTHER_LIBS += nums str unix getopt
+OCAML_LIBS = $(DYP_LIB)/dyp ../druby
+
+RAT_TEST = $(OCamlProgram rat_test, $(TEST))
+
+.DEFAULT: $(RAT_TEST)
+

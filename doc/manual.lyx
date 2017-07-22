@@ -1,0 +1,5405 @@
+#LyX 1.6.1 created this file. For more info see http://www.lyx.org/
+\lyxformat 345
+\begin_document
+\begin_header
+\textclass article
+\begin_preamble
+\usepackage{xcolor}
+\usepackage{color}
+\end_preamble
+\use_default_options true
+\language english
+\inputencoding auto
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\paperfontsize default
+\spacing single
+\use_hyperref true
+\pdf_bookmarks true
+\pdf_bookmarksnumbered false
+\pdf_bookmarksopen false
+\pdf_bookmarksopenlevel 1
+\pdf_breaklinks false
+\pdf_pdfborder true
+\pdf_colorlinks true
+\pdf_backref section
+\pdf_pdfusetitle true
+\papersize default
+\use_geometry true
+\use_amsmath 1
+\use_esint 1
+\cite_engine basic
+\use_bibtopic false
+\paperorientation portrait
+\leftmargin 1in
+\topmargin 1in
+\rightmargin 1in
+\bottommargin 1.5in
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation skip
+\defskip medskip
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\bullet 1 0 9 -1
+\tracking_changes false
+\output_changes false
+\author "" 
+\author "" 
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Diamondback Ruby Guide
+\end_layout
+
+\begin_layout Author
+Mike Furr, David An, Jeff Foster, Mike Hicks
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset toc
+LatexCommand tableofcontents
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Introduction
+\end_layout
+
+\begin_layout Standard
+Ruby is a dynamically typed, object oriented scripting language.
+ Dynamic typing keeps the language flexible, allowing small, expressive
+ programs to be written with little effort.
+ However, software never stands still.
+ As these programs evolve, the lack of static typing makes it increasingly
+ difficult to maintain, extend, and reason about.
+ Diamondback (DRuby) is a tool that augments Ruby with a static type system.
+ DRuby's type system was designed to handle common idioms used by Ruby programme
+rs so that programs would not need to be changed in order to gain the benefits
+ of static checks.
+ 
+\end_layout
+
+\begin_layout Section
+Installation
+\end_layout
+
+\begin_layout Standard
+The easiest way to use DRuby is to install the binary rubygem package, available
+ on the download page.
+ If you are using a platform or architecture that is not listed, or otherwise
+ wish to compile DRuby from source, the remainder of this section will walk
+ you building the software.
+\end_layout
+
+\begin_layout Subsection
+Requirements
+\end_layout
+
+\begin_layout Standard
+To build DRuby from source, you will need the install the following dependencies.
+ 
+\end_layout
+
+\begin_layout Subsubsection
+OCaml Dependencies
+\end_layout
+
+\begin_layout Standard
+These programs should be available with most linux distributions.
+ For other operating systems, the package manager 
+\emph on
+godi
+\emph default
+ (
+\begin_inset CommandInset href
+LatexCommand href
+target "http://godi.camlcity.org/godi"
+
+\end_inset
+
+) can provide a convient way of installing them if you don't wish to do
+ so manually.
+ Note: if you do install them manually, be sure to install them with ocamlfind,
+ as the DRuby build process will query ocamlfind to detect if a package
+ is installed.
+\end_layout
+
+\begin_layout Itemize
+\begin_inset CommandInset href
+LatexCommand href
+name "ocaml"
+target "http://caml.inria.fr"
+
+\end_inset
+
+(3.09.2 or higher) 
+\end_layout
+
+\begin_layout Itemize
+\begin_inset CommandInset href
+LatexCommand href
+name "ocamlfind"
+target "http://www.camlcity.org/archive/programming/findlib.html"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset CommandInset href
+LatexCommand href
+name "ounit"
+target "http://www.xs4all.nl/~mmzeeman/ocaml/"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset CommandInset href
+LatexCommand href
+name "omake "
+target "http://omake.metaprl.org/index.html"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset CommandInset href
+LatexCommand href
+name "ocamlgetopt "
+target "http://alain.frisch.fr/soft.html#Getopt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset CommandInset href
+LatexCommand href
+name "ocamlgraph "
+target "http://ocamlgraph.lri.fr/"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+C Dependecies
+\end_layout
+
+\begin_layout Standard
+This library is also commonly distributed with linux distributions.
+ It is also available through the MacPorts package manager for OS X.
+\end_layout
+
+\begin_layout Itemize
+\begin_inset CommandInset href
+LatexCommand href
+name "syck"
+target "http://whytheluckystiff.net/syck/"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Building and Installing
+\end_layout
+
+\begin_layout Standard
+DRuby uses the OMake build system to build it from source.
+ OMake is a make-like build system that includes both configuration and
+ build rules.
+ Thus, the build is broken into three steps: configuration, compilation,
+ and installation.
+ However, these steps can also be combined into a single command:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Address
+$ [sudo] omake --config VAR1=arg1 VAR2=arg2 install
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Here, we call omake with the --config flag to set the variables VAR1 and
+ VAR2 and tell it to build the install target.
+ The install target depends on the configuration and compilation targets
+ and will therefore do all the necessary work.
+ The call to sudo is needed if you do not have write permissions to your
+ Ruby installation.
+ Alternatively, druby can be installed outside of the system directories
+ using the variables below.
+ The current list of supported build variables are:
+\end_layout
+
+\begin_layout Itemize
+PREFIX - The path used to provide defaults for other DRuby paths such as
+ where to install the druby binary.
+ Defaults to /usr/local/
+\end_layout
+
+\begin_layout Itemize
+BINDIR - The install location of the druby binary.
+ Defaults to PREFIX/bin
+\end_layout
+
+\begin_layout Itemize
+SYSCONFDIR - The install location of the druby global configuration file,
+ druby.conf.
+ Defaults to PREFIX/etc
+\end_layout
+
+\begin_layout Itemize
+DESTDIR - A staging directory for building packages of DRuby.
+ Any necessary paths will computed based on PREFIX, but the actual installation
+ step will stage the installation into DESTDIR/PREFIX/....
+\end_layout
+
+\begin_layout Itemize
+RUBYLIB - The location of your Ruby installation (library files).
+ For example, /usr/lib/ruby/.
+ You should not have to specify this under normal circumstances as it will
+ be determined by the 'ruby' executable found in your PATH.
+\end_layout
+
+\begin_layout Itemize
+RUBYSITEDIR - The location of your Ruby installation's site-lib directory.
+ For example /usr/lib/ruby/site-lib.
+ Like RUBYLIB, this should be automatically computed for you.
+\end_layout
+
+\begin_layout Itemize
+DRUBYSITELIB - The install location for DRuby's runtime ruby files.
+ For example, /usr/lib/ruby/site-lib/1.8/druby/.
+ Automatically computed based on RUBYSITEDIR
+\end_layout
+
+\begin_layout Itemize
+DRUBYLIB - The install location for DRuby's non-ruby files.
+ For example, /usr/lib/ruby/druby/.
+ Automatically computed based on RUBYLIB
+\end_layout
+
+\begin_layout Itemize
+SYCK - The base location of the syck C library.
+ For example, this should be specified as /opt/local if libsyck* is in /opt/loca
+l/lib/
+\end_layout
+
+\begin_layout Standard
+Note: if you need to change these variables after attempting to build DRuby,
+ you must specify the command line argument: --config.
+ As an example, a user on OS X with MacPorts and godi installed would build
+ and install DRuby with:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{verbatim}
+\end_layout
+
+\begin_layout Plain Layout
+
+$ sudo omake --config PREFIX=/opt/local SYCK=/opt/local install
+\end_layout
+
+\begin_layout Plain Layout
+
+*** omake: reading OMakefiles
+\end_layout
+
+\begin_layout Plain Layout
+
+--- Checking for ocamlfind...
+ (found /opt/godi/bin/ocamlfind)
+\end_layout
+
+\begin_layout Plain Layout
+
+--- Checking for ocamlc.opt...
+ (found /opt/godi/bin/ocamlc.opt)
+\end_layout
+
+\begin_layout Plain Layout
+
+--- Checking for ocamlopt.opt...
+ (found /opt/godi/bin/ocamlopt.opt)
+\end_layout
+
+\begin_layout Plain Layout
+
+--- Checking whether ocamlc understands the "z" warnings...
+ (yes)
+\end_layout
+
+\begin_layout Plain Layout
+
+--- Checking ocaml-getopt...
+ (/opt/godi/lib/ocaml/pkg-lib/getopt)
+\end_layout
+
+\begin_layout Plain Layout
+
+--- Checking ocamlgraph...
+ (/opt/godi/lib/ocaml/pkg-lib/ocamlgraph)
+\end_layout
+
+\begin_layout Plain Layout
+
+--- Checking for gcc...
+ (found /usr/bin/gcc)
+\end_layout
+
+\begin_layout Plain Layout
+
+--- Checking for g++...
+ (found /usr/bin/g++)
+\end_layout
+
+\begin_layout Plain Layout
+
+--- Checking for syck.h...
+ (found)
+\end_layout
+
+\begin_layout Plain Layout
+
+--- Checking for ruby...
+ (found /opt/local/bin/ruby)
+\end_layout
+
+\begin_layout Plain Layout
+
+--- Checking Ruby libdir...
+ (/opt/local/lib)
+\end_layout
+
+\begin_layout Plain Layout
+
+--- Checking Ruby ruby_version...
+ (1.8)
+\end_layout
+
+\begin_layout Plain Layout
+
+--- Checking Ruby sitelibdir...
+ (/opt/local/lib/ruby/site_ruby/1.8)
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+Installation summary:
+\end_layout
+
+\begin_layout Plain Layout
+
+              binary: /opt/local/bin/druby
+\end_layout
+
+\begin_layout Plain Layout
+
+         config file: /opt/local/etc/druby.conf
+\end_layout
+
+\begin_layout Plain Layout
+
+          ruby files: /opt/local/lib/ruby/site_ruby/1.8/druby
+\end_layout
+
+\begin_layout Plain Layout
+
+       support files: /opt/local/lib/ruby/druby/1.8
+\end_layout
+
+\begin_layout Plain Layout
+
+...
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{verbatim}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+DRuby has a couple of other useful targets:
+\end_layout
+
+\begin_layout Itemize
+config - this target simply prints out the current configuration variables
+\end_layout
+
+\begin_layout Itemize
+.DEFAULT - build the entire DRuby project and run the test suite.
+ This is also the what is built if no target is specified.
+\end_layout
+
+\begin_layout Section
+Running DRuby
+\end_layout
+
+\begin_layout Standard
+In order to make using DRuby as easy as possible, the druby binary can be
+ used as a drop in replacement for the Ruby interpreter.
+ However, instead of interpreting the ruby code, it performs its static
+ analysis.
+ DRuby accepts a superset of the command line arguments that Ruby accepts.
+ For instance, one can invoke:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+
+\family typewriter
+$ druby -I my_dir -rmylib
+\family default
+\emph on
+ 
+\emph default
+filename.rb
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+And DRuby will act appropriately (adding 
+\emph on
+my_dir
+\emph default
+ to its seach path, and preloading the 
+\emph on
+mylib.rb
+\emph default
+ file).
+ It is also possible to have DRuby invoke the regular Ruby interpreter after
+ it has finished its analysis by using 
+\family typewriter
+--dr-run-ruby
+\family default
+ option.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+
+\family typewriter
+$ druby --dr-run-ruby
+\family default
+ 
+\emph on
+filename
+\emph default
+ 
+\family typewriter
+--
+\family default
+ 
+\emph on
+args
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+All of DRuby's command line arguments are prefixed by --dr-.
+ To ensure any program arguments do not conflict with these arguments, it
+ is recommended that you pass any arguments intended for your script after
+ the 
+\family typewriter
+--
+\family default
+ delimiter.
+\end_layout
+
+\begin_layout Standard
+DRuby's command line arguments are FIXME
+\end_layout
+
+\begin_layout Standard
+These arguments can also be specified via configuration files.
+ DRuby looks for options in the following order.
+ A latter declaration overrides a previous one:
+\end_layout
+
+\begin_layout Itemize
+The global configuration file: SYSCONFDIR/druby.conf
+\end_layout
+
+\begin_layout Itemize
+A per-user configuration file: $HOME/.druby.conf
+\end_layout
+
+\begin_layout Itemize
+A file called druby.conf in the current working direcotry
+\end_layout
+
+\begin_layout Itemize
+Arguments passed on the command line to druby
+\end_layout
+
+\begin_layout Section
+A small example
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{verbatim}
+\end_layout
+
+\begin_layout Plain Layout
+
+args = ARGV
+\end_layout
+
+\begin_layout Plain Layout
+
+sum = 0
+\end_layout
+
+\begin_layout Plain Layout
+
+args.each do |v|
+\end_layout
+
+\begin_layout Plain Layout
+
+  sum += v
+\end_layout
+
+\begin_layout Plain Layout
+
+end
+\end_layout
+
+\begin_layout Plain Layout
+
+puts sum
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{verbatim}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Consider the example shown above which prints the sum of the command-line
+ arguments.
+ Try DRuby on this program to see whether this code is well-typed or not.
+ You will get a similar error message as the following: 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{verbatim}
+\end_layout
+
+\begin_layout Plain Layout
+
+$ druby --dr-run-ruby first.rb
+\end_layout
+
+\begin_layout Plain Layout
+
+[ERROR] instance String used where Numeric expected 
+\end_layout
+
+\begin_layout Plain Layout
+
+          It does not support methods ~, |, zero?, truncate, to_int, times,
+ step, 
+\end_layout
+
+\begin_layout Plain Layout
+
+          singleton_method_added, rpower, round, remainder, rdiv, quo, prec_i,
+ prec_f, 
+\end_layout
+
+\begin_layout Plain Layout
+
+          prec, power!, numerator, nonzero?, nan?, modulo, lcm, integer,
+ infinite?,    
+\end_layout
+
+\begin_layout Plain Layout
+
+          id2name, gcdlcm, gcd, floor, finite?, downto, divmod, div, denominator
+, coerce, 
+\end_layout
+
+\begin_layout Plain Layout
+
+          chr, ceil, abs, ^, >>, /, -@, -, +@, **, & 
+\end_layout
+
+\begin_layout Plain Layout
+
+  in typing method call sum.+ at ./first.rb:4 in typing method call sum.+ at
+ ./first.rb:4 
+\end_layout
+
+\begin_layout Plain Layout
+
+  in typing method call args.each at ./first.rb:3 
+\end_layout
+
+\begin_layout Plain Layout
+
+  in assignment to ::ARGV at /opt/local/lib/ruby/druby/1.8/base_types.rb:2993
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+  in creating instance of String at /opt/local/lib/ruby/druby/1.8/base_types.rb:29
+93 
+\end_layout
+
+\begin_layout Plain Layout
+
+  in typing expression %{args} at /opt/local/lib/ruby/druby/1.8/base_types.rb:2993
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+  in typing actual argument %{args} at /opt/local/lib/ruby/druby/1.8/base_types.rb
+:2993 
+\end_layout
+
+\begin_layout Plain Layout
+
+  in typing ::Array.new at /opt/local/lib/ruby/druby/1.8/base_types.rb:2993
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+DRuby analysis complete.
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+now running Ruby...
+\end_layout
+
+\begin_layout Plain Layout
+
+ruby  first.rb  0
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{verbatim}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The short description (the top most sentence) of the error message says,
+ 
+\begin_inset Quotes eld
+\end_inset
+
+
+\family typewriter
+instance String used where Numeric expected
+\family default
+,
+\begin_inset Quotes erd
+\end_inset
+
+ and the context information (filenames and line numbers) first points to
+ 
+\family typewriter
+sum.+
+\family default
+ method at line 4 of 
+\family typewriter
+first.rb
+\family default
+.
+ By inspecting the code, we realize that the command line arguments stored
+ in ARGV are strings not numbers and therefore trying to add a string to
+ a fixnum (sum) is the cuase of the error.
+ Change 
+\family typewriter
+sum += v
+\family default
+ to 
+\family typewriter
+sum += v.to_i
+\family default
+, and run DRuby again.
+ You will see that the program is now accepted.
+ This program is now well-typed because 
+\family typewriter
+to_i
+\family default
+ method converts the receiver to an integer.
+ 
+\end_layout
+
+\begin_layout Standard
+The long description of the message (the message beginning from ``
+\family typewriter
+It does not....
+\family default
+'' to right before the first context information), tells us more details
+ about the error.
+ Since Ruby uses structural typing (duck typing), DRuby models types in
+ a samilar manner.
+ Despite having different class names (String vs.
+ Numeric), DRuby tries to treat a String as a Numeric.
+ It is safe to use a String in place of a Numeric if and only if String
+ responds to at least as many methods as Numeric.
+ However, this is not the case, and so DRuby reports each missing method.
+\end_layout
+
+\begin_layout Standard
+Following this line is a list operations that DRuby performed or observed
+ that it believes contributed to the error.
+ As DRuby walks over a program, it generates structural constraints on objects
+ and methods in order to discover any potential errors.
+ These constraints form a graph, and an error represents 
+\emph on
+some
+\emph default
+ inconsistent path through this graph.
+ Unfortunately, it can be fairly difficult to construct a reasonable error
+ message from this graph in general, and DRuby currently uses a heuristic
+ to attempt to produce a useful error message.
+ However, this process is not perfect.
+ Sometimes DRuby will print the same information twice, or print a series
+ of constraints that are seemingly unrelated.
+ If you encounter such a situation, please feel free to email us with the
+ code that caused the error so we can try to improve the heuristic.
+\end_layout
+
+\begin_layout Standard
+You may be wondering how DRuby is capable of typing 
+\family typewriter
+ARGV, Fixnum#+, or String#to_i
+\family default
+ in the first place.
+ Because Ruby core library is mostly written in C, we cannot directly analyze
+ it.
+ Instead, DRuby uses a stub file called, 
+\family typewriter
+base_types.rb
+\family default
+, which defines stub classes and modules along with appropriate type annotations.
+ These annotations are essential to our analysis because they define the
+ types of the classes and modules that are built into the interpreter.
+ 
+\family typewriter
+base_types.rb
+\family default
+ can be found in 
+\family typewriter
+druby/
+\emph on
+RUBY_VERSION
+\family default
+\emph default
+ directory inside Ruby's library directory (usually 
+\family typewriter
+/usr/lib/ruby
+\family default
+).
+ For more details on the type annotation language, refer to Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:annot"
+
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Section
+Type Annotation Language
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:annot"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Although Ruby gives the illusion that built-in values such as 42 and true
+ are objects, in fact they are implemented inside the Ruby interpreter in
+ C code, and thus DRuby cannot infer the types of these classes.
+ However, we can declare their types using DRuby’s type annotation language.
+ In DRuby, type annotations appear before the corresponding class or method
+ declaration.
+ All annotations appear on a line beginning with 
+\family typewriter
+##%
+\family default
+, and therefore appear as comments to the standard Ruby interpreter.
+ These annotations are currently parsed with the 
+\begin_inset Quotes eld
+\end_inset
+
+def
+\begin_inset Quotes erd
+\end_inset
+
+ or 
+\begin_inset Quotes eld
+\end_inset
+
+class
+\begin_inset Quotes erd
+\end_inset
+
+ tokens, so nothing (except white-space) should appear between an annotation
+ and these keywords.
+\end_layout
+
+\begin_layout Standard
+Annotations can also be used to describe Ruby code, not just C code.
+ If an annotation is placed on a non-empty method, the body of the method
+ will be checked to ensure it satisfies the annotation (assuming --dr-check-anno
+tations is set).
+ The one exception is for intersection types, which are not yet checked
+ statically (it's a work in progress).
+\end_layout
+
+\begin_layout Standard
+Here is part of the declaration of class String: 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{verbatim}
+\end_layout
+
+\begin_layout Plain Layout
+
+class String
+\end_layout
+
+\begin_layout Plain Layout
+
+  ...
+\end_layout
+
+\begin_layout Plain Layout
+
+  ##% "+" : (String) -> String
+\end_layout
+
+\begin_layout Plain Layout
+
+  def +(p0); end
+\end_layout
+
+\begin_layout Plain Layout
+
+  ##% insert : (Fixnum, String) -> String
+\end_layout
+
+\begin_layout Plain Layout
+
+  def insert(p0, p1); end
+\end_layout
+
+\begin_layout Plain Layout
+
+  ...
+\end_layout
+
+\begin_layout Plain Layout
+
+end
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{verbatim}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The ﬁrst declaration types the method 
+\family typewriter
++
+\family default
+ (non-alphanumeric method names appear in quotes), which concatenates a
+ 
+\family typewriter
+String
+\family default
+ argument with the receiver and returns a new 
+\family typewriter
+String
+\family default
+.
+ Following the annotation is a dummy method body that is empty and therefore
+ ignored by DRuby.
+ Similarly, the next annotation line declares that 
+\family typewriter
+insert
+\family default
+ takes a 
+\family typewriter
+Fixnum
+\family default
+ (the index to insert at) and another 
+\family typewriter
+String
+\family default
+, and produces a new 
+\family typewriter
+String
+\family default
+ as a result.
+ 
+\end_layout
+
+\begin_layout Subsection
+Intersection Types
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Intersection-Types"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Many methods in the standard library have different behaviors depending
+ on the number and types of their arguments.
+ For example, here is the type of 
+\family typewriter
+String
+\family default
+’s 
+\family typewriter
+include?
+\family default
+ method, which either takes a 
+\family typewriter
+Fixnum
+\family default
+ representing a character and returns true if the object contains that character
+, or takes a 
+\family typewriter
+String
+\family default
+ and performs a substring test: 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{verbatim}
+\end_layout
+
+\begin_layout Plain Layout
+
+...
+\end_layout
+
+\begin_layout Plain Layout
+
+##% include? : ( Fixnum) -> Boolean 
+\end_layout
+
+\begin_layout Plain Layout
+
+##% include? : ( String ) -> Boolean 
+\end_layout
+
+\begin_layout Plain Layout
+
+def include?(p0); end
+\end_layout
+
+\begin_layout Plain Layout
+
+...
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{verbatim}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The type of 
+\family typewriter
+include?
+\family default
+ is an example of an intersection type.
+ A general intersection type has the form 
+\emph on
+t
+\emph default
+ and 
+\emph on
+t′
+\emph default
+ , and a value of such a type has both type 
+\emph on
+t
+\emph default
+ 
+\emph on
+and
+\emph default
+ type 
+\emph on
+t′
+\emph default
+ .
+ For example, if 
+\family typewriter
+A
+\family default
+ and 
+\family typewriter
+B
+\family default
+ are classes, an object of type 
+\family typewriter
+A
+\family default
+ 
+\emph on
+and
+\emph default
+ 
+\family typewriter
+B
+\family default
+ must be a common subtype of both 
+\family typewriter
+A
+\family default
+ and 
+\family typewriter
+B
+\family default
+.
+ In our annotation syntax for methods, the 
+\emph on
+and
+\emph default
+ keyword is omitted (only method types may appear in an intersection), and
+ each conjunct of the intersection is listed on its own line.
+ 
+\end_layout
+
+\begin_layout Standard
+Another example of intersection types is 
+\family typewriter
+String
+\family default
+’s 
+\family typewriter
+slice
+\family default
+ method, which returns either a character or a substring: 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{verbatim}
+\end_layout
+
+\begin_layout Plain Layout
+
+##% slice : ( Fixnum) -> Fixnum 
+\end_layout
+
+\begin_layout Plain Layout
+
+##% slice : ( Range) -> String 
+\end_layout
+
+\begin_layout Plain Layout
+
+##% slice : ( Regexp) -> String 
+\end_layout
+
+\begin_layout Plain Layout
+
+##% slice : ( String ) -> String 
+\end_layout
+
+\begin_layout Plain Layout
+
+##% slice : ( Fixnum, Fixnum) -> String 
+\end_layout
+
+\begin_layout Plain Layout
+
+##% slice : ( Regexp, Fixnum) -> String 
+\end_layout
+
+\begin_layout Plain Layout
+
+def slice(p0, p1=nil); end
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{verbatim}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Notice that this type has quite a few cases, and in fact, the Ruby standard
+ library documentation for this function has essentially the same type list.
+ Intersection types serve a purpose similar to method overloading in Java,
+ although they are resolved at run time via type introspection rather than
+ at compile time via type checking.
+ Note that our inference system is currently unable to infer intersection
+ types, as method bodies may perform ad-hoc type tests to differentiate
+ various cases, and so they can currently be created only via annotations.
+ 
+\end_layout
+
+\begin_layout Standard
+In order to determine what part of an intersection type to use for a given
+ method call, DRuby tries to match the types of the arguments of the caller
+ to list of possibilities.
+ Because DRuby performs inference, it may not now which classes are subtypes
+ of each other at this point.
+ Therefore, it uses a very simple check: name equality.
+ Consider the following example:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Frameless
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{verbatim}
+\end_layout
+
+\begin_layout Plain Layout
+
+class A; end
+\end_layout
+
+\begin_layout Plain Layout
+
+class B < A; end
+\end_layout
+
+\begin_layout Plain Layout
+
+##% f : () -> Boolean
+\end_layout
+
+\begin_layout Plain Layout
+
+##% f : A -> Boolean
+\end_layout
+
+\begin_layout Plain Layout
+
+def f(x=A.new) true end
+\end_layout
+
+\begin_layout Plain Layout
+
+f(A.new) # type checks
+\end_layout
+
+\begin_layout Plain Layout
+
+f(B.new) # fails
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{verbatim}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Unfortunately, the latter call to f() fails because DRuby can not yet tell
+ if B is a subtype of A (perhmaps more method defs are coming below!) This
+ can be fixed using an explicit subtype annotation, as discussed in Section
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Subtype-Relation"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Optional Arguments and Varargs
+\end_layout
+
+\begin_layout Standard
+One particularly common use of intersection types is methods with optional
+ arguments.
+ For example, 
+\family typewriter
+String
+\family default
+’s 
+\family typewriter
+chomp
+\family default
+ method has the following type:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{verbatim}
+\end_layout
+
+\begin_layout Plain Layout
+
+##% chomp : () -> String 
+\end_layout
+
+\begin_layout Plain Layout
+
+##% chomp : (String) -> String 
+\end_layout
+
+\begin_layout Plain Layout
+
+def chomp(p0=$/); end
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{verbatim}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Calling 
+\family typewriter
+chomp
+\family default
+ with an argument s removes s from the end of self , and calling chomp with
+ no arguments removes the value of (global variable) 
+\family typewriter
+$/
+\family default
+ from 
+\family typewriter
+self
+\family default
+ .
+ Since optional arguments are so common, DRuby allows them to be concisely
+ speciﬁed by preﬁxing an argu- ment type with 
+\family typewriter
+?
+\family default
+.
+ The following type for 
+\family typewriter
+chomp
+\family default
+ is equivalent to the intersection type above: 
+\family typewriter
+chomp : (?String) -> String 
+\end_layout
+
+\begin_layout Standard
+DRuby also supports varargs parameters, speciﬁed as 
+\family typewriter
+∗t
+\family default
+, meaning zero or more parameters of type 
+\family typewriter
+t
+\family default
+ (the corresponding formal argument would contain an 
+\family typewriter
+Array
+\family default
+ of 
+\family typewriter
+t
+\family default
+’s).
+ For example, here is the type of 
+\family typewriter
+delete
+\family default
+, which removes any characters in the intersection of its (one or more)
+ 
+\family typewriter
+String
+\family default
+ arguments from 
+\family typewriter
+self
+\family default
+ : 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{verbatim}
+\end_layout
+
+\begin_layout Plain Layout
+
+##% delete : (String, *String) -> String
+\end_layout
+
+\begin_layout Plain Layout
+
+def delete(p0,*p1); end
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{verbatim}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Notice this type is equivalent to an intersection of an unbounded number
+ of types.
+\end_layout
+
+\begin_layout Subsection
+Union Types
+\end_layout
+
+\begin_layout Standard
+Because Ruby is dynamically typed, it is easy to freely mix different classes
+ that share common methods.
+ For example, consider the following code:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{verbatim}
+\end_layout
+
+\begin_layout Plain Layout
+
+class A def f() end end
+\end_layout
+
+\begin_layout Plain Layout
+
+class B def f() end end
+\end_layout
+
+\begin_layout Plain Layout
+
+x = if ...
+ then A.new else B.new end
+\end_layout
+
+\begin_layout Plain Layout
+
+x.f
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{verbatim}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Even though we cannot statically decide whether or not 
+\family typewriter
+x
+\family default
+ is an 
+\family typewriter
+A
+\family default
+ or a 
+\family typewriter
+B
+\family default
+, this program is clearly well-typed at run time, since both classes have
+ an f method.
+ To support this kind of coding, DRuby supports union types of the form
+ 
+\emph on
+t
+\emph default
+ 
+\family typewriter
+or
+\family default
+ 
+\emph on
+t'
+\emph default
+, where 
+\emph on
+t
+\emph default
+ and 
+\emph on
+t'
+\emph default
+ are types (which can themselves be unions).
+ For example, 
+\family typewriter
+x
+\family default
+ above would have type 
+\family typewriter
+A
+\family default
+ or 
+\family typewriter
+B
+\family default
+, and we can invoke any method on 
+\family typewriter
+x
+\family default
+ that is common to 
+\family typewriter
+A
+\family default
+ and 
+\family typewriter
+B
+\family default
+.
+ The example below shows how a union type is used in 
+\family typewriter
+base_types.rb
+\family default
+.
+ Here 
+\family typewriter
+%
+\family default
+ method takes either 
+\family typewriter
+Fixnum
+\family default
+, 
+\family typewriter
+Float
+\family default
+, or 
+\family typewriter
+String
+\family default
+ and gives back a 
+\family typewriter
+String
+\family default
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{verbatim}
+\end_layout
+
+\begin_layout Plain Layout
+
+...
+\end_layout
+
+\begin_layout Plain Layout
+
+##% "%" : (Fixnum or Float or String) -> String
+\end_layout
+
+\begin_layout Plain Layout
+
+def %(p0); end
+\end_layout
+
+\begin_layout Plain Layout
+
+...
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{verbatim}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Object Types
+\end_layout
+
+\begin_layout Standard
+While most types refer to particular class names, Ruby code usually only
+ requires that objects have certain methods, and is agnostic with respect
+ to actual class names.
+ The code snippet below shows the 
+\family typewriter
+print
+\family default
+ method, which takes zero or more objects and displays them on standard
+ output.
+ The 
+\family typewriter
+print
+\family default
+ method only requires that its arguments have a no-argument 
+\family typewriter
+to_s
+\family default
+ method that produces a 
+\family typewriter
+String
+\family default
+.
+ In this case, the print method can be annotaed so that it only requires
+ that the argument has 
+\family typewriter
+to_s
+\family default
+ method instead of the argument being a 
+\family typewriter
+String
+\family default
+.
+ The object type must be in the following form, [
+\begin_inset Formula $m_{0}$
+\end_inset
+
+ : 
+\begin_inset Formula $t_{0},...,m_{n}:t_{n}$
+\end_inset
+
+], where each 
+\begin_inset Formula $m_{i}$
+\end_inset
+
+ has type 
+\begin_inset Formula $t_{i}$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{verbatim}
+\end_layout
+
+\begin_layout Plain Layout
+
+module Kernel
+\end_layout
+
+\begin_layout Plain Layout
+
+  ...
+\end_layout
+
+\begin_layout Plain Layout
+
+  ##% print : (*[to_s : () -> String]) -> NilClass
+\end_layout
+
+\begin_layout Plain Layout
+
+  def print(*p0); end
+\end_layout
+
+\begin_layout Plain Layout
+
+  ...
+\end_layout
+
+\begin_layout Plain Layout
+
+end
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{verbatim}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Self Types
+\end_layout
+
+\begin_layout Standard
+In some cases, it is cumbersome to give a nominal or structural type to
+ an object, especially to a return object.
+ Consider the following code snippet:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{verbatim}
+\end_layout
+
+\begin_layout Plain Layout
+
+class A; def me() self end end
+\end_layout
+
+\begin_layout Plain Layout
+
+class B < A; end
+\end_layout
+
+\begin_layout Plain Layout
+
+b = B.new.me
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{verbatim}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Here class 
+\family typewriter
+A
+\family default
+ defines a method 
+\family typewriter
+me
+\family default
+ that returns 
+\family typewriter
+self
+\family default
+.
+ If we give 
+\family typewriter
+me
+\family default
+ the type () -> A, DRuby does not treat 
+\family typewriter
+b
+\family default
+ as an instance of 
+\family typewriter
+B
+\family default
+, but rather an instance of 
+\family typewriter
+A
+\family default
+.
+ In order to model this case more precisely, we support 
+\family typewriter
+self
+\family default
+ type in the annotation.
+ The method me can now have the type, 
+\family typewriter
+() -> self
+\family default
+.
+ In 
+\family typewriter
+the Kernel
+\family default
+ module in 
+\family typewriter
+base_types.rb
+\family default
+, clone method also has the same type.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{verbatim}
+\end_layout
+
+\begin_layout Plain Layout
+
+##% clone: () -> self
+\end_layout
+
+\begin_layout Plain Layout
+
+def clone() end
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{verbatim}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Parametric Polymorphism
+\end_layout
+
+\begin_layout Standard
+To give precise types to container classes, DRuby supports 
+\emph on
+parametric polymorphism
+\emph default
+, also called generics in Java.
+ The following code show a segment of the 
+\family typewriter
+Array
+\family default
+ class, which is parameterized by a 
+\emph on
+type variable
+\emph default
+ 
+\family typewriter
+t
+\family default
+, which is the type of the contents of the array:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{verbatim}
+\end_layout
+
+\begin_layout Plain Layout
+
+##% Array<t>
+\end_layout
+
+\begin_layout Plain Layout
+
+class Array
+\end_layout
+
+\begin_layout Plain Layout
+
+  ##% at : (Fixnum) -> t
+\end_layout
+
+\begin_layout Plain Layout
+
+  def at(p0); end
+\end_layout
+
+\begin_layout Plain Layout
+
+  ##% first : () -> t
+\end_layout
+
+\begin_layout Plain Layout
+
+  ##% first : (Fixnum) -> Array<t>
+\end_layout
+
+\begin_layout Plain Layout
+
+  def first(p0 = 0); end
+\end_layout
+
+\begin_layout Plain Layout
+
+  ...
+\end_layout
+
+\begin_layout Plain Layout
+
+  ##% collect<u> : () {t -> u} -> Array<u> 
+\end_layout
+
+\begin_layout Plain Layout
+
+  def collect() end
+\end_layout
+
+\begin_layout Plain Layout
+
+  ...
+\end_layout
+
+\begin_layout Plain Layout
+
+end
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{verbatim}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+As usual, type variables bound at the top of a class can be used anywhere
+ inside that class.
+ For example, the type of the 
+\family typewriter
+at
+\family default
+ method, which takes an index and returns the element at that index.
+ Type variables can also be used in intersection types, e.g., the first method,
+ takes either no argument, in which case it returns the first element of
+ the array or a value 
+\emph on
+n
+\emph default
+, in which case it returns the first 
+\emph on
+n
+\emph default
+ elements of the array, which is itself an array of type 
+\family typewriter
+Array<t>
+\family default
+.
+ 
+\end_layout
+
+\begin_layout Standard
+We also support polymorphism on methods.
+ Consider the 
+\family typewriter
+collect
+\family default
+ method, which for any type 
+\family typewriter
+u
+\family default
+ takes a code block from 
+\family typewriter
+t
+\family default
+ to 
+\family typewriter
+u
+\family default
+ and produces an array of 
+\family typewriter
+u
+\family default
+.
+ The 
+\family typewriter
+concat
+\family default
+ method, which takes an array of 
+\family typewriter
+u
+\family default
+'s and (non-destructively) appends it to the end of the current array, producing
+ a new array whose elements are either 
+\family typewriter
+t
+\family default
+'s or 
+\family typewriter
+u
+\family default
+'s.
+\end_layout
+
+\begin_layout Standard
+DRuby also allows bounded quantifiers.
+ So far, all of the polymorphic variables have had no explicit bound, which
+ defaults to giving them an upper bound of the Top type.
+ Alternatively, an upper bound may be explicitly given for any polymorphic
+ type variable (including self).
+ For example, 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Frameless
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{verbatim}
+\end_layout
+
+\begin_layout Plain Layout
+
+class A
+\end_layout
+
+\begin_layout Plain Layout
+
+  ##% smart_clone<self> ; self <= A () -> self
+\end_layout
+
+\begin_layout Plain Layout
+
+  def smart_clone() ...
+ end
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{verbatim}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Here, smart_clone can only be called by (sub-)classes that are subtypes
+ of A.
+\end_layout
+
+\begin_layout Subsection
+Tuple Types
+\end_layout
+
+\begin_layout Standard
+The Array<t> type describes homogeneous arrays, whose elements all consists
+ of the same type.
+ However, Ruby's dynamic typing allows programmers to also create heterogeneous
+ ararys, in which each element may be a different type.
+ This is especially common for returning multiple values from a method,
+ and there is even special parallel assignment syntax for it.
+ For example, the following code
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{verbatim}
+\end_layout
+
+\begin_layout Plain Layout
+
+def f(); [1, true] end
+\end_layout
+
+\begin_layout Plain Layout
+
+a, b = f
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{verbatim}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+assigns 
+\family typewriter
+1
+\family default
+ to 
+\family typewriter
+a
+\family default
+ and 
+\family typewriter
+true
+\family default
+ to 
+\family typewriter
+b
+\family default
+.
+ If we were to type the return value of 
+\family typewriter
+f
+\family default
+ as a homogeneous 
+\family typewriter
+Array
+\family default
+, the best we could do is make it 
+\family typewriter
+Array<Object>
+\family default
+ or 
+\family typewriter
+Array<Fixnum or Boolean>
+\family default
+, with a corresponding loss of precision.
+ Our solution is to introduce a tuple type 
+\family typewriter
+(
+\begin_inset Formula $t_{1},...,t_{n}$
+\end_inset
+
+)
+\family default
+ that represents an array whose element types are, left to right, 
+\begin_inset Formula $t_{1}$
+\end_inset
+
+ through 
+\begin_inset Formula $t_{n}$
+\end_inset
+
+.
+ When we access an element of a tuple using parallel assignment, we then
+ know precisely the element type.
+ (When inferencing types, DRuby might assign something a tuple type, but
+ then there is a subsequent operation causes a loss of precision, such as
+ mutating a random element or appending an array.
+ In this case, DRuby falls back and treat it as an array, not a tuple anymore.)
+\end_layout
+
+\begin_layout Standard
+You can annotate the example above as the following:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{verbatim}
+\end_layout
+
+\begin_layout Plain Layout
+
+##% f : () -> (Fixnum, Boolean) 
+\end_layout
+
+\begin_layout Plain Layout
+
+def f(); [1, true] end
+\end_layout
+
+\begin_layout Plain Layout
+
+a, b = f
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{verbatim}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+First Class Methods
+\end_layout
+
+\begin_layout Standard
+DRuby includes support for another special kind of array: method parameter
+ lists.
+ Ruby's syntax permits at most one code block (higher-order function) to
+ be passed to a method.
+ For example, the following code illustrates how a block argument of 
+\family typewriter
+collect
+\family default
+ method can increment each element in the array by 1.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{verbatim}
+\end_layout
+
+\begin_layout Plain Layout
+
+[1, 2, 3].collect {|x| x + 1 } # returns [2, 3, 4]
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{verbatim}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+If we want to pass multiple code blocks into a method or do other higher-order
+ programming (e.g., store a code block in a data structure), we need to convert
+ it to a 
+\family typewriter
+Proc
+\family default
+ object:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{verbatim}
+\end_layout
+
+\begin_layout Plain Layout
+
+f = Proc.new {|x| x + 1}
+\end_layout
+
+\begin_layout Plain Layout
+
+f.call(3) # returns 4
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{verbatim}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A 
+\family typewriter
+Proc
+\family default
+ object can be constructed from any code block and may be called with any
+ number of arguments.
+ To support this special havior, in 
+\family typewriter
+base_types.rb
+\family default
+, we declare Proc as follows:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{verbatim}
+\end_layout
+
+\begin_layout Plain Layout
+
+##% Proc<^args,ret>
+\end_layout
+
+\begin_layout Plain Layout
+
+class Proc
+\end_layout
+
+\begin_layout Plain Layout
+
+  ##% initialize: () {(^args) -> ret} -> Proc<^args, ret>
+\end_layout
+
+\begin_layout Plain Layout
+
+  def initialize(); end
+\end_layout
+
+\begin_layout Plain Layout
+
+  ##% call : (^args) -> ret
+\end_layout
+
+\begin_layout Plain Layout
+
+  def call(p0); end
+\end_layout
+
+\begin_layout Plain Layout
+
+end
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{verbatim}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The 
+\family typewriter
+Proc
+\family default
+ class is parameterized by a parameter list type 
+\family typewriter
+^args
+\family default
+ and a return type 
+\family typewriter
+ret
+\family default
+.
+ The 
+\family typewriter
+^
+\family default
+ character acts as a type constructor allowing parameter list types to appear
+ as first class types.
+ The 
+\family typewriter
+initialize
+\family default
+ method (the constructor called when 
+\family typewriter
+Proc.new
+\family default
+ is invoked) takes a block with parameter types 
+\family typewriter
+^args
+\family default
+ and a return type 
+\family typewriter
+ret
+\family default
+ and returns a corresponding 
+\family typewriter
+Proc
+\family default
+.
+ The call method takes then has the same parameter and return types.
+ 
+\end_layout
+
+\begin_layout Standard
+As another example use of 
+\family typewriter
+^
+\family default
+, consider the 
+\family typewriter
+Hash
+\family default
+ class:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{verbatim}
+\end_layout
+
+\begin_layout Plain Layout
+
+##% Hash<k, v>
+\end_layout
+
+\begin_layout Plain Layout
+
+class Hash
+\end_layout
+
+\begin_layout Plain Layout
+
+  ##% initialize : () {(Hash<k,v>,k) -> v} -> Hash<k,v>
+\end_layout
+
+\begin_layout Plain Layout
+
+  def initialize(); end
+\end_layout
+
+\begin_layout Plain Layout
+
+  ##% default_proc : () -> Proc<^(Hash<k,v>,k),v>
+\end_layout
+
+\begin_layout Plain Layout
+
+  def default_proc(); end
+\end_layout
+
+\begin_layout Plain Layout
+
+end
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{verbatim}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The 
+\family typewriter
+Hash
+\family default
+ class is parameterized by 
+\family typewriter
+k
+\family default
+ and 
+\family typewriter
+v
+\family default
+, the types of the hash keys and values, respectively.
+ When creating a hash table, the pro- grammer may supply a default function
+ that is called when an ac- cessing a non-existent key.
+ Thus the type of initialize includes a block that is passed the hash table
+ (
+\family typewriter
+Hash<k,v>
+\family default
+) and the missing key (
+\family typewriter
+k
+\family default
+), and produces a value of type 
+\family typewriter
+v
+\family default
+.
+ The programmer can later extract this method using the default proc method,
+ which returns a 
+\family typewriter
+Proc
+\family default
+ object with the same type as the block.
+ 
+\end_layout
+
+\begin_layout Subsection
+Subtype Relation
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Subtype-Relation"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+It is also possible to give a hint to DRuby that a certain class is a 
+\emph on
+subtype
+\emph default
+ of another.
+ This is useful if you want to establish a relationship between classes
+ so that a class is assumed to be another class.
+ Consider again the example from Section
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Intersection-Types"
+
+\end_inset
+
+:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Frameless
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{verbatim}
+\end_layout
+
+\begin_layout Plain Layout
+
+class A; end
+\end_layout
+
+\begin_layout Plain Layout
+
+class B < A; end
+\end_layout
+
+\begin_layout Plain Layout
+
+##% f : () -> Boolean
+\end_layout
+
+\begin_layout Plain Layout
+
+##% f : A -> Boolean
+\end_layout
+
+\begin_layout Plain Layout
+
+def f(x=A.new) true end
+\end_layout
+
+\begin_layout Plain Layout
+
+f(A.new) # type checks
+\end_layout
+
+\begin_layout Plain Layout
+
+f(B.new) # fails
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{verbatim}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+As we mentioned above, DRuby cannot determine whether 
+\family typewriter
+B
+\family default
+ is substitutable for A and therefore can not verify the latter call to
+ f.
+ This is because 
+\family typewriter
+B < A
+\family default
+ declares a subclass relationship, which does not imply that B is a subtype
+ of A.
+ The former only tells us that 
+\family typewriter
+B
+\family default
+ inherits all the methods in 
+\family typewriter
+A
+\family default
+, and nothing about the type relationship between the two.
+ B is still free to overwrite these methods with a type-incompatible version.
+\end_layout
+
+\begin_layout Standard
+On the other hand, subtype annotation requires B to be a subtype of A and
+ therefore redefing A's methods must preserve their type.
+ This annotation also does one more thing: it allows DRuby to assume from
+ the start of inference that B is a subtype of A since this will be later
+ verified by the constraint solver.
+ Therefore, our example is now well-typed with this annotation:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Frameless
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{verbatim}
+\end_layout
+
+\begin_layout Plain Layout
+
+class A; end
+\end_layout
+
+\begin_layout Plain Layout
+
+##% B <= A
+\end_layout
+
+\begin_layout Plain Layout
+
+class B < A; end
+\end_layout
+
+\begin_layout Plain Layout
+
+##% f : () -> Boolean
+\end_layout
+
+\begin_layout Plain Layout
+
+##% f : A -> Boolean
+\end_layout
+
+\begin_layout Plain Layout
+
+def f(x=A.new) true end
+\end_layout
+
+\begin_layout Plain Layout
+
+f(A.new) # type checks
+\end_layout
+
+\begin_layout Plain Layout
+
+f(B.new) # fails
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{verbatim}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Thus when attempting to select a part of an intersection type, DRuby looks
+ for either an exact name match, or a name that has annotationed as a subtype
+ of the name required (note: this relation is transitive).
+\end_layout
+
+\begin_layout Standard
+This annotation can also be useful to 
+\emph on
+verify
+\emph default
+ that a class is a subtype of another for documentation purposes.
+ Recall that the subclass relationship does not constrain the types of overridin
+g methods with respect to the types of inherited methods.
+ Consider this valid code:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{verbatim}
+\end_layout
+
+\begin_layout Plain Layout
+
+class A; def g() 0 end end
+\end_layout
+
+\begin_layout Plain Layout
+
+class B < A; def g() "1" end end
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{verbatim}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This is a legitimate program although the overriding 
+\family typewriter
+B#g
+\family default
+ returns a 
+\family typewriter
+String
+\family default
+ whereas the overriden method 
+\family typewriter
+A#g
+\family default
+ returns a 
+\family typewriter
+Fixnum
+\family default
+.
+ However, sometimes it is desired to enforce the subtype relation so that
+ 
+\family typewriter
+B#g
+\family default
+ must be a subtype of 
+\family typewriter
+A#g
+\family default
+.
+ We can manually constrain this by introducing an annotation for subtype
+ relation to 
+\family typewriter
+B
+\family default
+ and its super type, 
+\family typewriter
+A
+\family default
+.
+ Try runnig DRuby on the following code.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{verbatim}
+\end_layout
+
+\begin_layout Plain Layout
+
+class A
+\end_layout
+
+\begin_layout Plain Layout
+
+  ##% g : () -> Fixnum
+\end_layout
+
+\begin_layout Plain Layout
+
+  def g() 0 end
+\end_layout
+
+\begin_layout Plain Layout
+
+end
+\end_layout
+
+\begin_layout Plain Layout
+
+##% B <= A
+\end_layout
+
+\begin_layout Plain Layout
+
+class B
+\end_layout
+
+\begin_layout Plain Layout
+
+  ##% g : () -> String
+\end_layout
+
+\begin_layout Plain Layout
+
+  def g() "1" end
+\end_layout
+
+\begin_layout Plain Layout
+
+end
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{verbatim}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Because of the presence of the subtype relation in the annotation, DRuby
+ strictly checks for that relation between 
+\family typewriter
+B
+\family default
+ and 
+\family typewriter
+A
+\family default
+.
+ DRuby rejects this program due to the inconsistent subtype relation between
+ 
+\family typewriter
+B#g
+\family default
+ and 
+\family typewriter
+A#g
+\family default
+ and generates this error message: 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{verbatim}
+\end_layout
+
+\begin_layout Plain Layout
+
+[ERROR] instance String used where Fixnum expected
+\end_layout
+
+\begin_layout Plain Layout
+
+         It does not support methods ~, |, zero?, truncate, to_int, times,
+\end_layout
+
+\begin_layout Plain Layout
+
+        step, singleton_method_added, rpower, round, remainder, rdiv, quo,
+\end_layout
+
+\begin_layout Plain Layout
+
+        prec_i, prec_f, prec, power!, numerator, nonzero?, nan?, modulo,
+ lcm,
+\end_layout
+
+\begin_layout Plain Layout
+
+        integer, infinite?, id2name, gcdlcm, gcd, floor, finite?, downto,
+\end_layout
+
+\begin_layout Plain Layout
+
+        divmod, div, denominator, coerce, chr, ceil, abs, ^, >>, /, -@,
+ -, +@,
+\end_layout
+
+\begin_layout Plain Layout
+
+        **, &
+\end_layout
+
+\begin_layout Plain Layout
+
+  in verifying declared subtype: B <= A
+\end_layout
+
+\begin_layout Plain Layout
+
+  in creating/updating type ::B
+\end_layout
+
+\begin_layout Plain Layout
+
+  at ./subtyperelation.rb:6 
+\end_layout
+
+\begin_layout Plain Layout
+
+  in class definition ::B
+\end_layout
+
+\begin_layout Plain Layout
+
+  at ./subtyperelation.rb:6 
+\end_layout
+
+\begin_layout Plain Layout
+
+  in annotation for g
+\end_layout
+
+\begin_layout Plain Layout
+
+  at ./subtyperelation.rb:8 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{verbatim}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Type System
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Type-System"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Static Type Inference and Checking
+\end_layout
+
+\begin_layout Standard
+The main feature of DRuby is static type analysis, which consists of type
+ inference and type checking.
+ It attempts to give a type to every object in a program and report any
+ inconsistencies observed during the process (type inference), and checks
+ the validity of type annotations against the inferred types and/or other
+ type annotations (type checking).
+ There are three kinds of errors DRuby reports that are critical to type
+ analysis---
+\emph on
+methods not supported
+\emph default
+, 
+\emph on
+wrong arity to function
+\emph default
+, and 
+\emph on
+subtype relation failure
+\emph default
+.
+ 
+\end_layout
+
+\begin_layout Subsubsection
+Methods Not Supported
+\end_layout
+
+\begin_layout Standard
+This will be probably the most common error you will have when using DRuby.
+ It is a simple type error, where expected methods are absent from an object.
+ For example,
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{verbatim}
+\end_layout
+
+\begin_layout Plain Layout
+
+class A; def f(); end end
+\end_layout
+
+\begin_layout Plain Layout
+
+A.new.g # there is no g in A
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{verbatim}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+causes 
+\emph on
+method not supported
+\emph default
+ error because method 
+\family typewriter
+g
+\family default
+ was invoked on 
+\family typewriter
+A.new
+\family default
+, but 
+\family typewriter
+A
+\family default
+ has no method 
+\family typewriter
+g
+\family default
+.
+ The error message that DRuby generate is apparent for this example.
+ There is no short description, yet the long description is informative.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{verbatim}
+\end_layout
+
+\begin_layout Plain Layout
+
+[ERROR] instance A does not support methods g
+\end_layout
+
+\begin_layout Plain Layout
+
+  in typing method call g
+\end_layout
+
+\begin_layout Plain Layout
+
+  at ./method.rb:2
+\end_layout
+
+\begin_layout Plain Layout
+
+  in typing ::A.new
+\end_layout
+
+\begin_layout Plain Layout
+
+  at ./method.rb:2  
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{verbatim}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Let's consider another example where there is a type annotation for a method.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{verbatim}
+\end_layout
+
+\begin_layout Plain Layout
+
+class A; def f() 0 end; def h() 2 end end
+\end_layout
+
+\begin_layout Plain Layout
+
+class B; def g() 1 end end
+\end_layout
+
+\begin_layout Plain Layout
+
+##% foo : A -> Fixnum
+\end_layout
+
+\begin_layout Plain Layout
+
+def foo(a) 3 end
+\end_layout
+
+\begin_layout Plain Layout
+
+foo(B.new) # A is expected
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{verbatim}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The method 
+\family typewriter
+foo
+\family default
+ takes an 
+\family typewriter
+A
+\family default
+ and returns a 
+\family typewriter
+Fixnum
+\family default
+, but 
+\family typewriter
+foo
+\family default
+ was called with 
+\family typewriter
+B.new
+\family default
+ at the end.
+ Therefore, this is obviously a type error, and DRuby generates an error
+ message as follows:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{verbatim}
+\end_layout
+
+\begin_layout Plain Layout
+
+[ERROR] instance B used where A expected
+\end_layout
+
+\begin_layout Plain Layout
+
+        It does not support methods h, f
+\end_layout
+
+\begin_layout Plain Layout
+
+  in typing method call foo
+\end_layout
+
+\begin_layout Plain Layout
+
+  at ./method2.rb:5
+\end_layout
+
+\begin_layout Plain Layout
+
+  in typing ::B.new
+\end_layout
+
+\begin_layout Plain Layout
+
+  at ./method2.rb:5 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{verbatim}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The short description (the top most sentence) says, 
+\begin_inset Quotes eld
+\end_inset
+
+
+\family typewriter
+instance B used where A expected
+\family default
+
+\begin_inset Quotes erd
+\end_inset
+
+, mentioning the nominal type 
+\family typewriter
+A
+\family default
+.
+ This indicates that DRuby has taken into consideration the types presented
+ by the annotation since the error message refers to the 
+\emph on
+expected
+\emph default
+ object as 
+\begin_inset Quotes eld
+\end_inset
+
+
+\family typewriter
+instance A
+\family default
+
+\begin_inset Quotes erd
+\end_inset
+
+, not as some arbitrary type that has methods 
+\family typewriter
+h
+\family default
+ and 
+\family typewriter
+f
+\family default
+.
+ Therefore, it outputs more user-friendly description of the error.
+ The long description still provide the details of the error which is the
+ list of methods required by 
+\family typewriter
+A
+\family default
+ but missing in 
+\family typewriter
+B
+\family default
+ which are 
+\family typewriter
+f
+\family default
+ and 
+\family typewriter
+h
+\family default
+.
+ To illustrate this point further, consider this code
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{verbatim}
+\end_layout
+
+\begin_layout Plain Layout
+
+class A; def f() 0 end; def h() 2 end end
+\end_layout
+
+\begin_layout Plain Layout
+
+class B; def g() 1 end; def f() 0 end; def h() 2 end end 
+\end_layout
+
+\begin_layout Plain Layout
+
+##% foo : A -> Fixnum
+\end_layout
+
+\begin_layout Plain Layout
+
+def foo(a) end
+\end_layout
+
+\begin_layout Plain Layout
+
+foo(B.new) # A is expected
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{verbatim}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where B now has 
+\family typewriter
+f
+\family default
+ and 
+\family typewriter
+h
+\family default
+ in addition to 
+\family typewriter
+g
+\family default
+.
+ DRuby now accepts the program although 
+\family typewriter
+B.new
+\family default
+ is not really an instance of 
+\family typewriter
+A
+\family default
+, because DRuby uses structural typing.
+ Although the type annotation notifies DRuby that 
+\family typewriter
+foo
+\family default
+ accepts an instance of 
+\family typewriter
+A
+\family default
+, DRuby interprets it as 
+\begin_inset Quotes eld
+\end_inset
+
+
+\family typewriter
+foo
+\family default
+ accepts an instance of a class that has all the methods that 
+\family typewriter
+A
+\family default
+ has (with appropriate types)
+\begin_inset Quotes erd
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Subsubsection
+Wrong Arity To Function
+\end_layout
+
+\begin_layout Standard
+This is another common mistake that Ruby programmers often make---wrong
+ number of arguments.
+ If the number of actual parameters in a method call does not match with
+ the number of formal parameters of the corresponding method, it is obviously
+ an error.
+ The following code
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{verbatim}
+\end_layout
+
+\begin_layout Plain Layout
+
+class A; def f(a) a.to_s end end
+\end_layout
+
+\begin_layout Plain Layout
+
+A.new.f()
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{verbatim}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+defines method 
+\family typewriter
+f
+\family default
+ in class 
+\family typewriter
+A
+\family default
+, but calls it with no argument.
+ DRuby outputs as follows.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{verbatim}
+\end_layout
+
+\begin_layout Plain Layout
+
+[ERROR] wrong arity to function, got no arguments, expected exactly 1 arguments
+\end_layout
+
+\begin_layout Plain Layout
+
+  in solving method: f
+\end_layout
+
+\begin_layout Plain Layout
+
+  in closed solving instance A <= ?
+\end_layout
+
+\begin_layout Plain Layout
+
+  in typing method call f
+\end_layout
+
+\begin_layout Plain Layout
+
+  at ./arity.rb:2 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{verbatim}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This kind of error is actually more common with formal parameters of a block
+ argument.
+ Consider the following code:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{verbatim}
+\end_layout
+
+\begin_layout Plain Layout
+
+class A; def f(a, b) yield([a, b]) end end
+\end_layout
+
+\begin_layout Plain Layout
+
+A.new.f(1, 2) {|x, y| x * y}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{verbatim}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Method 
+\family typewriter
+f
+\family default
+ takes two arguments (
+\family typewriter
+a
+\family default
+ and 
+\family typewriter
+b
+\family default
+) and pass them as a single array to 
+\family typewriter
+yield
+\family default
+, but the block argument to 
+\family typewriter
+f
+\family default
+ has two formal parameters 
+\family typewriter
+x
+\family default
+ and 
+\family typewriter
+y
+\family default
+.
+ Unfortunately, Ruby is lenient on the formal parameters in a block argument,
+ so this mistake is difficult to notice.
+ This is a bad programming style because it makes hard for programmers to
+ detect real errors caused by the same programming habit.
+ Therefore, DRuby reports this as an error.
+ The correct coding style for the above example is
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{verbatim}
+\end_layout
+
+\begin_layout Plain Layout
+
+class A; def f(a, b) yield([a, b]) end end
+\end_layout
+
+\begin_layout Plain Layout
+
+A.new.f(1, 2) {|(x, y)| x * y}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{verbatim}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where the tuple type 
+\family typewriter
+(x,y)
+\family default
+ makes up a single type.
+ This may seem unnatural at first, but it might make more sense when compare
+ it to a slightly altered version of the example:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{verbatim}
+\end_layout
+
+\begin_layout Plain Layout
+
+class A; def f(a, b, c) yield([a, b], c) end end
+\end_layout
+
+\begin_layout Plain Layout
+
+A.new.f(1, 2, 3) {|(x, y), z| x * y + z}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{verbatim}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In this case, even Ruby will complain if 
+\family typewriter
+x
+\family default
+ and 
+\family typewriter
+y
+\family default
+ are not a tuple.
+\end_layout
+
+\begin_layout Subsubsection
+Subtype Relation Failure
+\end_layout
+
+\begin_layout Standard
+When DRuby is unable to determine whether or not a given type is consistent
+ with respect to an intersection type, it reports a subtype relation failure.
+ For example, the following code 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{verbatim}
+\end_layout
+
+\begin_layout Plain Layout
+
+##% f : Symbol -> Boolean
+\end_layout
+
+\begin_layout Plain Layout
+
+##% f : String -> Boolean
+\end_layout
+
+\begin_layout Plain Layout
+
+def f(p0) true end
+\end_layout
+
+\begin_layout Plain Layout
+
+foo(1)
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{verbatim}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+defines method 
+\family typewriter
+f
+\family default
+ and asserts the type of the method as an intersection type.
+ However, 
+\family typewriter
+f
+\family default
+ was used with a 
+\family typewriter
+Fixnum
+\family default
+, causing an inconsistency with repect to the annotation.
+ In fact, this problem occurs more often than you might expect.
+ This is because if DRuby cannot determine whether or not the type of an
+ actual argument is a subtype of the either Symbol or String, it considers
+ it as a subtype relation failure.
+ You can avoid this problem by adding subtype relation in type annotation.
+ For more information on this topic, refer to Type Annotation section.
+\end_layout
+
+\begin_layout Subsubsection
+Other Errors
+\end_layout
+
+\begin_layout Standard
+You might occasionally encounter other kinds of errors such as undefined
+ constants, unresolve scopes, and etc.
+ These are not critical to the analysis yet worth mentioning:
+\end_layout
+
+\begin_layout Itemize
+Scoping errors - these errors usually happen when DRuby cannot find a particular
+ class or module that it's looking for.
+ Try to use specific paths or include the paths into RUBYLIB environment
+ variable.
+\end_layout
+
+\begin_layout Itemize
+Aliasing errors - if the source method of the aliasing operation cannot
+ be found, DRuby warns the user.
+ 
+\end_layout
+
+\begin_layout Itemize
+[TODO: Hmm...I'm actually not so sure how to categorize these]
+\end_layout
+
+\begin_layout Section
+Profile-Guided Analysis
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+NOTE: This feature is currently experimental
+\end_layout
+
+\begin_layout Standard
+Ruby has dynamic language constructs that allow programmers to execute dynamic
+ code and perform reflections on objects at run time.
+ For instance, 
+\family typewriter
+eval
+\family default
+ takes a string argument and executes the code on-the-fly.
+ The following code snippet (excerpted from 
+\emph on
+text-highlight-1.0.2
+\emph default
+)
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{verbatim}
+\end_layout
+
+\begin_layout Plain Layout
+
+ATTRIBUTES.each do |attr|
+\end_layout
+
+\begin_layout Plain Layout
+
+  code = <<-EODEF
+\end_layout
+
+\begin_layout Plain Layout
+
+  def #{attr}(&blk)
+\end_layout
+
+\begin_layout Plain Layout
+
+    color("#{attr}", &blk)
+\end_layout
+
+\begin_layout Plain Layout
+
+  end
+\end_layout
+
+\begin_layout Plain Layout
+
+  EODEF
+\end_layout
+
+\begin_layout Plain Layout
+
+  eval code
+\end_layout
+
+\begin_layout Plain Layout
+
+end
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{verbatim}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+iterates through 
+\family typewriter
+ATTRIBUTES
+\family default
+, an array of strings.
+ For each element it creates a string code containing a new method definition,
+ and then evaluates code.
+ The result is certainly elegant---methods are generated dynamically based
+ on the contents of an array.
+ However, no reasonable static type system will be able to analyze this
+ code.
+ 
+\end_layout
+
+\begin_layout Standard
+Actually, even 
+\family typewriter
+require
+\family default
+ behaves dynamically.
+ Unlike the 
+\family typewriter
+include
+\family default
+ keyword in C, which is actually handled by a preprocessor, Ruby's 
+\family typewriter
+require
+\family default
+ works as a method call which means that Ruby dynamically reads the file,
+ and evaluates the contents as a string code on-the-fly.
+ The argument to the 
+\family typewriter
+require
+\family default
+ call, which is the path to a target file, can be a non-literal expression
+ whose value might not be statically determined.
+ For instance, 
+\family typewriter
+require File.dirname(__FILE__) + ’/../lib/mylib’
+\family default
+ takes an expression rather than a string literal in order to resolve the
+ path with respect to the current file's path.
+ 
+\end_layout
+
+\begin_layout Standard
+Instead of performing a complex dataflow analysis such as string literal
+ analysis, we take a hybrid approach.
+ In order to determine how these dynamic features are used, DRuby can first
+ run the program to gather profiles of their use.
+ Since many Ruby programs are developed with a test suite with (hopefully)
+ good code coverage, running these tests provides exactly the information
+ we need.
+ Once we have executed the test suite, DRuby can then improve its static
+ analysis based on the information it has gathered, thereby improving the
+ precision of its analysis.
+\end_layout
+
+\begin_layout Standard
+You can run the profile-guided analysis by running the following command:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+
+\family typewriter
+$ druby --dr-profile 
+\family default
+\emph on
+filename
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+It is also common among Ruby programmers to use Rake to drive their testsuites.
+ In this case, you should specify 
+\emph on
+filename
+\emph default
+ as the rake executable: 
+\family typewriter
+\emph on
+PATH_TO_RAKE_BIN
+\emph default
+/rake test
+\family default
+, along with 
+\family typewriter
+--dr-profile
+\family default
+ option, which will allow DRuby to observe the tests described by your Rakefile.
+ If the program comes with a custom testing framework, you must run its
+ own test runner.
+ It is also possible to run the program directly and not the testsuite.
+ This should also work fairly well in practice because we learned that most
+ dynamic behaviors occur during the load time.
+ However, it is recommended that you would write test cases that has a reasonabl
+e path coverage.
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+So what is really happening here with the profiling option?
+\emph default
+ Consider the 
+\emph on
+text-highlight
+\emph default
+ example again.
+ When we run druby with the profiling option, DRuby instruments the 
+\family typewriter
+eval
+\family default
+ method call and executes the program using the Ruby intepreter.
+ This instrumentation code, at run time, records the arguments to the 
+\family typewriter
+eval
+\family default
+.
+ Once the profiling phase is complete, DRuby reads in the profiled data
+ and transforms the 
+\family typewriter
+eval
+\family default
+ method call into a case statement as follows.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{verbatim}
+\end_layout
+
+\begin_layout Plain Layout
+
+ATTRIBUTES.each do |attr|
+\end_layout
+
+\begin_layout Plain Layout
+
+  code = <<-EODEF
+\end_layout
+
+\begin_layout Plain Layout
+
+  def #{attr}(&blk)
+\end_layout
+
+\begin_layout Plain Layout
+
+    color("#{attr}", &blk)
+\end_layout
+
+\begin_layout Plain Layout
+
+  end
+\end_layout
+
+\begin_layout Plain Layout
+
+  EODEF
+\end_layout
+
+\begin_layout Plain Layout
+
+  case eval_arg 
+\end_layout
+
+\begin_layout Plain Layout
+
+  when "def none(&blk) ...
+ end"
+\end_layout
+
+\begin_layout Plain Layout
+
+    def non(&blk) ...
+ end
+\end_layout
+
+\begin_layout Plain Layout
+
+  when "def reset(&blk) ...
+ end"
+\end_layout
+
+\begin_layout Plain Layout
+
+    def reset(&blk) ...
+ end
+\end_layout
+
+\begin_layout Plain Layout
+
+  else
+\end_layout
+
+\begin_layout Plain Layout
+
+    raise Error
+\end_layout
+
+\begin_layout Plain Layout
+
+  end
+\end_layout
+
+\begin_layout Plain Layout
+
+end
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{verbatim}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Now, because all possible cases of the 
+\family typewriter
+eval
+\family default
+ call are replaced with actual code, simulating the run time behavior.
+ This transformation allows DRuby to analyze this code now.
+ Note that the transformed code aborts the program if an unseen string is
+ passed to eval.
+ This is obviously not ideal and future versions of DRuby will be able to
+ add extra dynamic checks at this point so that unseen strings can still
+ be safely evaluated.
+\end_layout
+
+\begin_layout Standard
+This profiling option is crucial to analyzing programs that use the Ruby
+ standard library, since it makes heavy use of dynamic features.
+ Consequently, many false positives are inevitable without this profiling
+ technique.
+ In future versions of DRuby, a snapshot of pre-profiled data will be provided
+ with the distribution, so the profiling phase is not required for every
+ time DRuby is run.
+\end_layout
+
+\begin_layout Standard
+Here is the complete list of the dynamic language constructs that DRuby
+ currently handles: 
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+require
+\family default
+, 
+\family typewriter
+load
+\family default
+, 
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+eval
+\family default
+, 
+\family typewriter
+instance_eval
+\family default
+, 
+\family typewriter
+class_eval
+\family default
+, 
+\family typewriter
+module_eval
+\family default
+, 
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+send
+\family default
+, 
+\family typewriter
+__send__
+\family default
+, 
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+instance_variable_get
+\family default
+, 
+\family typewriter
+instance_variable_set
+\family default
+, 
+\family typewriter
+class_variable_get
+\family default
+, 
+\family typewriter
+class_variable_set
+\family default
+, 
+\family typewriter
+const_get
+\family default
+, 
+\family typewriter
+const_set
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+method_missing
+\family default
+.
+\end_layout
+
+\begin_layout Section
+Ruby Intermediate Language (RIL)
+\end_layout
+
+\begin_layout Standard
+The DRuby implementation includes Ruby Intermediate Language (RIL).
+ In order to analyze Ruby source code, we first parse the source code into
+ a raw AST, and then translate and simplify that tree into RIL for further
+ analysis.
+ For example, the type analysis is done on top of RIL, not the actual source
+ code.
+ Code instrumentation and transformation for the profiling process are also
+ done within RIL.
+ DRuby is designed so that it is easy to perform various operations such
+ as exploring, instrumenting, transforming, and analyzing on RIL.
+ More detailed documentation on RIL will be provided in future distribution.
+ Meanwhile, here is a short example that parses code and transforms every
+ method call to 
+\family typewriter
+foo
+\family default
+ into a call to 
+\family typewriter
+bar
+\family default
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{verbatim}
+\end_layout
+
+\begin_layout Plain Layout
+
+  1 open Cfg
+\end_layout
+
+\begin_layout Plain Layout
+
+  2 open Visitor
+\end_layout
+
+\begin_layout Plain Layout
+
+  3 class foo_visitor =
+\end_layout
+
+\begin_layout Plain Layout
+
+  4 object(self)
+\end_layout
+
+\begin_layout Plain Layout
+
+  5   inherit default_visitor
+\end_layout
+
+\begin_layout Plain Layout
+
+  6   method visit_stmt s = match s.snode with
+\end_layout
+
+\begin_layout Plain Layout
+
+  7     | MethodCall(lhs_o, mc) ->
+\end_layout
+
+\begin_layout Plain Layout
+
+  8         begin match mc.mc_msg with
+\end_layout
+
+\begin_layout Plain Layout
+
+  9           | `ID_MethodName("foo") ->
+\end_layout
+
+\begin_layout Plain Layout
+
+ 10               let new_mc = {mc with mc_msg = `ID_MethodName("bar")}
+ in
+\end_layout
+
+\begin_layout Plain Layout
+
+ 11               let new_snode = MethodCall(lhs_o, new_mc) in
+\end_layout
+
+\begin_layout Plain Layout
+
+ 12               let new_stmt = mkstmt new_snode s.pos in
+\end_layout
+
+\begin_layout Plain Layout
+
+ 13                 ChangeTo new_stmt
+\end_layout
+
+\begin_layout Plain Layout
+
+ 14           | _ -> DoChildren
+\end_layout
+
+\begin_layout Plain Layout
+
+ 15         end
+\end_layout
+
+\begin_layout Plain Layout
+
+ 16     | _ -> DoChildren
+\end_layout
+
+\begin_layout Plain Layout
+
+ 17 end
+\end_layout
+
+\begin_layout Plain Layout
+
+ 18 let _ =
+\end_layout
+
+\begin_layout Plain Layout
+
+ 19   let fname = Sys.argv.(1) in
+\end_layout
+
+\begin_layout Plain Layout
+
+ 20   let ast = Parse_helper.parse_file fname in
+\end_layout
+
+\begin_layout Plain Layout
+
+ 21   let cfg = Cfg_refactor.refactor_ast ast in
+\end_layout
+
+\begin_layout Plain Layout
+
+ 22   let visitor = new foo_visitor in
+\end_layout
+
+\begin_layout Plain Layout
+
+ 23   let new_cfg = visit_stmt visitor cfg in
+\end_layout
+
+\begin_layout Plain Layout
+
+ 24     Cfg_printer.CodePrinter.print_stmt stdout new_cfg
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{verbatim}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+First, we are going to open 
+\family typewriter
+Cfg
+\family default
+ and 
+\family typewriter
+Visitor
+\family default
+ modules so that functions and values in the modules can be accessed without
+ the namespaces.
+ Lines 3-17 illustrates how a CFG visitor class can be defined to manipulate
+ control flow graph.
+ Refer to 
+\family typewriter
+src/cfg/cfg.mli
+\family default
+ and 
+\family typewriter
+src/visitor.mli
+\family default
+ for more information on the CFG module and the Visitor class.
+ We override the method 
+\family typewriter
+visit_stmt
+\family default
+ so that whenever it encounters a method call to 
+\begin_inset Quotes eld
+\end_inset
+
+
+\family typewriter
+foo
+\family default
+
+\begin_inset Quotes erd
+\end_inset
+
+, it changes the node to a method call to 
+\begin_inset Quotes eld
+\end_inset
+
+
+\family typewriter
+bar
+\family default
+
+\begin_inset Quotes erd
+\end_inset
+
+.
+ For other CFG nodes, it keeps visiting the current node's children.
+\end_layout
+
+\begin_layout Standard
+The main function parses the specified file and refactors the AST into a
+ CFG.
+ Then, this CFG is transformed by the visitor (at line 22 and 23).
+ Finally, it prints the modified source code into standard output.
+ 
+\end_layout
+
+\begin_layout Section
+Contact
+\end_layout
+
+\begin_layout Standard
+If you questions about using DRuby or about the code, please contact our
+ 
+\begin_inset CommandInset href
+LatexCommand href
+name "mailing list"
+target "https://mailman.cs.umd.edu/mailman/listinfo/druby-discuss"
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document

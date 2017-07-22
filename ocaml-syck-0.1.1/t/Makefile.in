@@ -1,0 +1,13 @@
+# -*- Mode: Makefile -*-
+
+DEPTH		:= ..
+srcdir		:= @srcdir@
+topsrcdir	:= @top_srcdir@
+
+include $(DEPTH)/config.mk
+
+TARGETS		:= yamlsh
+PACKAGES	:= yaml
+
+include $(topsrcdir)/rules.mk
+

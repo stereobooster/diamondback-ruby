@@ -1,0 +1,198 @@
+2009-07-25  Mike Furr  <furr@cs.umd.edu>
+
+	* OMakefile: added centralized version number, also stored in
+	build_vars.ml
+
+	* src/typing/rType.ml: Added KTyp.instantiate_annotation to
+	instantiate polymorphic classes with witness types, similarly to
+	the KMethod version for polymorphic methods.
+
+	* src/typing/typing.ml: We know assume all classes are
+	non-virtual.  That is, every method has the constraint that "self"
+	must be a subtype of the defining class.  This behavior can be
+	overriden by explicitly quantifying self in the method signature.
+
+	* src/typing/rType.ml: Fixed logic bug in the fixpoint algo where
+	a intersection or union type constraint might not be revisited
+	when a partial valid_subtype was initially detected, depending on
+	the order the constraints were solved in.
+
+	* src/typing/constraintGraph.ml: Extended the constraint graph
+	data structure to include a separate graph for capturing
+	dependencies between types with different kinds.  For example, a
+	constraint between methods (KMethod.t) might depend on the
+	validity of the subtyping judgment for a top-level type (KTyp.t)
+
+2009-07-07  Mike Furr  <furr@cs.umd.edu>
+
+	* src/log.ml: Tweak to try to cut down on duplicate entries in the
+	error traces
+
+	* src/dyn/dynamic.ml: The dynamic executor now prints out the
+	stdout/stderr from the Ruby process from its instrumented run.
+
+	* src/typing/rType.ml: Fix for checking polymorphic method
+	signatures.
+
+2009-06-30  Mike Furr  <furr@cs.umd.edu>
+
+	* tests/common/prog_test.ml: setup and teardown functions now take
+	a string naming the current file being analyzed
+
+	* tests/contracts/contracts_suite.ml: Added a long-overdue test
+	suite for testing the runtime contracts for method annotations
+
+	* src/typing/rType.ml: Improved heuristic for selecting an element
+	of an intersection type containing objects. We now compare classes
+	without names (i.e. "Object Types") using a shallow structural
+	test, where we immediately remove the possibility if the lhs does
+	not have at least the methods on the rhs using a name comparison.
+
+	* src/typing/contracts.ml: Cleaned up some of the type contracts
+	implementation.  Runtime checks for union types and polymorphic
+	methods are now fully supported (some of this code wasn't
+	previously checked in).
+
+	* src/typing/typing.mli: Added an interface file for the typing
+	module.  Added a function type_in_env to incrementally add new
+	typing contraints
+
+	* src/cfg/cfg_scope.mli: Created a type Cfg_scope.t that
+	encapsulates the state of the scope resolver so that a program can
+	be analyzed in discrete chunks, instead of as a monolithic stmt.
+
+	* lib/druby/contract.rb: Improved error messages for the various
+	contract checking routines (safe_eval, type contracts).
+
+2009-06-28  Mike Furr  <furr@cs.umd.edu>
+
+	* stubs/1.8/base_types.rb: Changed several signatures to use the
+	empty object type "[]", instead of a free type variable for
+	methods that are not intended to return a meaningful value
+
+	* src/dyn/dynamic.ml: Split profiling and code transformations
+	into two separate passes, added new option --dr-transform to
+	invoke the latter
+
+2009-06-26  Mike Furr  <furr@cs.umd.edu>
+
+	* src/typing/rType.ml: Fixed bug where annotated object types
+	were given open types instead of closed ones.
+
+2009-06-05  Mike Furr  <furr@cs.umd.edu>
+
+	* src/OMakefile: Added missing dep on safe_eval for install target
+
+2009-06-03  Mike Furr  <furr@cs.umd.edu>
+
+	* src/cfg/cfg.mli: Streamlined some of RIL's datatypes.  Turned
+	method_targ_expr into an "expr option", and moved the proc arg
+	from method_arg_expor to the type for codeblocks, leaving just a
+	star_expr.
+
+2009-06-02  Mike Furr  <furr@cs.umd.edu>
+
+	* src/cfg/dataflow.ml: Fixed a bug with updating the hashtable for
+	in sets
+
+	* src/cfg/cfg.ml: Added some more convenience functions in the
+	Abbr module
+
+	* src/cfg/cfg_refactor.mli: Added format versions of the reparsing
+	functions 
+
+2009-05-29  Mike Furr  <furr@cs.umd.edu>
+
+	* src/cfg/cfg_refactor.ml: Fixed translation bug. The method
+	evaluation order for parallel assignments is apparently different
+	than non-parallel assignment.
+
+2009-05-23  Mike Furr  <furr@cs.umd.edu>
+
+	* src/parser/newParser.dyp: Fixed a bug with parsing method names
+	called "undef"
+
+	* src/cfg/cfg.ml: Added remaining stmt constructs to the Cfg.Abbr
+	module
+
+	* src/cfg/cfg.mli: Removed the Cast construct since it is
+	redundant to an Expression node with an annotation.
+
+	* src/cfg/cfg_refactor.ml: Fixed translation for assigning the
+	return value of a loop.  Additionally, if you have a loop "x=while
+	... (break e)", then the break argument is now translated into an
+	explicit assignment to x followed by a nil Break.  Cleaned up
+	entire file to use more readable Abbr forms of stmt constructors.
+
+2009-05-17  Mike Furr  <furr@cs.umd.edu>
+
+	* config.omake: Made RSpec check more verbose.  The result of this
+	is now optional and so the Ruby test suite will be skipped if you
+	don't have rspec installed.
+
+	* Added static configuration check for older versions of OUnit and
+	added stub files to handle API difference.
+
+2009-05-15  Mike Furr  <furr@cs.umd.edu>
+
+	* src/parser/newParser.dyp: Handle corner case of a method call
+	with a space before paren to match Ruby's behavior (although its a
+	warning). "m (x,y)" and "m (x),y" are now equivalent.
+
+2009-05-11  Mike Furr  <furr@cs.umd.edu>
+
+	* ocaml-syck-0.1.1/yaml/OMakefile: Added support for building a
+	bytecode version of DRuby
+
+2009-05-04  Mike Furr  <furr@cs.umd.edu>
+
+	* src/cfg/cfg_refactor.mli: Expose the ?env paramter that is
+	passed to parse_helper through [k]reparse
+
+2009-05-03  Mike Furr  <furr@cs.umd.edu>
+
+	* src/typing/typing.ml: Changed typing rule for & to call to_proc
+	and constrain the return type of that call with a Proc object.
+
+	* src/cfg/cfg.mli: Changed `Proc to accept any expr, not just
+	identifiers.
+	
+
+2009-04-27  Mike Furr  <furr@cs.umd.edu>
+
+	* tests/typing/nanotypes.rb (Hash): Added get/set methods
+
+	* src/typing/typing.ml: Tuples now use width subtyping
+
+	* stubs/1.8/base_types.rb (Kernel::__splat): Added a splat method
+	to simulate the type of Ruby's * operator
+
+	* src/cfg/cfg.mli: Reduced the type for lhs.  The only
+	sub-expression allowable under a * is now an identifier.  If a
+	unbound star is present like "x,* = 1,2", a fresh identifier is
+	introduced instead.
+
+2009-04-24  Mike Furr  <furr@cs.umd.edu>
+
+	* src/typing/rType.ml: Changed KDict to KRecord and began
+	implementing records
+
+2009-04-21  Mike Furr  <furr@cs.umd.edu>
+
+	* gem_bin/druby: pass our libpath to the druby executable when run
+	under rubygems
+
+	* src/typing/rType.ml: Removed spurious constraints when a tuple
+	was promoted to an Array in some cases
+
+2009-04-20  Mike Furr  <furr@cs.umd.edu>
+
+	* src/main.ml: Seed the file_loader with the list of directories
+	passed via -I.  When not using profiling, prepend a require
+	statement for file passed via -r.
+
+	* file_loader.ml: Changed the create function to accept a string
+	list of instead of a single colon-delimited string.
+
+	* ChangeLog: Added a changelog!
+	

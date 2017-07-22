@@ -1,0 +1,94 @@
+
+ruby_succeed(x) = 
+  if $(not $(shell-success-null ruby $(x)))
+    println("ruby test file $(x) should have run, but 'ruby' command failed")
+    exit(1)
+
+ruby_syntax_succeed(x) = 
+  if $(not $(shell-success-null ruby -c $(x)))
+    println("$(x) has syntax errors")
+    exit(1)
+
+ruby_fail(x) = 
+  if $(shell-success-null ruby $(x))
+    println("ruby test file $(x) should have caused 'ruby' to fail")
+    exit 1
+
+validate_directory(f,dir) = 
+  files = $(glob $(dir)/*.rb)
+  checked_files = $(replacesuffixes .rb, .checked, $(files))
+  local_files = $(foreach $(fun x, $(basename $(x))), $(checked_files))
+  .SUBDIRS: $(dir)
+    $(local_files): %.checked : %.rb
+      section
+        f($<)
+        touch $@
+#    .DEFAULT: $(local_files)
+  return $(files) $(checked_files)
+
+valid_rubycode_directory(dir) =
+  validate_directory($(ruby_succeed), $(dir))
+
+invalid_rubycode_directory(dir) =
+  validate_directory($(ruby_fail), $(dir))
+
+syntax_rubycode_directory(dir) =
+  validate_directory($(ruby_syntax_succeed), $(dir))
+
+SUBDIRS = common parser cfg typing profile yaml contracts
+
+if $(RSPEC)
+  SUBDIRS += ruby
+  export
+
+OCAMLINCLUDES += \
+	$(SUBDIRS) \
+	$(ROOT)/src/parser \
+	$(ROOT)/src/cfg \
+	$(ROOT)/src/typing \
+	$(ROOT)/src/dyn \
+	$(ROOT)/src/ \
+	$(OUNIT_DIR) \
+	$(DYP_LIB) \
+	$(GETOPT_DIR) \
+	$(OCAMLGRAPH_DIR) \
+	$(YAML_DIR)
+
+OCAML_LIBS[] = 
+	$(YAML_DIR)/yaml
+	$(DYP_LIB)/dyp
+	$(ROOT)/src/druby
+	test_lib
+
+OCAML_OTHER_LIBS += str nums unix oUnit getopt graph
+
+TEST_PROGRAM = run_tests
+
+FILES[] = 
+
+.SUBDIRS: $(SUBDIRS)
+	include OMakefile
+	export FILES
+
+TEST_LIB = $(OCamlLibrary test_lib, $(FILES))
+
+CACHE_BASE_CFG = $(OCamlProgram cache_base_cfg, cache_base_cfg)
+
+base_types.cfg: $(CACHE_BASE_CFG) $(ROOT)/stubs/1.8/base_types.rb
+	./cache_base_cfg
+
+RUN_TEST_FILES[] = run_tests oUnit_success
+
+oUnit_success.ml: oUnit_success.ml.custom oUnit_success.ml.exist
+  if $(OUNIT_SUCCESSFUL)
+    cp oUnit_success.ml.exist oUnit_success.ml
+  else
+    cp oUnit_success.ml.custom oUnit_success.ml
+
+TEST = $(OCamlProgram $(TEST_PROGRAM), $(RUN_TEST_FILES))
+
+unit_tests.results: $(TEST) base_types.cfg
+	./$(TEST_PROGRAM) |& tee $@
+
+
+.DEFAULT: $(TEST) unit_tests.results

@@ -1,0 +1,13 @@
+
+OCAMLINCLUDES += ../common
+
+FILES[] += 
+	contracts/contracts_suite
+
+SUCC_CHECKS = $(valid_rubycode_directory $(dir succeed))
+FAIL_CHECKS = $(syntax_rubycode_directory $(dir fail))
+
+RUBYLIB_FILES = $`(ls R, ../../lib/druby) # `
+
+../unit_tests.results: 	\
+	$(SUCC_CHECKS) $(FAIL_CHECKS) $(RUBYLIB_FILES)

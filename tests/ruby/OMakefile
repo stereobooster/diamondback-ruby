@@ -1,0 +1,9 @@
+
+
+SPEC_FILES = $(glob specs/*)
+LIB_FILES = $`(ls R, ../../lib/druby) # `
+
+ruby_specs.results : $(SPEC_FILES) $(LIB_FILES)
+	ruby -I ../../lib $(RSPEC) . |& tee $@
+
+.DEFAULT: ruby_specs.results

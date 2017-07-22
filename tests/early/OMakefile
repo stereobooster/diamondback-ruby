@@ -1,0 +1,9 @@
+
+OCAMLINCLUDES += $(shell $(OCAMLFIND) query oUnit)
+
+FILES[] = 
+	early_suite
+
+.DEFAULT: $(OCamlLibrary test_early, $(FILES))
+
+../unit_tests.results: $(ROOT)/src/early $(glob *.rb)

@@ -1,0 +1,12 @@
+
+all: dyp dyp.opt
+
+
+FILES[] = 
+	dyp
+	gs
+	priority_by_relation
+	automaton
+	dyp
+
+.DEFAULT: $(OCamlLibrary dyp, $(FILES))

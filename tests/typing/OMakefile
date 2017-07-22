@@ -1,0 +1,20 @@
+
+OCAMLINCLUDES += ../common
+
+FILES[] += 
+	typing/typing_suite
+	typing/type_progs
+	typing/access_tests
+
+ANNOT_SUCC = $(valid_rubycode_directory $(dir annot_succeed))
+ANNOT_FAIL = $(syntax_rubycode_directory $(dir annot_fail))
+
+SUCC_CHECKS = $(valid_rubycode_directory $(dir succeed))
+FAIL_CHECKS = $(invalid_rubycode_directory $(dir fail))
+
+../unit_tests.results: 	\
+	nanotypes.rb \
+	$(ROOT)/stubs/1.8/base_types.rb \
+	$(SUCC_CHECKS) $(FAIL_CHECKS) \
+	$(ANNOT_SUCC) $(ANNOT_FAIL)
+

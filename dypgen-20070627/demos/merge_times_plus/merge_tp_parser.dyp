@@ -1,0 +1,23 @@
+{
+open Parse_tree
+
+let dyp_merge_expr l o2 = match l with [o1] ->
+  begin match o1 with
+    | Times (Plus(_,_),_) -> [o2]
+    | Times (_,Plus(_,_)) -> [o2]
+    | _ -> [o1]
+  end | _ -> assert false
+}
+
+%token <int> INT PLUS TIMES EOL
+
+%start <Parse_tree.tree> main
+
+%%
+
+main : expr EOL { $1 }
+
+expr :
+  | INT             { Int $1 }
+  | expr PLUS expr  { Plus ($1,$3) }
+  | expr TIMES expr { Times ($1,$3) }

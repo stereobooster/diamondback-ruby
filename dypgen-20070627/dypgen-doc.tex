@@ -1,0 +1,1318 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\geometry{ hmargin=2cm, vmargin=2cm }
+\title{\texttt{dypgen} User's Manual}
+\author{Emmanuel Onzon}
+
+\begin{document}
+\maketitle
+
+\section*{Overview}
+
+\texttt{dypgen} is a parser generator for Objective Caml. 
+  To use it you need to learn the BNF syntax for grammars
+  which is briefly explained in section \ref{BNF}.
+ Its main differences with other solutions are:
+\begin{itemize}
+%\item  But you should not
+%  need to learn the various notions of stack automaton (LR(0), LALR(1),
+%  \dots).
+\item This is a GLR parser. This means it can handle ambiguous
+  grammars and output the list of all possible parse trees. Even for
+  non ambiguous grammars, GLR parsing allows to define the grammar in
+  a more natural way. It is possible to extract a definition suitable
+  for the documentation directly from the \texttt{dypgen} source file.
+  
+\item Ambiguities can be removed by introducing {\em priorities} and
+  relations between them. This gives a very natural way to express a
+  grammar (the example in this documentation illustrates this).
+
+\item Grammars are self-extensible, i.e. an action can modify the
+  current grammar. Moreover, the modifications can be local. The new
+  grammar is valid only for a well delimited section of the parsed input.
+ 
+\item \verb#dypgen# provides management of local and global data that
+  the user can access and modify. These mechanisms adress the problem
+  posed by side effects with GLR parsing (see section \ref{data}).
+  
+  Modifications of local data are preserved when traveling from right to
+  left in a rule or when going down in the parse tree. Modifications of
+  global data are preserved across the complete traversal of the parse
+  tree.
+
+  This data may be used for instance to do type-checking at parsing
+  time in an elegant and acceptable way. The local data may
+  contain the environment that associates a type to each variable while the
+  global data would contain the substitution over types that is
+  usually produced by unification.
+  
+\item Pattern matching for symbols in right-hand sides of rules is possible.
+  In particular this allows guarded reductions and to bind names
+  to the arguments of actions.
+
+\item \verb#dypgen# allows {\em partial actions}, that are semantic actions
+  performed before the end of a rule.
+\end{itemize} 
+\newpage
+
+\tableofcontents
+
+\section{The calculator example}
+
+It is traditional to start the documentation of a parser generator
+with the calculator exemple.  Here we only give the grammar file:
+\texttt{dypgen} takes a file ending with \texttt{.dyp} as input and
+generates a \texttt{.ml} file and a \texttt{.mli} file.
+
+For the program to be complete, one also need to generate a lexical
+analyser, which can be done with \texttt{ocamllex}. The complete
+source for this example lies in the directory \texttt{demos/calc} of
+the distribution.
+
+Here is the file defining the calculator grammar:
+
+\newcommand{\verbatimfile}[1]{\expandafter\beginverb\inputfile{#1}}
+\newcommand{\beginverb}{\begin{verbatim}}
+\newcommand{\inputfile}[1]{\input{#1}}
+
+\verbatimfile{demos/calc/calc_parser.dyp}
+\end{verbatim}
+
+Let us comment it briefly. More details are available later in  this
+documentation. 
+
+\begin{itemize}
+\item The first two lines starting with \verb#%token# define the {\em
+tokens} also called {\em terminal symbols} of the grammar. The lexical analyser
+is supposed to transform a character stream into a token stream. 
+
+For instance, the token \verb#PLUS# will probably (this is defined by
+the lexical analyser) correspond to the character
+\verb#+# in the input stream.
+
+On the second line, we also indicate that the \verb#INT# tokens comes
+with a value of type \verb#int#. They correspond to integer values in
+the input stream.
+
+\item The third line starting with \verb#%relation# defines three
+priority levels, which intuitively will correspond to atomic
+expressions (\verb#pi#), products (\verb#pt#) and sums (\verb#pp#).
+
+\item The line starting with \verb#%start# gives the entry point of
+the grammar 
+. This means that one can parse an input stream using the function
+\verb#Calc_parser.main# which is the function you need to call to
+actually
+parse something.
+
+\item All the other line define the grammar. The next section will
+  explain how to write grammar. Briefly we remark a BNF grammar
+  (explained below) decorated with the new concept of priority and with
+  semantical action between curly braces.
+
+\end{itemize}
+\section{BNF grammars}\label{BNF} 
+
+A BNF grammar is a concise way of defining a language, that is set of
+sequence of characters. However, it is traditional and may be more efficient to define language
+in to steps: lexical analysis and grammatical analysis. 
+
+We will not describe lexical analysis here. We will assume an already
+defined lexer (for instance using \texttt{ocamllex}) which defines 
+some sets of words denoted using capital letters. For instance, 
+in that calculator example above, \verb#PLUS# denotes one word 
+``\verb#+#'' while \verb#INT# denoted the set of all words representing
+an integer.
+
+These set of words defined by the lexer are usually called {\em
+  tokens} or {\em terminal symbols}.
+
+Then a BNF grammar, describe the language as set of sequence of
+terminal symbols 
+(they have sometime to be separated by {\em spaces}). 
+
+The calculator grammar in this context is 
+
+\begin{verbatim}
+expr : INT | MINUS expr | LEFTPAR expr RIGHTPAR
+  | expr PLUS expr | expr MINUS expr 
+  | expr TIMES expr | expr DIV expr
+\end{verbatim}
+ 
+This in fact just defines the language \texttt{expr} as the smallest language
+containing \texttt{INT} and closed by the following construction
+rules:
+\begin{itemize}
+\item If $w \in \mathtt{expr}$ then $\mathtt{-}w \in \mathtt{expr}$ (we assume
+  here that $\texttt{MINUS}$ contains only the word \verb#-#, and
+  similar assumptions for the other tokens).
+\item If $w \in \mathtt{expr}$ then $(w) \in \mathtt{expr}$
+\item If $w,w' \in \mathtt{expr}$ then $w\mathtt{+}w' \in \mathtt{expr}$
+\item If $w,w' \in \mathtt{expr}$ then $w\mathtt{-}w' \in \mathtt{expr}$
+\item If $w,w' \in \mathtt{expr}$ then $w\mathtt{*}w' \in \mathtt{expr}$
+\item If $w,w' \in \mathtt{expr}$ then $w\mathtt{/}w' \in \mathtt{expr}$
+\end{itemize}
+
+In general, a grammar is define by a finite number of non-terminal
+symbols (the calculator grammar has only one non-terminal :
+\texttt{expr}) and a set of rules describing the elements of each
+non-terminal symbols.  
+A rule associates to one non-terminal symbol a sequence of symbols
+(terminal or non-terminal). 
+
+Then the languages corresponding to each non-terminals are defined
+simultaneously as the smallest language satisfying every rules.
+
+Let us consider another example:
+
+\begin{verbatim}
+a : INT | a MINUS b
+b : INT | b PLUS a
+\end{verbatim}
+ 
+This means that \verb#a# and \verb#b# are the smallest languages
+containing the integers and such that:
+\begin{itemize}
+\item If $w \in \mathtt{a}$ and $w' \in \mathtt{b}$ then $w\mathtt{-}w' \in \mathtt{a}$
+\item If $w \in \mathtt{b}$ and $w' \in \mathtt{a}$ then $w\mathtt{+}w' \in \mathtt{b}$
+\end{itemize}
+
+Then, it is easy to see that \verb#0-0+0-0# is in the language
+\verb#a#, because \verb#0# is both in \verb#a# and \verb#b# which
+implies
+that \verb#0-0# is in \verb#a#, from which we deduce that \verb#0+0-0#
+is in \verb#b# and then, it is easy to conclude. However,
+\verb#0-0+0-0# is not in \verb#b# (an easy exercise).
+
+\section{Priorities}\label{priorities}
+
+The problem with our calculator grammar as written in the previous section
+is that it is ambiguous and wrong because for instance, there 
+are to way to parse \verb#3-2+1#, one way equivalent to \verb#(3-2)+1#
+and the other way leading to \verb#3-(2+1)#.
+
+The second way is not the usual way to read this expression and will
+give a wrong answer when we will compute the value of the expression
+in the semantical action.
+
+We forget to say that our operator should be associated to the left
+and also that product and division have priority over addition and subtraction.
+
+To say so, \texttt{dypgen} provides priority constant and relation
+over them. In the case of the calculator, we define three priorities
+constants : \verb#pi#, \verb#pt# and \verb#pp#. We define the relation
+\verb#<# by \verb#pi<pt#, \verb#pi<pp# and \verb#pt<pp#.
+
+For each rule, we say to which priority it belongs
+ and for each non terminal in a
+rule,
+we give the priority it accepts.
+
+
+The calculator grammar in this context is 
+
+\begin{verbatim}
+expr : INT pi 
+  | MINUS expr(<=pi) pi 
+  | LEFTPAR expr RIGHTPAR pi
+  | expr(<=pp) PLUS expr(<pp) pp
+  | expr(<=pp) MINUS expr(<pp) pp
+  | expr(<=pt) TIMES expr(<pt) pt
+  | expr(<=pt) DIV expr(<pt) pt
+\end{verbatim}
+ 
+Let us comment some rules: in the rule  
+\verb#E : expr(<=pp) PLUS expr(<pp) pp#, 
+we say that an expression produced by this rule will be associated to
+the priority constant \verb#pp#. We also say that on the left of the
+\verb#PLUS#
+token, only an expression of priority less or equal than \verb#pp# can
+appear while on the right, we are more restrictive since we only
+accept a priority stricly less that \verb#pp#.
+
+For the rule \verb#E : LEFTPAR expr RIGHTPAR pi#, we associate the
+smallest priority to the resulting expression and we give no
+constraint
+for the expression between parenthesis.
+
+More details about priorities will be given in the section \ref{priority}.
+
+\section{Semantical actions}\label{actions}
+
+Now, parsing is not just defining acceptable sequence. One as to
+produce something from the parsed sequence. This is performed using
+semantical actions, given after each rule.
+
+ An action is a piece of
+\verb#ocaml# code returning data associated to the parsed sequence, it can
+be used to build a parse-tree or, as with the calculator, to compute a value.
+Actions can access the semantics (that is the data
+associated to) each non-terminal. Terminal symbols also can have
+semantics associated to them by the lexical analyser. 
+
+In the code of
+an action, we access the semantical data of each symbol in the rule
+using notation \verb#$1, $2, $3... # (\verb#$3# is the semantics of 
+the third symbol in the rule).
+
+Action must be placed after each rule between curly braces and before
+the priority of the rule.
+
+Let us look again at the calculator grammar, but with the
+semantical action added:
+
+\begin{verbatim}
+expr :
+  | INT                        { $1 }      pi
+  | MINUS expr(<=pi)           { -$2 }     pi
+  | LPAREN expr RPAREN         { $2 }      pi
+  | expr(<=pp) PLUS expr(<pp)  { $1 + $3 } pp
+  | expr(<=pp) MINUS expr(<pp) { $1 - $3 } pp
+  | expr(<=pt) TIMES expr(<pt) { $1 * $3 } pt
+  | expr(<=pt) DIV expr(<pt)   { $1 / $3 } pt
+\end{verbatim}
+
+Here, the actions compute the value of the numerical expression and
+the example is self explaining.
+
+Remark: a non terminal can accept the empty sequence, by writing no
+symbol before the opening curly brace of the action.
+
+\section{Managing ambiguities}\label{ambiguities}
+
+There are two main mechanisms to handle ambiguities in \texttt{dypgen} : a system of priorities with relations between them and the merge functions which can decide which parse-tree to keep when a given part of the input is reduced to the same non terminal by two different ways. Two other secondary mechanisms make possible to decide to give up a reduction with a rule (by raising the exception \texttt{Dyp.Giveup}) or to prevent a shift (i.e. the parser is prevented from reading more input without performing a reduction).
+
+\subsection{Priorities with relations}\label{priority}
+
+Each time a reduction by a rule happens, the corresponding parse-tree is yielded with a value which is called a priority.
+Priorities are named and declared along with relations between them which hold true with the keyword \texttt{\%relation}. The symbol for the relation is \texttt{<} (but this does not mean that it has to be an order). A declaration of priorities can be for instance :
+\begin{verbatim}
+%relation pi<pt pt<pp pi<pp
+\end{verbatim}
+It is possible to declare a relation which is transitive on a subset of the priorities with a more compact syntax.
+\begin{verbatim}
+%relation p1<p2<...<pn
+\end{verbatim}
+means that the following relations hold : \texttt{p1<p2}, ... , \texttt{p1<pn}, \texttt{p2<p3}, ... , \texttt{p2<pn}, ... , \texttt{p(n-1)<pn}. Thus the first example of relations declaration can also be written:
+\begin{verbatim}
+%relation pi<pt<pp
+\end{verbatim}
+The declarations can use several lines, the following declaration is valid :
+\begin{verbatim}
+%relation pi<pt
+pt<pp
+%relation pi<pp
+\end{verbatim}
+
+Each rule in the grammar returns a priority value when it is used to reduce. This priority is stated by the user after the action code. For instance :
+\begin{verbatim}
+expr: INT { $1 } pi
+\end{verbatim}
+If the parser reduces with this rule then it returns the value associated to the token \texttt{INT} and the priority \texttt{pi}. The user can state no priority, then the default priority \texttt{default\_priority} is returned each time a reduction with this rule happens. The value \verb|default_priority| is part of the module \verb|Dyp_priority_data| available in the parser code.\\
+
+Each non terminal in the right-hand side of a rule is associated to a set of priorities that it accepts to perform a reduction. This set of priorities is denoted using the following symbols \texttt{<}, \texttt{>} and \texttt{=} and a priority \texttt{p}.\\
+
+\texttt{(<p)} denotes the set of all priorities \texttt{q} such that \texttt{q<p} holds. \texttt{(<=p)} denotes the previous set to which the priority \texttt{p} is added. \texttt{(>p)} is the set of all priorities \texttt{q} such that \texttt{p<q} holds. Obviously \texttt{(>=p)} denotes the previous set to which the priority \texttt{p} is added and \texttt{(=p)} is the set of just \texttt{p}. Note that when declaring relations between priorities, the symbols \texttt{>} and \texttt{=} cannot be used.\\
+
+If no set of priorities is stated after a non terminal in a right-hand side of a rule, then it means that it accepts any priority. Thus to not state any set of priority is equivalent to state the set of all priorities.\\
+
+A basic example, you have the following rules :
+\begin{verbatim}
+expr: INT { $1 } pi
+expr: MINUS expr(<=pi) { -$2 }
+\end{verbatim}
+You parse the string : `\texttt{-1}'. First \texttt{1} is reduced to \texttt{expr} with the first rule. \texttt{1} is the returned value and \texttt{pi} is the returned priority. Then the reduction with the second rule can happen because the non terminal \texttt{expr} in its right-hand side accepts the priority \texttt{pi}. This reduction is performed, the returned value is \texttt{-1} and the returned priority is \texttt{default\_priority}. Now if we want to parse the string `\texttt{--1}' a syntax error will happen, because when \texttt{-1} is reduced, the priority \texttt{default\_priority} is yielded, which is not accepted by the second rule and therefore a reduction by this rule cannot happen a second time.\\
+
+Another example, we have the relations \texttt{pi<pt<pp} and the following grammar :
+\begin{verbatim}
+expr :
+  | INT                        { $1 }      pi
+  | LPAREN expr RPAREN         { $2 }      pi
+  | expr(<=pp) PLUS expr(<pp)  { $1 + $3 } pp
+  | expr(<=pt) TIMES expr(<pt) { $1 * $3 } pt
+\end{verbatim}
+and we parse the following input : \texttt{1 + 2 * 3}\\
+
+\texttt{1} and \texttt{2} are reduced to \texttt{expr}, each returning the priority \texttt{pi}, then the parser explores the shift and the reduction.
+The parser can reduce with the third rule because \texttt{pi<pp} holds, the priority \texttt{pp} is returned. After \texttt{3} is reduced to \texttt{expr}, the parser cannot reduce with rule 4 after the reduction by rule 3 because \texttt{pp<pt} does not hold.
+But the exploration of the possibility of a shift of \texttt{*} after reducing \texttt{2} to \texttt{expr} leads to a successful parsing (which respects the precedence of \texttt{*} over \texttt{+}).\\
+
+The user can declare a priority without stating any relation with it by adding it in the section after \texttt{\%relation}. You should declare any prorities which has no relation. If you use a priority that is not declared and has no relation, in a rule, then \texttt{dypgen} will emit a warning.\\
+
+When a priority is declared a corresponding Caml value of type \texttt{priority} is introduced with the same name. You should beware of identifier collision and not name other variables with the names of your priorities or \texttt{default\_priority}. This value can be used in action codes. All the information about relations are stored in a structure of type \texttt{priority\_data}. This structure is accessible from the action code with the mutable record field \texttt{dyp.priority\_data}. The following function allows to know whether the relation holds between two priorities:
+\begin{verbatim}
+val is_relation : priority_data -> priority -> priority -> bool
+\end{verbatim}
+\texttt{is\_relation dyp.priority\_data p q} returns true if \texttt{p<q} holds and false otherwise. The type of the record \verb|dyp| is defined in the module \verb|Dyp| of the library \verb|dyp.cm[x]a|, see the section \ref{dyp} for more information about it.\\
+Other functions pertaining to priorities are available, see section \ref{dynamic priority} about changing the priorities at runtime. 
+
+\subsection{Merge functions}\label{merge}
+
+When a part of the input is reduced by several different ways to a same non terminal \texttt{nt} then the parser must decide whether to keep all the parse trees yielded or to choose just one or a few of them, or to make a new tree from them. By default only one parse tree is kept: the oldest, and the other ones are discarded but the user can make it otherwise. It is possible to define a function \verb|dyp_merge_nt| of type :
+\begin{verbatim}
+val dyp_merge_nt : 'a list -> 'a -> 'a list
+\end{verbatim}
+Where \texttt{'a} is the type of the value returned when one reduces to the non terminal \texttt{nt}. The first argument is the list of parse trees which are the different interpretations which were yielded and kept for the non terminal \texttt{nt} for a given part of the input. The second argument is the parse tree which has been just yielded. The result is a list of parse trees which are kept as the different interpretations for the non terminal \texttt{nt} for the considered part of the input. The user can define such a function for each non terminal in the header of the parser.\\
+
+For instance if one wants to keep all the parse trees for the non terminal \texttt{nt} then we can use:
+\begin{verbatim}
+let dyp_merge_nt ol o = o::ol
+\end{verbatim}
+If one wants to keep the newest parse tree:
+\begin{verbatim}
+let dyp_merge_nt _ o = [o]
+\end{verbatim}
+
+A merge function is only called on parse-trees which were yielded with same priorities. If a part of the input is reduced to the same non terminal by two different ways but yielding two distinct priorities, then each parse-tree is kept and used independantly for the parsing, but they are not merged.\\
+
+Here is an example of using a merge function to enforce the precedence of the multiplication over the addition. Suppose we have the following grammar:
+\begin{verbatim}
+expr:
+  | INT             { Int $1 }
+  | expr PLUS expr  { Plus ($1,$2) }
+  | expr TIMES expr { Times ($1,$2) }
+\end{verbatim}
+And the following string : \texttt{3+10*7} should be parsed \texttt{Plus (3,Times (10,7))}, more generally the parse result of any string should respect the precedence of \texttt{*} over \texttt{+}. Then we can do this by defining the following merge function:
+\begin{verbatim}
+let dyp_merge_expr l o2 = match l with [o1] ->
+  begin match o1 with
+    | Times (Plus(_,_),_) -> [o2]
+    | Times (_,Plus(_,_)) -> [o2]
+    | _ -> [o1]
+  end | _ -> assert false
+\end{verbatim}
+You can find this example implemented in the directory \texttt{demos/merge\_times\_plus}.\\
+
+In addition to these merge functions which are specific to one non terminal, the user can also define one global merge function called \verb|dyp_merge|, and several generic merge functions. A generic merge function can be the merge function of several different non terminals. The type of a generic merge function as well as the type of the global merge function is the following:
+\begin{verbatim}
+type merge_function : priority_data -> ((obj * priority) list) -> (obj * priority)
+  -> ((obj * priority) list)
+\end{verbatim}
+The type \texttt{obj} should be considered as an abstract type which cannot be destructured. If you want to define a merge function which can destructure a parse tree and to assign this merge function to several non terminals (which must return the same type) then you have to use the specific merge functions discussed above.\\
+
+The global merge function can be defined in the header of the parser definition, for instance to define a global merge function which keeps all the parse trees:
+\begin{verbatim}
+let dyp_merge ol o = o::ol
+\end{verbatim}
+Then it will be the merge function of any non terminal \texttt{nt} which has not its own function \verb|dyp_merge_nt| and has no generic merge function assigned to it.\\
+
+Generic merge functions are defined in the header. Then to assign a merge function to one or several non terminal one uses the keyword \texttt{\%merge} in the following way:
+\begin{verbatim}
+%merge my_merge_function nt1 nt2 nt3 nt4 nt5
+\end{verbatim}
+where \texttt{my\_merge\_function} is the name of the generic merge function which has been defined in the header and \texttt{nt1} ... \texttt{nt5} are the names of the non terminal which are assigned this generic merge function.\\
+
+There are three predefined generic merge functions available to the user:
+\begin{verbatim}
+val keep_all : merge_function
+val keep_oldest : merge_function
+val keep_newest : merge_function
+\end{verbatim}
+They keep respectively all the parse trees, the oldest and the newest. If no global merge function is defined then by default it is \texttt{keep\_oldest}.\\
+
+Note that you can use the predefined merge functions as generic functions and as the global merge function as well. If you want to keep all the parse trees for all the non terminals, just define the following in the header:
+\begin{verbatim}
+let dyp_merge = keep_all
+\end{verbatim}
+You can find a very simple example using merge in the directory \texttt{demos/forest} where a parse forest is yielded.\\
+
+To know whether a merge happens you can use the command line option \texttt{--merge-warning} with \texttt{dypgen}. Then the generated parser will emit a warning on the standard output each time a merge happens.\\
+
+Warning : when there is an error of type with the arguments or the result of a merge function, Caml reports it and points to the \texttt{.ml} file generated by \texttt{dypgen}, not to the \texttt{.dyp} input file, which may be puzzling.\\
+
+\subsection{Giving up a reduction}
+
+When a reduction occurs this reduction is given up if the exception \texttt{Dyp.Giveup} is raised in the corresponding action code.
+\begin{verbatim}
+expr :
+  | INT           { $1 }
+  | expr DIV expr { if $3=0 then raise Dyp.Giveup else ($1 / $3) }
+\end{verbatim}
+This is an example where a division by zero is not syntaxically correct, the parser refuses to reduce a division by zero. We can also imagine a language with input files being parsed and typed at the same time and an action would give up a reduction if it detected an incompatibility of type. Let us assume we have the following input for such a language:
+\begin{verbatim}
+exception Exception
+let head l = match l with
+  | x::_ -> x
+  | _ -> raise Exception
+let a = head 1::[2]
+\end{verbatim}
+Then the parser try to reduce \texttt{head 1} to an expression, but the typing concludes to an incompatibility of type. Hence an exception \texttt{Giveup} is raised which tells the parser not to explore this possibility further. Then the parser reduces \texttt{1::[2]} to an expression and thereafter \texttt{head 1::[2]} is reduced to an expression without type error.
+
+\subsection{Preventing a shift}
+
+When a reduction occurs it is possible to prevent the shift with the action code. You just have to use the following line in your action code:
+\begin{verbatim}
+dyp.will_shift <- false;
+\end{verbatim}
+
+Here is an example, we have the following rules in a grammar:
+\begin{verbatim}
+expr:
+  | INT { Int $1 }
+  | expr COMMA expr { action_comma $1 $3 }
+\end{verbatim}
+Assuming we have the following input : \texttt{1,2,3}, there are two ways to reduce it to \texttt{expr}. First one: \texttt{1,2} is reduced to \texttt{expr} then \texttt{expr,3} is reduced to \texttt{expr}. Second one: \texttt{2,3} is reduced to \texttt{expr} then \texttt{1,expr} is reduced to \texttt{expr}. Now if we have the input \texttt{1,2,...,n} there are as many ways to reduce it to \texttt{expr} as there are binary trees with n leaves. But we can use the following action code instead:
+\begin{verbatim}
+expr:
+  | INT { Int $1 }
+  | expr COMMA expr { dyp.will_shift <- false; action_comma $1 $3 }
+\end{verbatim}
+Then there is only one way to reduce \texttt{1,2,3} to \texttt{expr} : the first one, because when the record field \texttt{dyp.will\_shift} is \texttt{false} the parser will not shift the comma without reducing. And there is only one way to reduce \texttt{1,...,n} to \texttt{expr}.
+
+\section{Auxiliary data}\label{data}
+
+With GLR, the parsing can follow different interpretations independantly and simultaneously if there are local ambiguities. As a consequence if there are accesses and changes to data
+through side-effects for each of these parsings, there can be unwanted
+interactions between them. For this reason, using side effects for the purpose of storing data should be avoided during the parsing. If you want to build and store data while parsing and access this data from within the action code then you should use the mutable record fields \texttt{dyp.global\_data} or \texttt{dyp.local\_data}. If they are used, then the user must define their initial values in the header with the following references:
+\begin{verbatim}
+let global_data = ref some_initial_data
+let local_data = ref some_other_data
+\end{verbatim}
+The record \verb|dyp| is available in the action code and you can change the content of the fields \verb|global_data| and \verb|local_data| (the type of the record \verb|dyp| is defined in the module \verb|Dyp| see section \ref{dyp} for more information). The initial values can also be accessed from outside the parser definition if you declare them with their type in the \verb|.mli| file (by using \verb|%mli|, see section \ref{mli}). If you change them before calling the parser, then these changes will be taken into account as new initial values for \verb|global_data| and \verb|local_data|.\\
+
+The data accessible with \verb|dyp.global_data| follows the parsing during the reductions and the shifts. If at one point the parser follows different alternatives then it evolves independantly for each alternative.\\
+
+The same is true for \texttt{dyp.local\_data} except that when a reduction happens, it is `forgotten' and returned to its previous value. More precisely: when you update \texttt{dyp.local\_data} in an action which yields a non terminal \texttt{nt}, then this \texttt{dyp.local\_data} is not forgotten (unless you do it) in any action which follows until this non terminal \texttt{nt} is used in another reduction. When this happens, \texttt{dyp.local\_data} is forgotten and returns to its previous value just before the execution of the action code of this reduction.\\
+
+Here is an example:
+\begin{verbatim}
+a: TOK_1 b TOK_2 c TOK_3 d EOF { action_8 }
+b: e f   { action_3 }
+e: A1    { action_1 }
+f: A2    { action_2 }
+c: g h   { action_6 }
+g: B1    { action_4 }
+h: B2    { action_5 }
+d: C     { action_7 }
+\end{verbatim}
+We parse the string :
+\begin{verbatim}
+TOK_1 A1 A2 TOK_2 B1 B2 TOK_3 C EOF}
+\end{verbatim}
+\begin{itemize}
+\item Assume that at the beginning of the parsing 
+\texttt{dyp.local\_data} has some initial value \texttt{local\_data\_0}.
+\item The first action to be performed is \texttt{action\_1}, it has access to \texttt{local\_data\_0} which it modifies to \texttt{local\_data\_1},
+\item then the next action is \texttt{action\_2}, it has access to \texttt{local\_data\_1} and can modify it to \texttt{local\_data\_2}, although this is useless in this case because it is about to be forgotten.
+\item Then the reduction of \texttt{e f} to \texttt{b} happens. \texttt{dyp.local\_data} comes back to its value before \texttt{action\_1} was performed, that is \texttt{local\_data\_0}. \texttt{action\_3} is performed and changes \texttt{dyp.local\_data} to the value \texttt{local\_data\_3}.
+\item The next action to be performed is \texttt{action\_4}, it changes \texttt{local\_data\_3} to \texttt{local\_data\_4},
+\item then \texttt{action\_5} has access to this new value and can change it but it is useless in this case.
+\item The reduction of \texttt{g h} to \texttt{c} happens and the value of \texttt{dyp.local\_data} is again \texttt{local\_data\_3}, the value it had just after \texttt{action\_3} was applied. It is changed to \texttt{local\_data\_6} by \texttt{action\_6}.
+\item The next action is \texttt{action\_7} which has access to \texttt{local\_data\_6}. It is useless to change it since it is about to be forgotten.
+\item The reduction with the first rule is performed, the value of \texttt{dyp.local\_data} comes back to \texttt{local\_data\_0} and the last action \texttt{action\_8} is performed.
+\end{itemize}
+
+\texttt{dyp.local\_data} is useful, for instance, to build a symbol table, and makes possible to use it to disambiguate. Assume the following grammar and action code:
+\begin{verbatim}
+main : expr EOL { $1 }
+expr: INT                  { Int $1 }
+  | IDENT                  { if is_bound dyp.Dyp.local_data $1 then Ident $1
+                             else raise Dyp.Giveup }
+  | LPAREN expr RPAREN     { $2 }
+  | expr PLUS expr         { Plus ($1,$3) }
+  | LET binding IN expr    { Let ($2,$4) }
+binding: IDENT EQUAL expr
+    { dyp.Dyp.local_data <- insert_binding dyp.Dyp.local_data $1 $3;
+      Binding ($1,$3) }
+\end{verbatim}
+If we keep all the parse trees (see merge functions section \ref{merge}), then the following input string: \begin{verbatim}
+let x = 1 in x+1
+\end{verbatim}
+yields the two following parse trees :
+\begin{verbatim}
+(let x = 1 in (x+1))
+((let x = 1 in x)+1)
+\end{verbatim}
+But this input string :
+\begin{verbatim}
+let x = 1 in 1+x
+\end{verbatim}
+yields only one parse-tree :
+\begin{verbatim}
+(let x = 1 in (1+x))
+\end{verbatim}
+Moreover some input are detected as invalid because of unbound identifiers before the whole string has been parsed, like:
+\begin{verbatim}
+(let x = 1 in y+2) + ...
+\end{verbatim}
+This example is available in the directory \texttt{demos/local\_data}.\\
+
+A function of equality between two global data \texttt{global\_data\_equal} can be defined otherwise it is by default the physical equality \texttt{(==)}, same thing for \texttt{local\_data} but the function is called \texttt{local\_data\_equal}. These equality functions are used by the parser in order to not merge two interpretations of a given part of the input if they have different \texttt{global\_data} or different \texttt{local\_data}\\
+
+Here is a very simple example of use of \verb|dyp.global_data|, it counts the number of reductions.
+\begin{verbatim}
+{ open Dyp
+let global_data = ref 0
+let global_data_equal = (=) }
+
+%token <int> INT PLUS TIMES EOL
+%relation pi<pt<pp
+%start <int> main
+%%
+main: expr EOL { Printf.printf "The parser made %d reductions for this
+                 interpretation.\n" dyp.global_data; $1 }
+expr:
+  | INT                        { dyp.global_data <- dyp.global_data+1; $1 }      pi
+  | expr(<=pp) PLUS expr(<pp)  { dyp.global_data <- dyp.global_data+1; $1 + $3 } pp
+  | expr(<=pt) TIMES expr(<pt) { dyp.global_data <- dyp.global_data+1; $1 * $3 } pt
+\end{verbatim}
+For instance we parse \texttt{5*7+3*4}, when \texttt{4} is reduced, \verb|dyp.global_data| is incremented from 4 to 5 (note that it will actually not count the real total number of reductions, but only the number of reductions made for the first interpretation of the input). This example is available in the directory \verb|demos/global_data|.\\
+
+Here is a less basic example and where \verb|dyp.global_data| can be useful, suppose we have the following grammar:
+\begin{verbatim}
+expr:
+  | LIDENT
+  | INT
+  | FLOAT
+  | LPAREN expr COMMA expr RPAREN
+  | expr PLUS expr
+  | LPAREN expr RPAREN
+  | expr PLUSDOT expr
+\end{verbatim}
+
+We parse an input and the following string is a part of this input:
+\begin{verbatim}
+(x+.3.14,(x+1,(x+5, ... )))
+\end{verbatim}
+Where \texttt{...} stands for something long. Suppose we are typing the expressions in parallel with their parsing and we want to reject the previous string as early as possible. We do not want to wait for reducing the whole string to detect the type incompatibility of \texttt{x}. Then we can use \verb|dyp.global_data| for that purpose and when reducing \texttt{x+.3.14} we store in \verb|dyp.global_data| that \texttt{x} is of type float and then when we reduce \texttt{x+1} we have this information still stored in \verb|dyp.global_data| which is accessible from the action code. And we can detect the type incompatibility whithout having to parse more input.
+
+\section{More about actions and rules}
+
+\subsection{Several actions for a rule}
+
+It is possible to bind several actions to the same rule, but only one will be completely performed. When there are several actions for the same rule, the parser tries them one after the other until the first one that does not raise \texttt{Giveup}. To bind several actions to a rule, write the rule as many times as you need actions and state a different action after the rule each time. The actions are tried by the parser in the same order as they appear in the definition file \texttt{.dyp}. For instance with the following actions:
+\begin{verbatim}
+expr:
+  | INT  { if $1 = 0 then raise Dyp.Giveup else $1 }
+  | INT  { 100 }
+\end{verbatim}
+an integer returns its value except for \texttt{0} which returns \texttt{100}.\\
+
+When a rule is dynamically added to the grammar, if it was already in the grammar, then the action it was bound to is still in the grammar but when a reduction by the rule occurs the old action will be applied only if the new one raises \texttt{Giveup}. This is useful when one wants to add a rule at runtime with a keyword which is not recognized specifically as a keyword by the lexer but as an identifier.
+
+\subsection{Partial actions}
+
+It is possible to insert action code in the right-hand side of a rule before the end (the last symbol) of this right-hand side. This is a partial action. For instance you may have:
+\begin{verbatim}
+expr: LET IDENT EQUAL expr { binding dyp $2 $4 } IN expr { Let ($5,$7) }
+\end{verbatim}
+The value returned by the partial action is accessible to the final action as if the partial action were a symbol in the right-hand side. In the rule above it is accessible with \texttt{\$5}. The record \verb|dyp| is passed to \verb|binding| to have access to \verb|dyp.local_data|.\\
+
+For the parser the rule :
+\begin{verbatim}
+expr: LET IDENT EQUAL expr IN expr
+\end{verbatim}
+does not exist. \texttt{dypgen} splits this rule in the two following:
+\begin{verbatim}
+expr: dypgen__nt_0 IN expr
+dypgen__nt_0: LET IDENT EQUAL expr
+\end{verbatim}
+As a consequence if you modify \texttt{local\_data} in the partial action, then this new value of \texttt{local\_data} is accessible to any action which is performed before the final action is applied (the final action not included). For instance if we have:
+\begin{verbatim}
+expr: LET IDENT EQUAL expr { binding dyp $2 $4 } IN expr { Let ($5,$7) }
+\end{verbatim}
+with
+\begin{verbatim}
+let binding dyp name exp =
+  dyp.local_data <- insert_binding dyp.local_data name exp;
+  Binding (name,exp)
+\end{verbatim}
+Then during the recognition of the last non terminal \texttt{expr} of the righ-hand side of the rule, any action has access to the value of \texttt{dyp.local\_data} assigned by \texttt{binding} called by the partial action.\\
+
+It is possible to insert several partial action in a rule, but not at the same position in the right-hand side.
+\begin{verbatim}
+nt1: TOK1 nt2 { pa_1 } nt2 nt3 { pa_2 } nt4 TOK2 { pa_3 } TOK3 { final_action }
+\end{verbatim}
+creates the following rules:
+\begin{verbatim}
+nt1: dypgen__nt_1 TOK3
+dypgen__nt_1: dypgen__nt_2 nt4 TOK2
+dypgen__nt_2: dypgen__nt_3 nt2 nt3
+dypgen__nt_3: TOK1 nt2
+\end{verbatim}
+As a consequence of these new rules, if \texttt{local\_data} is changed by \texttt{pa\_1}, these changes stay accessible until \texttt{pa\_2} is performed (\texttt{pa\_2} not included). Note that the names of the generated new non terminals are unique, the ones stated here may be inaccurate.\\
+
+Another consequence is that if a rule exists two times in the parser definition, one time with partial actions and another time whithout partial action, or both times with partial actions, then each of them may be tried by the parser to reduce regardless of whether the other raised \texttt{Giveup} or not. This differs from the case where both of them do not have partial action.
+
+\subsection{Pattern matching on symbols}\label{pattern}
+
+It is possible to match the value returned by any symbol in a right-hand side against a pattern. The syntax is just to add the pattern inside brackets after the symbol name and the possible priority constraint. For instance we may have the following:
+\begin{verbatim}
+expr: INT[x]  { x }
+\end{verbatim}
+which is identical to:
+\begin{verbatim}
+expr: INT  { $1 }
+\end{verbatim}
+One can use pattern matching to have a guarded reduction. Assuming the lexer return \texttt{OP("+")} on   `\texttt{+}' and \texttt{OP("*")} on `\texttt{*}', we can have the following rules:
+\begin{verbatim}
+expr:
+  | expr OP["+"] expr { $1 + $2 }
+  | expr OP["*"] expr { $1 * $2 }
+\end{verbatim}
+
+The patterns can be any Caml patterns (but without the keyword \verb|when|). For instance this is possible:
+\begin{verbatim}
+expr: expr[(Function([arg1;arg2],f_body)) as f] expr  { ... }
+\end{verbatim}
+
+The value returned by a partial action can also be matched. You can write:
+\begin{verbatim}
+nt0: TOK1 nt1 { partial_action }[pattern] nt2 TOK2 nt3 { action }
+\end{verbatim}
+
+The directory \texttt{calc\_pattern} contains a version of the calculator which uses patterns (in a basic way).
+
+\subsection{Nested rules}
+
+A non terminal in a right-hand side can be replaced by a list of right-hand sides in parentheses, like:
+\begin{verbatim}
+nt1:
+| symb1 (  symb2 symb3 { action1 } prio1
+         | symb4 symb5 { action2 } prio2
+         | symb6 symb7 { action3 } prio3 )[pattern] symb8 symb9 { action4 } prio4
+| ...
+\end{verbatim}
+The pattern in brackets after the list of nested rules is optionnal.
+
+\section{Dynamic changes to the grammar}
+
+\subsection{Adding and removing rules}\label{adding rules}
+
+Dynamic changes to the grammar are performed by action code. To add rules one uses the mutable record field \texttt{dyp.add\_rules} and to remove rules the mutable record field \texttt{dyp.remove\_rules}.
+\begin{verbatim}
+mutable add_rules : (rule * (dypgen_toolbox -> obj list -> obj)) list;
+mutable remove_rules : rule list
+\end{verbatim}
+Where \verb|dypgen_toolbox| is the type of the record \verb|dyp| (see section \ref{dyp}), and the type \verb|obj| is explained a bit further. To add several rules and their respective actions to the grammar, the user assigns the list of the corresponding couples \texttt{(rule, action)} to \texttt{dyp.add\_rules}.\\
+
+The type \texttt{rule} is defined as follows :
+\begin{verbatim}
+type token_name
+type non_ter
+type 'a pliteral =
+  | Ter of token_name
+  | Non_ter of 'a * non_terminal_priority
+type lit = (non_ter * non_terminal_priority) pliteral
+type rule = non_ter * (lit list) * priority
+\end{verbatim}
+In the type \verb|rule|, \verb|non_ter| is the non terminal of the left-hand side of the rule, \verb|lit list| is the list of symbols in the right-hand side of the rule. These types are part of the module \verb|Dyp| which is not open by default.\\
+
+For each token \texttt{Token} there is one \verb|token_name| value which is bound to the variable \verb|t_Token|. Non terminals are accessible with their names which are variable names. All these values (tokens names and non terminals names) are encapsulated in a module named \verb|Dyp_symbols|. For instance if you have a non terminal \verb|expr| and you want to use it to build a new rule, then you would use \verb|Dyp_symbols.expr|. It is a value of type \verb|non_ter|.\\
+
+The type \texttt{non\_terminal\_priority} is :
+\begin{verbatim}
+type non_terminal_priority =
+  | No_priority
+  | Eq_priority of priority
+  | Less_priority of priority
+  | Lesseq_priority of priority
+  | Greater_priority of priority
+  | Greatereq_priority of priority
+\end{verbatim}
+Which is also part of the module \verb|Dyp|.\\
+
+The type \texttt{obj} is a sum of constructors with each constructor corresponding to a terminal or non terminal. For each symbol of name \texttt{symbol} in the grammar, the corresponding constructor of the type obj is \texttt{Obj\_symbol}. \texttt{Obj\_symbol} has an argument if \texttt{symbol} is a non terminal or a token with argument. The type of this argument is the type of the argument of the corresponding token or the type of the value returned by the corresponding non terminal.\\
+
+When you write the function that builds the action associated to a rule added dynamically to the grammar, you have to use one of these constructors for the result of the action. If the constructor is not the good one, i.e. the one that is associated to the non terminal in the left-hand side of the rule, then an exception will be raised when reducing by this rule. This exception is:
+\begin{verbatim}
+exception Bad_constructor of (string * string * string)
+\end{verbatim}
+where the first string represents the rule, the second string represents the constructor that was waiting for this left-hand side non terminal and the third string is the name of the constructor that has been used.\\
+
+If you want several non terminals to have the same constructor then you can use the directive:
+\begin{verbatim}
+%constructor Cons %for nt1 nt2 ...
+\end{verbatim}
+where \verb|Cons| is the name of the  common constructor you want to assign for all these non terminals. Of course all these non terminals need to return values of the same type. And even if you decide to use polymorphic variants (see below) you should not write \verb|`Cons| here but just \verb|Cons|. You can also use the keyword \verb|%constructor| to declare constructors that are not used by any non terminal in the initial grammar but that may be used for new non terminals when new rules are added dynamically (see section \ref{new nt}). For instance:
+\begin{verbatim}
+%constructor Cons1 Cons2 Cons3
+\end{verbatim}
+
+Note that \texttt{obj} is actually a type constructor rather than a type. The types of values returned by the tokens and the non terminals are its type parameters. But these type parameters are not explicitly written in this manual to avoid clutter. See the next subsection for an example of type constructor \verb|obj|. Note that if your grammar has a lot of symbols, the maximal number of non-constant constructors (246) may be reached. Then use the option \verb|--pv-obj| with \verb|dypgen|. With this option, dypgen uses polymorphic variants instead of constructors.\\
+
+\subsection{Example}\label{example}
+\begin{verbatim}
+{ open Dyp
+open Dyp_priority_data
+
+let rule_plus = (Dyp_symbols.expr, [
+  Non_ter (Dyp_symbols.expr,No_priority);
+  Ter Dyp_symbols.t_PLUS;
+  Non_ter (Dyp_symbols.expr,No_priority)
+  ], default_priority)
+(* define the rule : E -> E + E *)
+
+let action_plus = (fun dyp l ->
+  let x1,x2 = match l with
+    | [Obj_expr x1;_;Obj_expr x2] -> x1,x2
+    | _ -> failwith "action_plus"
+  in
+  dyp.will_shift <- false;
+  Obj_expr (x1+x2)
+)
+}
+
+%token <int> INT PLUS AMPERSAND EOF
+%start <int> main
+%%
+main : expr EOF    { $1 }
+
+expr :
+  | INT            { $1 }
+  | a expr         { $2 }
+
+a : AMPERSAND { dyp.add_rules <- [(rule_plus, action_plus)] }
+\end{verbatim}
+
+Now if we parse the following input
+\begin{verbatim}
+& 1 + 2 + 3 + 4
+\end{verbatim}
+the parser reduces \texttt{\&} to \texttt{a}, the action code of this reduction adds the rule \texttt{expr: expr PLUS expr} to the initial grammar which does not contain it. And the action code associated to this rule is \texttt{action\_plus} which is the addition. Then the rest of the input is parsed with this new rule and the whole string is reduced to the integer 10.\\
+
+The type constructor \verb|obj| discussed in the previous subsection is:
+\begin{verbatim}
+type ( 'a, 'expr) obj =
+  | Obj_AMPERSAND
+  | Obj_EOF
+  | Obj_INT of (int)
+  | Obj_PLUS
+  | Obj_a of 'a
+  | Obj_expr of 'expr
+  | Obj_main of int
+\end{verbatim}
+
+Note that with a partial action we can use alternatively the following grammar:
+\begin{verbatim}
+main : expr EOF    { $1 }
+expr :
+  | INT            { $1 }
+  | AMPERSAND { dyp.add_rules <- [(rule_plus, action_plus)] } expr { $3 }
+\end{verbatim}
+
+Now the type constructor \verb|obj| becomes:
+\begin{verbatim}
+type ( 'dypgen__nt_0, 'expr) obj =
+  | Obj_AMPERSAND
+  | Obj_EOF
+  | Obj_INT of (int)
+  | Obj_PLUS
+  | Obj_dypgen__nt_0 of 'dypgen__nt_0
+  | Obj_expr of 'expr
+  | Obj_main of int
+\end{verbatim}
+
+\subsection{Scope of the changes}
+
+The changes to the grammar introduced by an action do not apply anywhere in the input. When an action code changes the grammar a reduction occurs and yield a non terminal (the non terminal \texttt{a} in the previous example). Once this non terminal is itself reduced, the changes to the grammar are forgotten and the grammar which was used before the changes is used again. The scope of the changes to the grammar is the same as the scope of \verb|local_data|.\\
+
+We add parentheses to the previous example :
+
+\begin{verbatim}
+{
+  (* same as previous example *)
+}
+
+%token <int> INT PLUS AMPERSAND LPAREN RPAREN EOF
+%start <int> main
+%%
+main : expr EOF    { $1 }
+
+expr :
+  | INT            { $1 }
+  | a expr         { $2 }
+  | LPAREN expr RPAREN { $2 }
+
+a : AMPERSAND { add_rules <- [(rule_plus, action_plus)] }
+\end{verbatim}
+
+The input
+\begin{verbatim}
+(& 1 + 2 + 3 + 4)
+\end{verbatim}
+is correct, but
+\begin{verbatim}
+(& 1 + 2) + 3 + 4
+\end{verbatim}
+is not and raises \verb|Dyp.Syntax_error|. In order to reduce \texttt{(\& 1 + 2)} the parser reduces \texttt{\& 1 + 2} to \texttt{a expr} and then to \texttt{expr}. At this moment the old grammar applies again and the rule \texttt{expr: expr PLUS expr} does not apply any more. This is why the parser cannot shift \texttt{+} after \texttt{(\& 1 + 2)}. In the directory \texttt{demos/sharp} there is an example which is close to this one.
+
+\subsection{Adding new non terminals}\label{new nt}
+
+To add a new non terminal to the grammar from the action code, one uses the following functions:
+\begin{verbatim}
+dyp.add_nt : string -> string -> Dyp.non_ter
+dyp.find_nt : string -> Dyp.non_ter * string
+\end{verbatim}
+When new rules with new non terminals are added, each new non terminal must be added to the grammar as a string, paired with another string representing the constructor of the values returned by this non terminal.
+\begin{verbatim}
+dyp.add_nt nt cons
+\end{verbatim}
+is used to insert a new non terminal which key string is \verb|nt| and which associated constructor has the key string \verb|cons|. The function returns a fresh value of type \verb|non_ter| that can be used to build rules. The string \verb|nt| can be any string, the string \verb|cons| must be either:
+\begin{itemize}
+\item A valid constructor of the form \verb|Obj_nt| where \verb|nt| is a non terminal which has not been assigned a different constructor than its default.
+\item Or a constructor that has been declared with the keyword \verb|%constructor| and without using the backquote even if the option \verb|--pv-obj| is used.
+\end{itemize}
+Any non terminal of the initial grammar is bound with its corresponding string. If the string \verb|nt| is already bound to a non terminal (from the initial grammar or that has been added subsequently) then there are two possible outcomes:
+\begin{itemize}
+\item The string \verb|cons| is the same as the one that is already bound to this non terminal, then \verb|dyp.add_nt| returns the value of type \verb|non_ter| that was already bound \verb|nt|.
+\item The string \verb|cons| is different from the one that is already bound to this non terminal, then \verb|dyp.add_nt| raises:
+\begin{verbatim}
+exception Constructor_mismatch of (string * string)
+\end{verbatim}
+where the first string is the one representing the constructor that was previously bound to the non terminal and the second string is \verb|cons|.\\
+\end{itemize}
+
+\verb|dyp.find_nt nt_key| returns a couple \verb|(nt,cons)| where \verb|nt| is the value of type \verb|non_ter| associated to the string \verb|nt_key| and \verb|cons| is the string of the associated constructor, if it is bound and it raises \verb|Not_found| otherwise.\\
+
+Note that you can also include non terminals in the initial grammar without being part of any rule. To do this use the keyword \verb|%non_terminal| followed by the names of the non terminals you want to include, like:
+\begin{verbatim}
+%non_terminal nt1 nt2 nt3
+\end{verbatim}
+This directive is put in the section after the header, before the grammar.\\
+
+For a complete example of grammar extension, see appendix \ref{complete example}. It describes a small language that is somewhat extensible.
+
+\section{Changing dynamically priority data}\label{dynamic priority}
+
+The following functions are part of the module \verb|Dyp| and makes possible to change the priorities and their relations.
+
+\begin{verbatim}
+val insert_priority : priority_data -> string -> (priority_data * priority)
+val find_priority : priority_data -> string -> priority
+\end{verbatim}
+\verb|insert_priority| creates a new priority and inserts it in the priority data structure. The user gives a key which is a \texttt{string} and the original priority data structure. The function returns the priority data structure with the new priority added and the value of type \texttt{priority} corresponding to the new priority. For instance, to insert a new priority with key \texttt{"new\_prio"}, write the following inside your action code:
+\begin{verbatim}
+let newprio_data, new_prio = insert_priority dyp.priority_data "new_prio" in
+dyp.priority_data <- newprio_data;
+\end{verbatim}
+
+\begin{verbatim}
+val find_priority : priority_data -> string -> priority
+\end{verbatim}
+\texttt{find\_priority priodata key} returns the priority associated to the string \texttt{key} in the priority data structure \texttt{priodata}.
+
+\begin{verbatim}
+val set_relation : priority_data -> bool -> priority -> priority ->
+  priority_data
+\end{verbatim}
+\texttt{set\_relation priodata b p q} returns a priority data structure which is \texttt{priodata} with the following change: if \texttt{b} is \texttt{true} then \texttt{p<q} holds, if it is false \texttt{p<q} does not hold.
+
+\begin{verbatim}
+val update_priority : priority_data -> (priority * priority * bool) list -> priority_data
+\end{verbatim}
+\texttt{update\_priority priodata ppl} returns the priority data structure \texttt{priodata} with the following changes: for each triple \texttt{(p,q,true)} in \texttt{ppl}, the relation \texttt{p<q} holds and for each triple \texttt{(p,q,false)} the relation \texttt{p<q} does not hold.
+
+\begin{verbatim}
+val add_list_relations : priority_data -> (priority list) -> priority_data
+\end{verbatim}
+\texttt{add\_list\_relations priodata pl} returns the priority data structure \texttt{priodata} with the following change: if \texttt{pl} is \texttt{[p1;...;pn]} then \texttt{p1<...<pn} holds in the sense defined in section \ref{priority}.\\
+
+\section{The record \texttt{dyp} and the type \texttt{dypgen\_toolbox}}\label{dyp}
+
+The record \verb|dyp| is accessible in any action code, its type is \verb|dypgen_toolbox|, it is defined in the module \verb|Dyp|:
+\begin{verbatim}
+type ('obj,'data,'local_data) dypgen_toolbox = {
+  mutable global_data : 'data;
+  mutable local_data : 'local_data;
+  mutable priority_data : Dyp.priority_data;
+  mutable add_rules : (Dyp.rule * (
+    ('obj,'data,'local_data) dypgen_toolbox -> 'obj list -> 'obj)) list;
+  mutable remove_rules : Dyp.rule list;
+  mutable will_shift : bool;
+  mutable next_state : out_channel option;
+  mutable next_grammar : out_channel option;
+  symbol_start : unit -> int;
+  symbol_start_pos : unit -> Lexing.position;
+  symbol_end : unit -> int;
+  symbol_end_pos : unit -> Lexing.position;
+  rhs_start : int -> int;
+  rhs_start_pos : int -> Lexing.position;
+  rhs_end : int -> int;
+  rhs_end_pos : int -> Lexing.position;
+  add_nt : string -> string -> Dyp.non_ter;
+  find_nt : string -> (Dyp.non_ter * string);
+  print_state : out_channel -> unit;
+  print_grammar : out_channel -> unit;
+}
+\end{verbatim}
+Where \verb|'gd| and \verb|'ld| are replaced by the type for global data and local data chosen by the user (and infered by Caml), and \verb|'obj| is replaced by the type \verb|obj| discussed in section \ref{adding rules}.
+
+\section{Names conflicts}
+
+To avoid names conflicts you should not use identifier beginning with \verb|__dypgen_| and take into account the names that are listed in this section.\\
+
+This is the list of the names available in the code of the parser:
+\begin{verbatim}
+type token
+
+type ('nt1,'nt2,...) obj =
+  | Obj_TOKEN_1 of t1
+  | Obj_TOKEN_2 of t2
+...
+  | Obj_non_ter_1 of 'nt1
+  | Obj_non_ter_2 of 'nt2
+...
+
+type ('obj,'gd,'ld) dypgen_toolbox
+
+val global_data : int ref (* by default, can be defined by the user *)
+val local_data : int ref (* by default, can be defined by the user *)
+val global_data_equal : 'a -> 'a -> bool (* is (==) by default *)
+val local_data_equal : 'a -> 'a -> bool (* is (==) by default *)
+
+val dyp_merge : 'a list -> 'a -> 'a list
+val dyp_merge_nt1 : 'a list -> 'a -> 'a list
+val dyp_merge_nt2 : 'a list -> 'a -> 'a list
+...
+
+module Dyp_symbols :
+sig
+  val nt1 : int
+  val nt2 : int
+  ...
+  val t_TOKEN_1 : int
+  val t_TOKEN_2 : int
+  ...
+  val get_token_name : token -> int
+  val str_token : token -> string
+end
+
+module Dyp_priority_data :
+stig
+  val priority_data : Dyp.priority_data
+  val default_priority : Dyp.priority
+  val prio_1 : Dyp.priority
+  val prio_1 : Dyp.priority
+  ...
+end
+\end{verbatim}
+
+In addition the following module names are used:
+\begin{verbatim}
+module Dyp_symbols_array
+module Dyp_parameters
+module Dyp_runtime
+module Dyp_engine
+module Dyp_aux_functions
+\end{verbatim}
+
+Names defined in the module \verb|Dyp| are listed here:
+\begin{verbatim}
+val dypgen_verbose : int ref
+type token_name = int
+type non_ter = int
+type 'a pliteral =
+  | Ter of token_name
+  | Non_ter of 'a
+type priority
+type non_terminal_priority =
+  | No_priority
+  | Eq_priority of priority
+  | Less_priority of priority
+  | Lesseq_priority of priority
+  | Greater_priority of priority
+  | Greatereq_priority of priority
+
+type priority_data
+val empty_priority_data : priority_data
+val is_relation : priority_data -> priority -> priority -> bool
+val insert_priority : priority_data -> string -> (priority_data * priority)
+val find_priority : priority_data -> string -> priority
+val set_relation : priority_data -> bool -> priority -> priority ->
+  priority_data
+val update_priority : priority_data -> (priority * priority * bool) list ->
+  priority_data
+val add_list_relations : priority_data -> (priority list) -> priority_data
+
+type lit = (int * non_terminal_priority) pliteral
+type rule = non_ter * (lit list) * priority
+
+type ('obj,'data,'local_data) dypgen_toolbox = {
+  mutable global_data : 'data;
+  mutable local_data : 'local_data;
+  mutable priority_data : priority_data;
+  mutable add_rules : (rule * (
+    ('obj,'data,'local_data) dypgen_toolbox -> 'obj list -> 'obj)) list;
+  mutable remove_rules : rule list;
+  mutable will_shift : bool;
+  mutable next_state : out_channel option;
+  mutable next_grammar : out_channel option;
+  symbol_start : unit -> int;
+  symbol_start_pos : unit -> Lexing.position;
+  symbol_end : unit -> int;
+  symbol_end_pos : unit -> Lexing.position;
+  rhs_start : int -> int;
+  rhs_start_pos : int -> Lexing.position;
+  rhs_end : int -> int;
+  rhs_end_pos : int -> Lexing.position;
+  add_nt : string -> string -> non_ter;
+  find_nt : string -> non_ter * string;
+  print_state : out_channel -> unit;
+  print_grammar : out_channel -> unit;
+}
+
+
+exception Giveup
+exception Undefined_nt of string
+exception Bad_constructor of (string * string)
+exception Constructor_mismatch of (string * string)
+exception Syntax_error
+
+type 'obj merge_function = 'obj list -> 'obj -> ('obj list)
+type 'obj merge_map
+
+val keep_all : 'a list -> 'a -> 'a list
+val keep_oldest : 'a list -> 'a -> 'a list
+val keep_newest : 'a list -> 'a -> 'a list
+
+module type Dyp_parameters_type
+module Dyp_special_types
+module Make_dyp
+\end{verbatim}
+
+\section{Generated documentation of the grammar}
+
+A quick and ugly perl script to generate a BNF documentation for your grammar
+is provided with dypgen. This script is not guaranteed to generate anything of
+interest but it works as a proof of concept. The grammar generated in this way
+is more readable than the original dypgen file, and since a lot of conflict
+resolving can be done inside the actions, the grammar is usually much more
+concise than a corresponding Ocamlyacc grammar. The generated file can thus be
+used as such in the documentation.
+
+You invoke this script by the following command:
+\begin{verbatim}
+dyp2gram.pl path_to/parser.dyp path_to/parser.txt
+\end{verbatim}
+
+The file \verb|parser.txt| does not contain the OCaml parts of the file \verb|parser.dyp| (action, preamble, etc). Everything else is included without changes except for the following rules:
+
+\begin{itemize}
+
+\item The comments starting with \verb|/*--| are removed. Other dypgen comments
+are kept. Remark: the OCaml comments are removed together with all OCaml code.
+
+\item If a \verb|%token| line is annotated with a comment like
+\verb|/* -> 'xxxxx' */| then, in every action, the terminal is replaced by the provided string \verb|xxxxx| and the \verb|%token| line is removed.  This allows to replace \verb|PLUS| by \verb|+|, removing the need for a separate documentation for the lexer.
+
+\item If a \verb|%token| line is annotated with a comment like
+\verb|/* := 'xxxxx' -> 'yyyyy' */| then the same as above applies, but the \verb|%token| line is
+not removed and the comment is just replaced by the given definition
+``\verb|:= xxxxxx|''.  This allows to put the definition of terminal like \verb|IDENT|, \verb|INT|, \ldots  inside the generated file.
+
+\item If a \verb|%token| line is annotated with a comment like
+\verb|/* := 'xxxxx' */|, the \verb|%token| line is kept, but no substitution is performed.
+
+\item All other \verb|%token| lines are kept unchanged
+
+\end{itemize}
+
+When a rule can parse the empty stream, it disappears because the action
+disappears. It is thus a good idea to put a comment like in
+
+\begin{verbatim}
+  /*
+   * telescopes: lists of (typed) identifiers
+   */
+  telescope :
+      /* possibly empty */
+          { [] }
+    | argument telescope
+          { $1::$2 }
+\end{verbatim}
+
+As an example, look at the grammar text file generated from the dypgen
+parser for \verb|tinyML| (in the \verb|demo| directory)\ldots
+
+\section{Other features}
+
+\subsection{Information about the parsing}\label{verbose}
+
+The user can assign the following reference that is part of the module \verb|Dyp|:
+\begin{verbatim}
+val dypgen_verbose : int ref
+\end{verbatim}
+in the header of the parser definition. The value \texttt{1} makes the parser print information about dynamically built automata on the standard output. The value \texttt{2} adds the following information: number of reductions performed while parsing and the size of the graph-structured stack of the parser. Any value \texttt{>2} makes the parser logs information in a file about the parsing which are useful for debugging \texttt{dypgen} but unlikely to be useful for the user. Setting a value \verb|>2| currently breaks re-entrancy.\\
+
+The following functions may be useful for debugging purpose:
+\begin{verbatim}
+  dyp.print_state out_channel;
+\end{verbatim}
+prints the current state of the automaton on \verb|out_channel|.
+
+\begin{verbatim}
+  dyp.print_grammar out_channel;
+\end{verbatim}
+prints the current grammar on \verb|out_channel|.
+
+\begin{verbatim}
+  dyp.next_state <- Some out_channel;
+\end{verbatim}
+will print the next state of the automaton (the one where the parser
+goes after the current reduction)
+
+\begin{verbatim}
+  dyp.next_grammar <- Some out_channel;
+\end{verbatim}
+will print the grammar after the current reduction (and possible changes).\\
+
+If the option \texttt{--merge-warning} is used then a warning is issued on the standard output each time a merge happens. If the \texttt{lexbuf} structure is updated then the beginning and the end of the part of the input is given.
+
+\subsection{Adding code to the interface of the parser} \label{mli}
+
+The keyword \texttt{\%mli \{ \}} makes possible to add code to the interface file of the parser. The code inside the braces is appended at the end of the \texttt{.mli} file.
+
+\subsection{Error}
+
+When the parser is stuck in a situation where it cannot reduce and cannot shift but had not reduced to the start symbol, it raises the exception \verb|Dyp.Syntax_error|.\\
+
+When there is in the grammar a non terminal that is in a right-hand side but never in a left-hand side (i.e. it is never defined) then the following exception is raised by the parser:
+\begin{verbatim}
+exception Undefined_nt of string
+\end{verbatim}
+where the string is the name of this non terminal.
+
+\subsection{Using another lexer than \texttt{ocamllex}}\label{other-lexer}
+
+To use another lexer than \texttt{ocamllex} use the option \texttt{--lexer other} with \texttt{dypgen}. The interface of the entry functions are then changed to:
+\begin{verbatim}
+val entry : ('a -> token) -> 'a -> (int * Dyp.priority) list
+\end{verbatim}
+Whereas by default it is:
+\begin{verbatim}
+val entry : (Lexing.lexbuf -> token) -> Lexing.lexbuf -> (int * Dyp.priority) list
+\end{verbatim}
+
+Note that the functions returning the positions of the lexer in the action code do not return relevant information with lexers other than \texttt{ocamllex}.
+
+\subsection{Position of the lexer}
+
+When \texttt{ocamllex} is used the following functions are available:
+\begin{verbatim}
+val symbol_start : unit -> int
+val symbol_start_pos : unit -> Lexing.position
+val symbol_end : unit -> int
+val symbol_end_pos : unit -> Lexing.position
+val rhs_start : int -> int
+val rhs_start_pos : int -> Lexing.position
+val rhs_end : int -> int
+val rhs_end_pos : int -> Lexing.position
+\end{verbatim}
+These functions tell what is the part of the input that is reduced to a given non terminal. They should behave the same way as the functions of the same names of the module \texttt{Parsing} do in \texttt{ocamlyacc}.
+These functions are part of the record \verb|dyp|. When you use them you must use the record \verb|dyp|, like:
+\begin{verbatim}
+dyp.symbol_start ()
+\end{verbatim}
+
+The demo program \texttt{position} illustrates the use of these functions.
+
+\subsection{Maximum number of constructors and using polymorphic variants}
+
+If you have a lot of tokens or non terminals then you may reach the maximum number of non-constant constructors. Then you use the options \verb|--pv-token| and \verb|--pv-obj|. With \verb|--pv-token|, the \verb|token| type is a sum of polymorphic variants, and with \verb|--pv-obj| the type constructor \verb|obj| uses polymorphic variants.
+
+\subsection{Automaton options}
+
+%By default \texttt{dypgen} builds LR(0) automata but the user can make it otherwise by using the option \texttt{--automaton LALR} or \texttt{--automaton LR1} with \texttt{dypgen} on the command line. Then the generated parser will use an LALR(1) or LR(1) automaton and the dynamically generated automata will be of the same kind. In any case the generated parser is a GLR parser. The LR(1) automaton is significantly longer to generate than the LALR(1) which is significantly longer to generate than the LR(0), but parsing with it may be faster than with LALR(1) and parsing with LR(1) faster than with LALR(1).\\
+
+%By default the priorities are enforced while parsing, which is done with tests. Another method is to embed their enforcement into the automaton. With this method the generation of the automaton is significantly longer but the parsing is faster. To make \texttt{dypgen} use this method, use the option \texttt{--prio-aut}.
+
+By default the enforcement of the priorities is embedded into the automaton. This makes the parsing faster than if they were enforced at parsing time but the automaton is bigger and longer to generate. You can not embed the priorities in the automaton and make them enforced at parsing time with the option \verb|--prio-pt|.
+
+\section{Demonstration programs}
+
+The directory \texttt{demos} contains a few small programs that illustrate the use of \texttt{dypgen}.\\
+
+\texttt{calc} is a simple calculator that uses priorities. It does not use dynamic change of the grammar. \texttt{calc\_pattern} is the same calculator but the parser definition uses pattern matching of symbols (see section \ref{pattern}), and \verb|calc_nested| uses nested rules.\\
+
+\texttt{sharp} is a very basic demonstration of adding a rule and replacing it by another. When entering \texttt{\&+} the user adds a rule which makes the character \texttt{\#} like a \texttt{+} and entering \texttt{\&*} makes the character \texttt{\#} like a \texttt{*}.\\
+
+\texttt{merge\_times\_plus} is an example of using a merge function to enforce the precedence of the multiplication over the addition.\\
+
+\texttt{forest} is an example of how to use the function \verb|dyp_merge| to yield a parse forest.\\
+
+\verb|global_data| and \texttt{local\_data} are example of using \verb|global_data| and \texttt{local\_data}. \texttt{local\_data\_partial\_action} is the same as \texttt{local\_data} except that it uses a partial action.\\
+
+\texttt{position} is a small example using the functions \texttt{dyp.symbol\_start}, \ldots which returns the position of a part of the input which is reduced to a given non terminal.\\
+
+\texttt{demo} is the example of appendix \ref{complete example}.\\
+
+\texttt{tinyML} is a very limited interpreted language which includes integers, tuples, constructors \`a la Caml, some basic pattern matching and recursive functions with one argument. It also includes a construct \texttt{define} ... \texttt{in} which makes possible to extend somewhat the syntax of the language by defining macros using the following characters as tokens \texttt{[}, \texttt{]}, \texttt{|}, \texttt{::}, \texttt{;}, \texttt{<}, \texttt{>}, \texttt{@} and the non terminal corresponding to expressions. This construct allows to add several rules at the same time as opposed to the construct \texttt{define} ... \texttt{in} of \texttt{demo} which can only add one rule at a time. A few input examples are included in the directory \texttt{tinyML}. To interpret them with \texttt{tinyML} do : \texttt{./tinyML test\_*.tiny} where \texttt{*} is \texttt{append}, \texttt{add\_at\_end}, \texttt{reverse} or \texttt{comb}.\\
+
+\texttt{tinyML-ulex} is an example of how to use \texttt{ulex} as a lexer before parsing with \texttt{dypgen}. The makefile requires \texttt{findlib}. Note that this example does not use the possibilities of UTF, it is just an example of how to use \texttt{ulex} with \texttt{dypgen}.
+
+\appendix
+\section{Comparison with \texttt{ocamlyacc}}
+
+%\texttt{dypgen} is a parser generator for Objective Caml. It generates GLR parsers which are dynamically extensible. Which means that it accepts action code which changes the grammar of the parser. This is an alpha version, thank you for reporting bugs and any inconsistency between the behavior of \texttt{dypgen} and this documentation.\\
+
+\texttt{dypgen} takes a file ending with \texttt{.dyp} as input and generates a \texttt{.ml} file and a \texttt{.mli} file. The frame of an input file for \texttt{dypgen} is somewhat similar to an input file for \texttt{ocamlyacc}. The syntax differs in the following points :
+\begin{itemize}
+\item The header and trailer codes are placed between braces \texttt{\{\}} (instead of \texttt{\%\{\%\}} for the header in \texttt{ocamlyacc}).
+\item The keywords \texttt{\%right}, \texttt{\%left} and \texttt{\%nonassoc} do not exist, precedence and associativity assigned to symbol is not implemented yet. Ambiguities are managed by other means.
+\item The entry points are declared with their type like : \texttt{\%start <int> main}, with one keyword \texttt{\%start} for each entry point.
+\item When tokens are declared the type statement only applies to the following token and a type statement can be stated anywhere on a line beginning with \texttt{\%token}, provided it is followed by a token name. For instance :\\
+\texttt{\%token BAR <string> UIDENT COMMA <string> LIDENT COLON}\\
+is the declaration of \texttt{BAR}, \texttt{COMMA} and \texttt{COLON} as tokens with 0 argument and \texttt{UIDENT} and \texttt{LIDENT} as tokens with a \texttt{string} as argument.
+\item There is no special symbol \texttt{error} for rules.
+\item There is no `\texttt{;}' between rules.
+\item To avoid identifier collision identifiers beginning with \texttt{\_\_dypgen} should not be used.
+\item \texttt{dypgen} does not handle cyclic grammars (i.e. when a non terminal can derive itself). When the parser is generated, there is no warning if the grammar is cyclic. But the parser fails with an error when used.
+\item The parser must be linked against the library \texttt{dyp.cma} (or \texttt{dyp.cmxa}) which is found in the directory \texttt{dyplib}.
+\end{itemize}
+
+\section{A complete example of grammar extension}\label{complete example}
+
+This example is a small language with integers, pairs, constructors and variable names. The program parses the input and then prints it. If one enters the input \texttt{List(1,List(2,Nil))} the program outputs \texttt{= List(1,List(2,Nil))}. The language is somewhat extensible, with the following construction : \texttt{define lhs := \emph{rhs} = \emph{expression} in} where \texttt{lhs} is the left-hand side non terminal of the rule the user wants to add, \texttt{\emph{rhs}} is the right hand side of this new rule, \texttt{\emph{expression}} is the expression which will be yielded when a reduction by this new rule occurs. Here is an example of introduction of a specific syntax for lists :
+\begin{verbatim}
+define list_contents := expr(x) = List(x,Nil) in
+define list_contents := expr(x);list_contents(y) = List(x,y) in
+define expr := [] = Nil in
+define expr := [list_contents(x)] = x in
+define expr := expr(x)::expr(y) = List(x,y) in
+[1;2;3]
+\end{verbatim}
+The output is
+\begin{verbatim}
+= List(1,List(2,List(3,Nil)))
+\end{verbatim}
+A distinction is made between a token inside the right-hand side of the construct \texttt{define ... in} and the same token outside of this right-hand. This distinction is made by the lexer. For instance, for the character `\texttt{[}' it returns \texttt{Token "["} if it is between \texttt{:=} and \texttt{=}, and it returns \texttt{LBRACK} otherwise.\\
+
+The example is made of 4 files : \texttt{parse\_tree.ml}, \texttt{parser.dyp}, \texttt{lexer.mll} and \texttt{demo.ml}.
+
+\verbatimfile{demos/demo/parse_tree.ml}
+\end{verbatim}
+This file declares the two types associated to the two non terminals \texttt{expr} and \texttt{rhs}. \texttt{str\_expr} prints expressions and \texttt{substitute env expr} substitutes in \texttt{expr} the variables names by the expressions which they are bound to in \texttt{env} if they are present in \texttt{env}. This is used in the parser to define the action associated to new a rule.
+\verbatimfile{demos/demo/parser.dyp}
+\end{verbatim}
+The reduction by the rule :
+\begin{verbatim}
+define_in : DEFINE LIDENT COLONEQUAL rhs EQUAL expr IN
+\end{verbatim}
+introduces a new rule. The string returned by \texttt{LIDENT} (\emph{i.e.} \texttt{\$2}) is the name of the non terminal of the left-hand side. It is added as a new non terminal with the line :
+\begin{verbatim}
+let _ = dyp.add_nt $2 in
+\end{verbatim}
+
+Then the function \texttt{a\_define\_in} is called. It returns a rule, an action and a priority. To construct the new rule, \texttt{dyp.find\_nt} and \texttt{get\_token\_name} are used. Non terminals are refered to by a string \texttt{s}, \texttt{dyp.find\_nt s} returns the corresponding value of type \texttt{non\_ter}. \texttt{get\_token\_name s} returns the value of type \texttt{token\_name} corresponding to the string \texttt{s}.\\
+
+For each non terminal in the right-hand side \texttt{rhs}, a variable name follows in parentheses. The action code of the new rule is defined as returning the expression which follows the second \texttt{=} in which some variable names are substituted by some expressions. The variable names which appear in the right-hand side of the rule are substituted by the results yielded by the corresponding non terminals.\\
+
+For information about \texttt{dypgen\_verbose}, which is stated at the beginning of the parser definition, see section \ref{verbose}.
+
+\verbatimfile{demos/demo/lexer.mll}
+\end{verbatim}
+This is the lexer. Some strings are special, they do not always yield the same token, they are the ones the user can use in the \texttt{define ... in} construct. The ref \texttt{lex\_define} is a flag which tells the lexer whether it is between \texttt{:=} and \texttt{=} or not. In the first case, any special string \texttt{s} would yield \texttt{TOKEN s}, in the second case it would yield its corresponding regular token (like \texttt{SEMICOLON} for `\texttt{;}').
+
+\verbatimfile{demos/demo/demo.ml}
+\end{verbatim}
+
+This is the main implementation file, it opens the file given as argument, parses it and prints the corresponding expression.\\
+
+All the files of this example are available in the directory \texttt{demos/demo}. To test it with a test input do : \begin{verbatim}
+./demo test1.tiny
+\end{verbatim}
+
+
+\end{document}

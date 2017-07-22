@@ -1,0 +1,447 @@
+2007/06/27
+Fixed a bug that happened in some case when merge was needed, some
+parse trees would be lost.
+
+__________________________________________________________________________
+2007/06/24
+Bug fixed: the exception Bad_constructor was raised inappropriately when
+the following conditions were true:
+1) a non terminal is declared with
+  %constructor Cons %for nt
+or
+  %non_terminal nt
+and this non terminal is not used in the initial grammar but subsquently
+in extensions of the grammar.
+2) and the non terminal of the left-hand side of a rule that introduces
+extensions of the grammar can derive epsilon (the empty string).
+
+__________________________________________________________________________
+2007/06/23
+New type for Bad_constructor:
+  exception Bad_constructor of (string * string * string)
+3rd string is the name of the constructor that has been used.
+
+__________________________________________________________________________
+2007/06/22
+
+Faster generation of the .ml file
+
+Better encapsulation: the type dypgen_toolbox (i.e. the type of the
+record dyp) is now in the module Dyp.
+
+The types of dyp.add_nt and dyp.find_nt change:
+  dyp.add_nt : string -> string -> Dyp.non_ter
+instead of
+  dyp.add_nt : string -> Dyp.non_ter
+and
+  dyp.find_nt : string -> Dyp.non_ter * string
+instead of
+  dyp.find_nt : string -> Dyp.non_ter
+See section 8.4 of the manual for more information.
+
+Three new exceptions:
+
+exception Bad_constructor of (string * string)
+  This exception is raised when a value is returned by a user action
+with a bad constructor (not corresponding to the non terminal). This
+can only happen with rules defined dynamically.
+1st string is the rule and can be used to be printed.
+2nd string is the name of the constructor that should have been used.
+
+exception Constructor_mismatch of (string * string)
+  This exception is raised when a nt is added using dyp.add_nt with
+a constructor cons but it already exists with another constructor.
+1st string is the name of the previous constructor,
+2nd string is the name of the constructor one tried to add.
+
+exception Undefined_nt of string
+  This exception is raised when there is in the grammar a non
+terminal that is in a right-hand side but never in a left-hand
+side (i.e. it is never defined). The string represents this non
+terminal. This exception is not raised if the option --no-undef-nt
+is used.
+
+__________________________________________________________________________
+2007/06/17
+Fixed a bug that made dyp.add_nt returns a wrong value when used on
+a new non terminal.
+Added a few new fields to dyp for debugging purpose (see 10 and 13.1).
+
+__________________________________________________________________________
+2007/06/16
+Added a keyword %non_terminal which makes possible to include non
+terminals in the initial grammar that are not part of any rule.
+
+__________________________________________________________________________
+2007/06/13
+Generation time of the .ml file is less long.
+
+__________________________________________________________________________
+2007/06/11
+Some type errors that used to be reported by Caml in the .ml generated
+file are now reported in the .dyp file and are less complex.
+
+__________________________________________________________________________
+2007/06/08
+Fixed a bug that raised Not_found when a starting non terminal was
+not used.
+Added the keyword %type that behaves as in ocamlyacc.
+
+__________________________________________________________________________
+2007/06/07
+Added nested rules:
+nt1:
+| symb1 (  symb2 symb3 { action1 } prio1
+         | symb4 symb5 { action2 } prio2
+         | symb6 symb7 { action3 } prio3 ) symb8 symb9 { action4 } prio4
+| ...
+
+__________________________________________________________________________
+2007/06/06
+Fixed a bug that happened when using the option --prio-pt along with
+priorities and extensibility of the grammar.
+Speed of the automaton generation improved.
+
+__________________________________________________________________________
+2007/05/31
+Refactoring of the code (the parsing is now table driven instead of
+automaton driven).
+Speed of the automaton generation improved.
+Parsing speed improved.
+Memory usage decreased.
+The options --automaton LALR and --automaton LR1 are not available
+anymore.
+New option --version.
+A bug that made parse trees lost in case of ambiguity has been fixed.
+By default the priorities are now embedded into the automaton (used
+to be option --prio-aut), the option --prio-pt disables this.
+
+__________________________________________________________________________
+2007/05/23
+Bug fixed, caused "Uncaught Exception: "Index out of bounds" at the
+initialization of the parser when using priorities.
+
+__________________________________________________________________________
+2007/5/20
+Fixed a bug that replaced '$' by '_' in strings in actions code.
+Fixed a bug (introduced with the previous optimisations) that made the parser
+perform the reductions in a wrong order in some situations.
+insert_partially_ordered is tail recursive
+Further optimisations when initializing the parser and when extending the
+grammar.
+Install of the library with support for ocamlfind
+
+__________________________________________________________________________
+2007/05/18
+
+The library dyp does not use -pack option anymore.
+The module Dyp_tools does not exist anymore. The values and types contained
+in the module Dyp_tools are now accesible in the module Dyp of the library
+dyp.cm[x]a. This module is not open by default.
+The values of the non terminals are now encapsulated in a module Dyp_symbols.
+i.e. if you have a non terminal `expr' then you use Dyp_symbol.expr to build
+new rules, instead of expr. The token names are also encapsulated in this
+module and they now begin with t_ instead of token_.
+The priorities and the initial priority_data are encapsulated in the module
+Dyp_priority_data.
+It is now possible to assign a common constructor to several non terminals
+with the directive %constructor Cons for nt1 nt2 ...
+Some slight optimization when initializing the parser and when extending the
+grammar.
+
+There is a new section about name conflicts and the accessible modules in the
+manual (section 11).
+
+__________________________________________________________________________
+2007/5/13
+
+Bug fixed: the parser was not able to handle a grammar where the right-hand
+side of the rule of the entry point ends with a non terminal like :
+statementsx:
+    | statement_aster statements_terminator
+statements_terminator:
+   | ENDMARKER
+
+Bug fixed: interface was incorrect when a start symbol returned a tuple.
+
+The cyclic grammars are now detected and cause an error when the parser is
+used (but not when the parser is generated).
+
+Some of the options have been renamed, do dypgen --help for more details.
+merge and merge_nt where nt is the name of a non terminal have been renamed
+dyp_merge and dyp_merge_nt.
+
+The following values and types are now encapsulated in a module
+(which is actually already open, this may change):
+module Dyp_tools :
+  sig
+    val dypgen_verbose : int ref
+    type token_name = int
+    type non_ter = int
+    type 'a pliteral =
+      | Ter of token_name
+      | Non_ter of 'a
+    type priority
+    val default_priority : priority
+    type non_terminal_priority =
+      | No_priority
+      | Eq_priority of priority
+      | Less_priority of priority
+      | Lesseq_priority of priority
+      | Greater_priority of priority
+      | Greatereq_priority of priority
+    type priority_data
+    val empty_priority_data : priority_data
+    val is_relation : priority_data -> priority -> priority -> bool
+    val insert_priority : priority_data -> string ->
+      (priority_data * priority)
+    val find_priority : priority_data -> string -> priority
+    val set_relation : priority_data -> bool -> priority -> priority ->
+      priority_data
+    val update_priority : priority_data ->
+      (priority * priority * bool) list -> priority_data
+    val add_list_relations : priority_data -> (priority list) -> priority_data
+    type lit = (int * non_terminal_priority) pliteral
+    type rule = non_ter * (lit list) * priority
+    exception Giveup
+    exception Syntax_error
+    val keep_all : 'a list -> 'a -> 'a list
+    val keep_oldest : 'a list -> 'a -> 'a list
+    val keep_newest : 'a list -> 'a -> 'a list
+  end
+
+__________________________________________________________________________
+2007/5/7
+1) Added the option -symbol-with-variants which makes possible to construct
+the symbols with polymorphic variants instead of constructors. This is
+useful if you reach the maximum number of non-constant constructors.
+2) Parsers generated by dypgen are now re-entrant. This has consequences on
+the name of some variables (ex: dyp.global_data instead of data).
+The record dyp is now used in actions, it is an argument of the action,
+it has type dypgen_toolbox:
+type ('obj,'data,'local_data) dypgen_toolbox = {
+  mutable global_data : 'data;
+  mutable local_data : 'local_data;
+  mutable priority_data : priority_data;
+  mutable add_rules :
+    (rule *
+     (('obj,'data,'local_data) dypgen_toolbox -> 'obj list -> 'obj)) list;
+  mutable remove_rules : rule list;
+  mutable will_shift : bool;
+  symbol_start : unit -> int;
+  symbol_start_pos : unit -> Lexing.position;
+  symbol_end : unit -> int;
+  symbol_end_pos : unit -> Lexing.position;
+  rhs_start : int -> int;
+  rhs_start_pos : int -> Lexing.position;
+  rhs_end : int -> int;
+  rhs_end_pos : int -> Lexing.position;
+  add_nt : string -> non_ter;
+  find_nt : string -> non_ter
+}
+For example when you want to add rules you no longer do:
+ add_rules := your-rule-list
+but:
+ dyp.add_rules <- your-rule-list
+To prevent a shift you do: dyp.will_shift <- false, etc.
+The variable to set the initial value of the local data is still a ref with
+name local_data. For the global data it is now a ref with name global_data
+instead of data.
+
+__________________________________________________________________________
+2007/5/2
+Fixed a bug that prevented from appending code to the .mli with %mli
+When one changes the refs data and local_data before calling the parser
+it is now taken into account as new initial values for them.
+
+__________________________________________________________________________
+2007/4/1
+Fixed a bug that happened with two or more partial actions in the same rule.
+
+__________________________________________________________________________
+2007/3/18
+Added a script to generate a documentation of the grammar
+(by Pierre Hyvernat)
+
+__________________________________________________________________________
+2007/3/16
+Added let rec to the example language tinyML.
+
+__________________________________________________________________________
+2007/2/26
+Minor changes in the makefiles
+
+__________________________________________________________________________
+2007/2/13
+Fixed a bug that caused the following error :
+The constructor Obj_structure expects 1 argument(s),
+but is here applied to 0 argument(s)
+
+__________________________________________________________________________
+2007/2/10
+Several bug fixed about pattern matching for symbols.
+Improved location accuracy of syntax errors in .dyp files.
+
+__________________________________________________________________________
+2007/2/9
+Added pattern matching for symbols in right-hand sides of rules.
+In particular this makes possible guarded reductions and to bind names
+to the arguments of actions.
+
+__________________________________________________________________________
+2007/2/8
+Added the partial actions : actions within the right-hand side of a rule.
+Added the priority sets (=p), (>p) and (>=p) to be used after a non
+terminal in the right-hand side of a rule.
+Fixed a bug in the generation of the LR(1) and LALR(1) automata that
+prevented the parser to handle grammar with rules like :
+a: (empty side) | b T
+b: a U
+Updated the manual, more details on local_data.
+
+__________________________________________________________________________
+2007/2/7
+Syntax error in .dyp files are now located with the line and character
+number by dypgen.
+To use a token which is not declared is an error.
+If an undeclared priority is used, dypgen emits a warning.
+
+__________________________________________________________________________
+2007/2/7
+The following constructors are renamed:
+To_priority    becomes  Less_priority
+Toeq_priority  becomes  Lesseq_priority
+
+__________________________________________________________________________
+2007/2/6
+The interface of the action code has been significantly simplified.
+There is no difference between a dynamic action and a classic action anymore.
+The keywords %dynamic and %full are now discarded.
+
+Access and changes to data, priority data and the grammar are now performed
+through the assignment of references. datadyn has been renamed local_data.
+
+The method of adding rules like with %dynamic(nt) in the previous
+versions is not possible anymore. This allowed to add actions which returned
+value of the same type than the one returned by the non terminal nt instead
+of returning value of type obj. Now any action introduced at runtime must
+return a value of type obj.
+An action added dynamically is now just : obj list -> obj.
+
+Priorities with sets are discarded.
+Priority functions are discarded. Now a rule returns a constant priority.
+The exception Giveup_reduce is renamed Giveup.
+The exception Giveup_shiftreduce is discarded.
+
+One can now bind several actions to a rule, the parser only apply the first
+that does not raise Giveup and then does not try the others.
+
+The relations between priorities is now denoted '<' instead of ':'.
+(p) is now (<p) and (=p) is now (<=p).
+
+Preventing a shift is now done with the reference will_shift.
+
+The constructors Terminal and Non_Terminal change for Ter and Non_ter.
+The token are accessible with token_TOKEN instead of token_name_TOKEN.
+
+A rule is now a triple non_ter * literal list * priority.
+
+The merge function are now only called on parse trees of same priorities.
+As a result the merge function are now just : obj list -> obj -> obj list.
+And the parser return a list of couple (parse-tree,priority) instead of
+just a list of parse trees.
+
+The default automaton is now the LR(0).
+A new method which embeds the inforcement of priorities in the automaton
+can be optionally chosen.
+
+__________________________________________________________________________
+2007/1/31
+Bug fixed : %relation p1:p2 would introduce p1:p1 and p2:p2 in addition to
+p1:p2, thus (p2) and (=p2) would denote the same thing. This has been fixed.
+
+__________________________________________________________________________
+2007/1/23
+Fixed an efficiency issue (a lot of %token lines would make the generation
+very slow).
+One can now use an LR(0) automaton. This is stated with an option to dypgen.
+
+__________________________________________________________________________
+2007/1/15
+The automaton of the parser is now built when one actually uses the parser,
+it is not marshalled anymore in the .ml file (this fixes a bug). As a result
+the .ml file is lighter but the parser is longer to start when it is used.
+The license changes to Cecill-B for all the files.
+Simplification of the installation.
+
+__________________________________________________________________________
+2006/12/26
+The merge warning now returns the position of the part of the input considered.
+
+__________________________________________________________________________
+2006/12/25
+The functions symbol_start,... which tell what is the part of the input that
+is reduced to a given non terminal are now available.
+When one uses a lexer different from ocamllex, one must use the option -lexer.
+The type of the action code changes slightly.
+
+__________________________________________________________________________
+2006/12/19
+Bug fixed: in some particular cases the parser would not shift while it had to.
+Bug fixed: Taking into account the lookahead token for the reduction by a
+dynamic rule prevented the parser from reducing in some particular cases when
+it had to. As a consequence the lookahead token is not considered anymore to
+decide whether to reduce by a dynamic rule or not.
+
+__________________________________________________________________________
+2006/12/16
+Introduction of the generic merge functions and of predefined merge functions.
+The type of the specific merge functions changes and is now :
+val merge_nt : priority_data -> ('obj * priority) list -> ('obj * priority) ->
+  ('obj * priority) list
+The command line option -merge_warning makes the generated parser emit a warning
+on the standard output each time a merge happens.
+
+__________________________________________________________________________
+2006/12/15
+By default the parser build an LALR(1) automaton instead of
+an LR(1) one, which is still possible by stating %LR1 in the
+parser definition.
+
+__________________________________________________________________________
+2006/12/13
+Fixed a bug which prevented merging of values to happen.
+One can define a general merge function now. It applies
+to any non terminal which has not its own merge function.
+Added an example which yields a parse forest.
+
+__________________________________________________________________________
+2006/12/12
+renamed the flag verbose to dypgen_verbose
+minor bug fixed.
+
+__________________________________________________________________________
+2006/11/29
+Several entry points are now allowed.
+The parsing function is not dyp_parse anymore but
+has the name of the corresponding non terminal
+as with ocamlyacc.
+The end of file token is not a special token anymore
+and can be used in the rules as with ocamlyacc.
+
+__________________________________________________________________________
+2006/10/26
+val dyp_parse : ('a -> token) -> 'a -> main_type list
+instead of
+val dyp_parse : (Lexing.lexbuf -> token) -> Lexing.lexbuf -> main_type list
+in addition to ocamllex any other lexer can be used with dypgen
+
+__________________________________________________________________________
+2006/10/24
+Fixed bugs with merge functions
+Added a compact syntax for transitive relations
+Completed user's manual.
+
+__________________________________________________________________________
+2006/10/20
+First version

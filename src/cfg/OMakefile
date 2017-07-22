@@ -1,0 +1,16 @@
+
+OCAMLINCLUDES += ../parser ../dyn ..
+
+FILES[] += 
+	cfg/cfg
+	cfg/cfg_refactor
+	cfg/cfg_printer
+	cfg/file_loader
+	cfg/namespace
+	cfg/dataflow
+	cfg/cfg_scope
+
+#CFG_LIB = $(OCamlLibrary cfg, $(FILES))
+
+#.DEFAULT: $(CFG_LIB)
+

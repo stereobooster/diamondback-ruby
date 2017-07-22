@@ -1,0 +1,12 @@
+
+OCAMLINCLUDES += ../../dyplib
+
+FILES[] = 
+	pgen_parser_param
+	pgen_lexer
+	pgen
+
+
+OCAML_LIBS = ../../dyplib/dyp
+
+.DEFAULT: $(OCamlProgram pgen,$(FILES))

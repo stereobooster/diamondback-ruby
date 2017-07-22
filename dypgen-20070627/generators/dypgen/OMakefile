@@ -1,0 +1,17 @@
+all: dypgen dypgen.opt
+
+dypgen_parser.ml dypgen_parser.mli: dypgen_parser.dyp ../pgen/pgen
+	../pgen/pgen dypgen_parser.dyp
+
+FILES[] = 
+	argument
+	dypgen_parser
+	dypgen_lexer
+	insert_linenum
+	dypgen
+
+OCAMLINCLUDES += ../../dyplib
+
+OCAML_LIBS = ../../dyplib/dyp
+
+.DEFAULT: $(OCamlProgram dypgen, $(FILES))

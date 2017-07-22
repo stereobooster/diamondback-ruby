@@ -1,0 +1,14 @@
+
+FILES[] +=
+	dyn/yaml
+	dyn/dynamic
+	dyn/evals
+	dyn/send
+	dyn/mining
+	dyn/reflection
+	dyn/method_missing
+	dyn/require
+	dyn/dyn_builder
+
+OCAMLINCLUDES += $(YAML_DIR) ../parser ../cfg  ..  
+

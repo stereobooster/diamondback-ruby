@@ -1,0 +1,6 @@
+
+base_types.orig.rb : extract_types.rb 
+	ruby extract_types.rb > base_types.orig.rb
+	echo "(ruby base_types.rb || exit 1) 2>&1 | (grep -v redefining || true)" | sh
+
+.DEFAULT: base_types.orig.rb

@@ -1,0 +1,4 @@
+/* -*- Mode: C; indent-tabs-mode: nil -*- */
+/* Copyright (c) 2007 Christopher R. Waterson */
+
+#undef HAVE_SNPRINTF

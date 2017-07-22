@@ -1,0 +1,104 @@
+
+CFLAGS=
+
+CheckProgVerbose(prog,msg,fail) =
+   ConfMsgChecking(for $(msg))
+   WHERE = $(where $(prog))
+   if $(WHERE)
+      ConfMsgResult(found $(nth 0, $(WHERE)))
+      return $(WHERE)
+   else
+      ConfMsgResult(FAILED - $(fail))
+      return false
+
+conf-dir(name,def) =
+  if $(defined $(name))
+    return $(getvar $(name))
+  elseif $(defined-env $(name))
+    return $(getenv $(name))
+  else
+    return $(def)
+
+ruby-conf(key) = 
+   ConfMsgChecking(for Ruby $(key))
+   res=$(shell ruby -rrbconfig -e "puts Config::CONFIG['$(key)']")
+   ConfMsgResult($(res))
+   return $(res)
+
+print-conf-directories() = 
+  println($(EMPTY))
+  println($"Installation summary:")
+  if $(DESTDIR)
+    println($"         staging dir: $(DESTDIR)")
+  println($"              binary: $(BINDIR)/druby")
+  println($"         config file: $(SYSCONFDIR)/druby.conf")
+  println($"          ruby files: $(DRUBYSITELIB)")
+  println($"       support files: $(DRUBYLIB)")
+  println($(EMPTY))
+
+static. = 
+        if $(OCAMLFIND_EXISTS)
+           USE_OCAMLFIND=true
+           export
+	if $(not $(defined OCAMLDEP_MODULES_AVAILABLE))
+		OCAMLDEP_MODULES_AVAILABLE = false
+		OCAMLDEP_MODULES_ENABLED = 
+		export
+	else
+		OCAMLDEP_MODULES_ENABLED = $(OCAMLDEP_MODULES_AVAILABLE)
+		OCAMLDEP=$(OCAMLDEP_MODULES)
+	ConfMsgChecking(for ocaml-getopt)
+	GETOPT_DIR=$(shell ocamlfind query getopt)
+	ConfMsgResult($(GETOPT_DIR))
+
+	ConfMsgChecking(for ocamlgraph)
+	OCAMLGRAPH_DIR=$(shell ocamlfind query ocamlgraph)
+	ConfMsgResult($(OCAMLGRAPH_DIR))
+
+        ConfMsgChecking(for OUnit)
+        OUNIT_DIR=$(shell ocamlfind query oUnit)
+        ConfMsgResult($(OUNIT_DIR))
+        ConfMsgChecking(if OUnit defines the was_successful function)
+        OUNIT_SUCCESSFUL=$(shell-success-null echo $""ignore(OUnit.was_successful);exit 0;;
+exit 1;;"" | ocaml -I $(OUNIT_DIR) unix.cma oUnit.cma)
+        ConfMsgResult($(OUNIT_SUCCESSFUL))
+
+	DYP_LIB=$(ROOT)/dypgen-20070627/dyplib
+	DYPGEN=$(ROOT)/dypgen-20070627/generators/dypgen/dypgen
+	# Check for syck.h for ocaml-syck
+	if $(CC)
+		# no-op just to force the gcc check before the syck.h check
+		# for a better error message
+	if $(defined SYCK)
+		SYCK_PREFIX=$(SYCK)
+		CFLAGS += -I$(SYCK_PREFIX)/include
+		export
+	if $(not $(VerboseCheckCHeader syck.h))
+		eprintln(Please install the syck library $"(libsyck0-dev on Debian)")
+		eprintln(or set it manually via 'omake --config SYCK=/path/to/syck')
+		exit 1
+	YAML_DIR=$(ROOT)/ocaml-syck-0.1.1/yaml
+
+        # paths retrieved from Ruby
+        $(CheckProg ruby)
+        RSPEC = $(CheckProgVerbose spec, RSpec testing framework, skipping Ruby tests)
+
+        RUBYVERSION = $(ruby-conf ruby_version)
+        if $(test $(RUBYVERSION) != 1.8)
+          eprintln(Only Ruby version 1.8.x is supported at this time)
+          exit 1
+        RUBYSITEDIR = $(conf-dir RUBYSITEDIR, $(ruby-conf sitelibdir))
+
+        # Our installation variables
+        DESTDIR = $(conf-dir DESTDIR, $(EMPTY))
+        PREFIX = $(conf-dir PREFIX, /usr/local)
+        SYSCONFDIR = $(PREFIX)/etc
+        BINDIR = $(conf-dir BINDIR, $(PREFIX)/bin)
+        DRUBYSITELIB = $(conf-dir DRUBYSITELIB, $(RUBYSITEDIR)/druby)
+
+        RUBYLIB = $(conf-dir RUBYLIB, $(ruby-conf libdir)/ruby)
+        DRUBYTOPLIB = $(RUBYLIB)/druby
+        DRUBYLIB = $(conf-dir DRUBYLIB, $(DRUBYTOPLIB)/$(RUBYVERSION))
+
+        print-conf-directories()
+	export

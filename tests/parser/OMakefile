@@ -1,0 +1,22 @@
+
+
+FILES[] += 
+	parser/parser_suite
+	parser/test_helper
+	parser/parse_constants
+	parser/parse_simple
+	parser/parse_identifier
+	parser/parse_objects
+	parser/parse_binop
+	parser/parse_unary
+	parser/parse_string
+	parser/parse_regexp
+	parser/parse_control
+	parser/parse_precedence
+	parser/parse_misc
+	parser/parse_disambig
+	parser/parse_large
+	parser/parse_position
+	parser/parse_annotation
+
+../unit_tests.results: :value: $(defined-env DO_LARGE)

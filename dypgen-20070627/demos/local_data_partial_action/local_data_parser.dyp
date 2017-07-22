@@ -1,0 +1,49 @@
+{
+open Parse_tree
+open Dyp
+
+module OrdString =
+struct
+  type t = string
+  let compare = Pervasives.compare
+end
+module String_map = Map.Make(OrdString)
+
+let is_bound map id =
+  try let _ = String_map.find id map in true
+  with Not_found -> false
+
+let insert_binding map id expr =
+  String_map.add id expr map
+
+let print_map map =
+  print_endline "symbol table :";
+  let f s t = print_string (s^" bound to "); print_tree t in
+  if String_map.is_empty map then print_endline " empty"
+  else String_map.iter f map
+
+let local_data = ref String_map.empty
+let local_data_equal ld1 ld2 = String_map.equal (=) ld1 ld2
+
+let dyp_merge = keep_all
+
+let binding dyp name exp =
+  dyp.local_data <- insert_binding dyp.local_data name exp;
+  Binding (name,exp)
+}
+
+%token <int> INT PLUS LPAREN RPAREN LET <string> IDENT IN EQUAL EOL
+
+%start <Parse_tree.tree> main
+
+%%
+
+main : expr EOL { $1 }
+
+expr: INT                  { Int $1 }
+  | IDENT                  { if is_bound dyp.local_data $1 then Ident $1
+                             else raise Giveup }
+  | LPAREN expr RPAREN     { $2 }
+  | expr PLUS expr         { Plus ($1,$3) }
+  | LET IDENT EQUAL expr { binding dyp $2 $4 } IN expr { Let ($5,$7) }
+
