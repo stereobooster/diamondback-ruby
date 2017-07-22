@@ -1,0 +1,12 @@
+**/*.omc
+.omakedb
+.omakedb.lock
+**/*.a
+**/*.cmxa
+**/*.annot
+**/*.cmi
+**/*.cmx
+**/*.o
+**/*.so
+**/yamlsh
+**/*.opt

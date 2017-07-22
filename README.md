@@ -6,38 +6,37 @@
 - use brew instead of macports in instructions
 - create stubs for Ruby 2.3/2.4
 
+
 ## 1 Introduction
 
 Ruby is a dynamically typed, object oriented scripting language. Dynamic typing keeps the language flexible, allowing small, expressive programs to be written with little effort. However, software never stands still. As these programs evolve, the lack of static typing makes it increasingly difficult to maintain, extend, and reason about. Diamondback (DRuby) is a tool that augments Ruby with a static type system. DRuby’s type system was designed to handle common idioms used by Ruby programmers so that programs would not need to be changed in order to gain the benefits of static checks.
 
-## 2 Installation
+## 2 Building DRuby
 
-### 2.1 Requirements
+DRuby is written in OCaml (OCaml 4.03.0 or higher is required). You can install OCaml on Mac OS X and Linux by following the instructions at [ocaml.org](https://ocaml.org/docs/install.html).
 
-To build DRuby from source, you will need the install the following dependencies.
-
-#### 2.1.1 OCaml Dependencies
-
-These programs are should be available with most linux distributions. For other operating systems, the package manager godi (http://godi.camlcity.org/godi) can provide a convient way of installing them if you don’t wish to do so manually.
+For example, on Ubuntu 16.04 and similar systems:
 
 ```
-ocaml(3.09.2 or higher)
-ocamlfind
-ounit
-omake
-ocamlgetopt
-ocamlgraph
+sudo apt-get install opam
+opam init --comp 4.03.0
+sudo apt-get install syck
 ```
 
-#### 2.1.2 C Dependecies
-
-This library is also commonly distributed with linux distributions. It is also available through the MacPorts package manager for OS X.
+On OS X, using the [brew package manager](http://brew.sh/):
 
 ```
-syck
+brew install opam
+opam init --comp 4.03.0
+brew install syck
 ```
 
-#### 2.2 Building and Installing
+Then, restart your shell and install these additional libraries:
+
+```
+opam update
+opam install -y ocamlfind ounit omake getopt ocamlgraph
+```
 
 DRuby uses the OMake build system to build it from source. OMake is a make-like build system that includes both configuration and build rules. Thus, the build is broken into three steps: configuration, compilation, and installation. However, these steps can also be combined into a single command:
 
@@ -54,7 +53,7 @@ SYSCONFDIR - The install location of the druby global configuration file, druby.
 DESTDIR - A staging directory for building packages of DRuby. Any necessary paths will computed based on PREFIX, but the actual installation step will stage the installation into DESTDIR/PREFIX/....
 RUBYLIB - The location of your Ruby installation (library files). For example, /usr/lib/ruby/. You should not have to specify this under normal circumstances as it will be determined by the ’ruby’ executable found in your PATH.
 RUBYSITEDIR - The location of your Ruby installation’s site-lib directory. For example /usr/lib/ruby/site-lib. Like RUBYLIB, this should be automatically computed for you.
-DRUBYSITELIB - The install location for DRuby’s runtime ruby files. For example, /usr/lib/ruby/site-lib/1.8/druby/. Automatically computed based on RUBYSITEDIR
+DRUBYSITELIB - The install location for DRuby’s runtime ruby files. For example, /usr/lib/ruby/site-lib/2.3/druby/. Automatically computed based on RUBYSITEDIR
 DRUBYLIB - The install location for DRuby’s non-ruby files. For example, /usr/lib/ruby/druby/. Automatically computed based on RUBYLIB
 SYCK - The base location of the syck C library. For example, this should be specified as /opt/local if libsyck* is in /opt/local/lib/
 ```
@@ -75,14 +74,14 @@ $ sudo omake --config PREFIX=/opt/local SYCK=/opt/local install
 --- Checking for syck.h... (found)
 --- Checking for ruby... (found /opt/local/bin/ruby)
 --- Checking Ruby libdir... (/opt/local/lib)
---- Checking Ruby ruby_version... (1.8)
---- Checking Ruby sitelibdir... (/opt/local/lib/ruby/site_ruby/1.8)
+--- Checking Ruby ruby_version... (2.3)
+--- Checking Ruby sitelibdir... (/opt/local/lib/ruby/site_ruby/2.3)
 
 Installation summary:
               binary: /opt/local/bin/druby
          config file: /opt/local/etc/druby.conf
-          ruby files: /opt/local/lib/ruby/site_ruby/1.8/druby
-       support files: /opt/local/lib/ruby/druby/1.8
+          ruby files: /opt/local/lib/ruby/site_ruby/2.3/druby
+       support files: /opt/local/lib/ruby/druby/2.3
 ...
 ```
 
@@ -143,11 +142,11 @@ $ druby --dr-run-ruby first.rb
           chr, ceil, abs, ^, >>, /, -@, -, +@, **, &
   in typing method call sum.+ at ./first.rb:4 in typing method call sum.+ at ./first.rb:4
   in typing method call args.each at ./first.rb:3
-  in assignment to ::ARGV at /opt/local/lib/ruby/druby/1.8/base_types.rb:2993
-  in creating instance of String at /opt/local/lib/ruby/druby/1.8/base_types.rb:2993
-  in typing expression %{args} at /opt/local/lib/ruby/druby/1.8/base_types.rb:2993
-  in typing actual argument %{args} at /opt/local/lib/ruby/druby/1.8/base_types.rb:2993
-  in typing ::Array.new at /opt/local/lib/ruby/druby/1.8/base_types.rb:2993
+  in assignment to ::ARGV at /opt/local/lib/ruby/druby/2.3/base_types.rb:2993
+  in creating instance of String at /opt/local/lib/ruby/druby/2.3/base_types.rb:2993
+  in typing expression %{args} at /opt/local/lib/ruby/druby/2.3/base_types.rb:2993
+  in typing actual argument %{args} at /opt/local/lib/ruby/druby/2.3/base_types.rb:2993
+  in typing ::Array.new at /opt/local/lib/ruby/druby/2.3/base_types.rb:2993
 DRuby analysis complete.
 now running Ruby...
 ruby  first.rb  0

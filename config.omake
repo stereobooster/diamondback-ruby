@@ -19,13 +19,13 @@ conf-dir(name,def) =
   else
     return $(def)
 
-ruby-conf(key) = 
+ruby-conf(key) =
    ConfMsgChecking(for Ruby $(key))
-   res=$(shell ruby -rrbconfig -e "puts Config::CONFIG['$(key)']")
+   res=$(shell ruby -rrbconfig -e "puts RbConfig::CONFIG['$(key)']")
    ConfMsgResult($(res))
    return $(res)
 
-print-conf-directories() = 
+print-conf-directories() =
   println($(EMPTY))
   println($"Installation summary:")
   if $(DESTDIR)
@@ -36,17 +36,17 @@ print-conf-directories() =
   println($"       support files: $(DRUBYLIB)")
   println($(EMPTY))
 
-static. = 
+static. =
         if $(OCAMLFIND_EXISTS)
            USE_OCAMLFIND=true
            export
 	if $(not $(defined OCAMLDEP_MODULES_AVAILABLE))
 		OCAMLDEP_MODULES_AVAILABLE = false
-		OCAMLDEP_MODULES_ENABLED = 
+		OCAMLDEP_MODULES_ENABLED =
 		export
 	else
 		OCAMLDEP_MODULES_ENABLED = $(OCAMLDEP_MODULES_AVAILABLE)
-		OCAMLDEP=$(OCAMLDEP_MODULES)
+		#OCAMLDEP=$(OCAMLDEP_MODULES)
 	ConfMsgChecking(for ocaml-getopt)
 	GETOPT_DIR=$(shell ocamlfind query getopt)
 	ConfMsgResult($(GETOPT_DIR))
@@ -84,8 +84,8 @@ exit 1;;"" | ocaml -I $(OUNIT_DIR) unix.cma oUnit.cma)
         RSPEC = $(CheckProgVerbose spec, RSpec testing framework, skipping Ruby tests)
 
         RUBYVERSION = $(ruby-conf ruby_version)
-        if $(test $(RUBYVERSION) != 1.8)
-          eprintln(Only Ruby version 1.8.x is supported at this time)
+        if $(test $(RUBYVERSION) != 2.3.0)
+          eprintln(Only Ruby version 2.3.x is supported at this time)
           exit 1
         RUBYSITEDIR = $(conf-dir RUBYSITEDIR, $(ruby-conf sitelibdir))
 

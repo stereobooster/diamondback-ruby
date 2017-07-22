@@ -47,15 +47,15 @@ install_conf: druby.conf
 
 install: install_site install_lib install_conf
 
-uninstall: 
-	rm -f $(SYSCONFDIR)/druby.conf 
+uninstall:
+	rm -f $(SYSCONFDIR)/druby.conf
 	rm -rf $(DRUBYSITELIB)
 	rm -rf $(DRUBYTOPLIB)
 
 
 .PHONY: build_gem
 
-build_gem: gem.configure src/druby src/safe_eval 
+build_gem: gem.configure src/druby src/safe_eval
 	cp src/druby gem_bin/druby.real
 	cp src/safe_eval gem_bin/safe_eval.real
 	cp gem.configure configure

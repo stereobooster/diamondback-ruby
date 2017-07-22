@@ -26,7 +26,7 @@ static struct custom_operations emitter_ops = {
     custom_deserialize_default
 };
 
-value yamlEmitter_create(value unit) 
+value yamlEmitter_create(value unit)
 {
   CAMLparam1(unit);
   SyckEmitter *em = syck_new_emitter();
@@ -36,7 +36,7 @@ value yamlEmitter_create(value unit)
   CAMLreturn(em_v);
 }
 
-void caml_output_handler(SyckEmitter *e, char *ptr, long len)
+void caml_output_handler(SyckEmitter *e, const char *ptr, long len)
 {
   CAMLparam0();
   CAMLlocal2(cb,buf);
@@ -51,7 +51,7 @@ void caml_emitter_handler(SyckEmitter *e, st_data_t data)
 {
   CAMLparam1(data);
   CAMLlocal3(node, lst, pair);
-  char *node_uri, *node_str; 
+  char *node_uri, *node_str;
   int str_len;
 
   node = (value)data;
@@ -104,7 +104,7 @@ value yamlEmitter_emit(value handler, value emitter, value node)
   CAMLparam3(handler,emitter,node);
 
     SyckEmitter *em = EMITTER_VAL(emitter);
-    
+
     em->bonus = (void*)handler;
     caml_register_global_root((value*)&(em->bonus));
 
