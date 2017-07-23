@@ -129,3 +129,24 @@ DRuby analysis complete.
 ruby exmaples/test5.rb
 exmaples/test5.rb:6:in `<main>': key not found: :c (RuntimeError)
 ```
+
+## 6
+
+```ruby
+B.new
+```
+
+### DRuby
+
+```
+gem_bin/druby exmaples/test6.rb
+[ERROR] Unable to statically locate scope B in namespace hierarchy at ::
+  at ./exmaples/test6.rb:1
+```
+
+### Ruby
+
+```
+ruby exmaples/test6.rb
+exmaples/test6.rb:1:in `<main>': uninitialized constant B (NameError)
+```
