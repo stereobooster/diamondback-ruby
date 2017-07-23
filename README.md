@@ -1,14 +1,22 @@
 # DRuby [![Travis](https://img.shields.io/travis/stereobooster/diamondback-ruby.svg)](https://travis-ci.org/stereobooster/diamondback-ruby)
 
+## Vision
+- It is suppose to be practical project rather than purely academical. To do this it should provide easy to install ruby gems (without requiring OCaml or C libs). This is doable, see how Flow compiles binaries for each platform and uploads to github and npm.
+- Everything that can be checked statically should be checked statically without dynamic check duplications. Statical type check should not have any negative impact on performance, like this happens in [rdl](https://github.com/plum-umd/rdl) without `wrap: false`.
+- Type-checker should be usable without modifying code, like Flow does. Thought it can be not that effective in finding type errors without provided type signatures.
+- There should be type signatures for standard libraries and top gems. Signatures should live in separate repository, so they can be reused by other projects, like [rdl](https://github.com/plum-umd/rdl) or [typed.rb](https://github.com/antoniogarrote/typed.rb) or [ruby 3 ;)](https://bugs.ruby-lang.org/issues/9999). Also we can hope that community will contribute type signature, like in [DefinitelyTyped](https://github.com/DefinitelyTyped/DefinitelyTyped).
+
 ## TODO
 - fix tests and add them back to make file
 - fix installation of syck on linux, maybe [ruby/sick](https://github.com/ruby/syck), because `libsyck0-dev` is deprecated. Or replace with other YAML implementation [camlyaml](https://github.com/Kakadu/camlyaml), [oyaml](https://github.com/mk270/oyaml).
 - fix warnings and reverse `-warn-error` flag
 - install to local dir instead of global
 - update dypgen, use [opam package](http://opam.ocaml.org/packages/dypgen/) instead of embedded version
-- can we reuse [ruby/spec](ruby/spec) to generate type signatures?
 - setup appveyor
 - setup distribution of gems from continuous integration, like Flow does
+- can we reuse [ruby/spec](ruby/spec) to generate type signatures?
+- can we get type signatures from [ActiveRecord schema file](http://api.rubyonrails.org/classes/ActiveRecord/Schema.html), or [virtus](https://github.com/solnic/virtus), or [dry-types](http://dry-rb.org/gems/dry-types/)?
+- can we reuse type signatures to improve speed by providing this info to JIT compiler?
 
 ## 1 Introduction
 
