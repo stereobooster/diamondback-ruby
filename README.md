@@ -2,10 +2,13 @@
 
 ## TODO
 - fix tests and add them back to make file
-- fix installation of syck on linux
+- fix installation of syck on linux, maybe [ruby/sick](https://github.com/ruby/syck), because `libsyck0-dev` is deprecated. Or replace with other YAML implementation [camlyaml](https://github.com/Kakadu/camlyaml), [oyaml](https://github.com/mk270/oyaml).
 - fix warnings and reverse `-warn-error` flag
-- setup appveyor
 - install to local dir instead of global
+- update dypgen, use [opam package](http://opam.ocaml.org/packages/dypgen/) instead of embedded version
+- can we reuse [ruby/spec](ruby/spec) to generate type signatures?
+- setup appveyor
+- setup distribution of gems from continuous integration, like Flow does
 
 ## 1 Introduction
 
@@ -21,7 +24,7 @@ For example, on Ubuntu 16.04 and similar systems:
 sudo apt-get install opam
 opam init --comp 4.03.0
 # TODO: fix this
-# sudo apt-get install syck
+# sudo apt-get install libsyck0-dev
 ```
 
 On OS X, using the [brew package manager](http://brew.sh/):
