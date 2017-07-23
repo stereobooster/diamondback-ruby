@@ -5,10 +5,12 @@
 - Everything that can be checked statically should be checked statically without dynamic check duplications. Statical type check should not have any negative impact on performance, like this happens in [rdl](https://github.com/plum-umd/rdl) without `wrap: false`.
 - Type-checker should be usable without modifying code, like Flow does. Thought it can be not that effective in finding type errors without provided type signatures.
 - There should be type signatures for standard libraries and top gems. Signatures should live in separate repository, so they can be reused by other projects, like [rdl](https://github.com/plum-umd/rdl) or [typed.rb](https://github.com/antoniogarrote/typed.rb) or [ruby 3 ;)](https://bugs.ruby-lang.org/issues/9999). Also we can hope that community will contribute type signature, like in [DefinitelyTyped](https://github.com/DefinitelyTyped/DefinitelyTyped).
+- Errors should be clear and helpful, [like in elm](http://elm-lang.org/blog/compiler-errors-for-humans).
 
 ## TODO
 - fix tests and add them back to make file
 - fix installation of syck on linux, maybe [ruby/sick](https://github.com/ruby/syck), because `libsyck0-dev` is deprecated. Or replace with other YAML implementation [camlyaml](https://github.com/Kakadu/camlyaml), [oyaml](https://github.com/mk270/oyaml).
+- fix ruby parser to support ruby 2.3, it works with 1.8 now
 - fix warnings and reverse `-warn-error` flag
 - install to local dir instead of global
 - update dypgen, use [opam package](http://opam.ocaml.org/packages/dypgen/) instead of embedded version
