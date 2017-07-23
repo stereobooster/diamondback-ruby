@@ -1,4 +1,4 @@
-# DRuby base_types.rb file 
+# DRuby base_types.rb file
 
 class String;end
 class Integer;end
@@ -19,7 +19,7 @@ module Kernel
   ##% Array<t> : [to_a : () -> Array<t>] -> Array<t>
   ##% Array<t> : [to_ary : () -> Array<t>] -> Array<t>
   ##% Array<t> : t -> Array<t>
-  def Array(p0) end 
+  def Array(p0) end
   ##% Float : [to_f : () -> Float] -> Float
   def Float(p0) end
   ##% Integer : [to_i : () -> Fixnum] or [to_int : () -> Integer] -> Integer
@@ -32,19 +32,19 @@ module Kernel
   ##% at_exit<^t, u> : () {^t -> u} -> Proc<^t,u> # DAVIDAN
   def at_exit(&block) end
   ##% autoload : (String or Symbol, String) -> NilClass
-  def autoload(p0, p1) end 
+  def autoload(p0, p1) end
   ##% autoload? : (String or Symbol) -> String
   def autoload?(p0) end
   ##% binding : () -> Binding
-  def binding() end 
+  def binding() end
   ##% block_given? : () -> Boolean
   def block_given?() end
   ##% callcc<t> : () {Continuation -> t} -> t
-  def callcc() end 
+  def callcc() end
   ##% caller : (?Fixnum) -> Array<String>
   def caller(start=1) end
   ##% catch<t> : (Symbol) {() -> t} -> t
-  def catch(p0) end 
+  def catch(p0) end
   ##% chomp : (?String) -> String
   def chomp(sep=$/) end
   ##% chomp! : (?String) -> String
@@ -55,7 +55,7 @@ module Kernel
   def chop!() end
   ##% eval : (String, ?String, ?Fixnum) -> ?
   ##% eval : (String, Binding, ?String, ?Fixnum) -> ?
-  def eval(expr, *rest) end 
+  def eval(expr, *rest) end
   ##% exec : (String, *String) -> NilClass
   def exec(cmd, *rest) end
   ##% exit : (?Integer) -> NilClass
@@ -66,10 +66,10 @@ module Kernel
   ##% fail<t> : (?String) -> t
   ##% fail<t> : (Exception, ?String, ?Array) -> t
   ##% fail<t> : ([exception : () -> Exception], ?String, ?Array) -> t
-  def fail(*rest) end 
+  def fail(*rest) end
   ##% fork : () {() -> []} -> Fixnum
   def fork() end
-  ##% format : (String, *[to_s : () -> String]) -> String 
+  ##% format : (String, *[to_s : () -> String]) -> String
   def format(fmt, *rest) end
   ### This is obsolete
   # def getc() end
@@ -88,7 +88,7 @@ module Kernel
   ##% lambda<^t, u> : () {^t -> u} -> Proc<^t, u>
   def lambda(&block) end
   ##% load : (String, ?Boolean) -> Boolean
-  def load(filename, wrap=false) end 
+  def load(filename, wrap=false) end
   ##% local_variables : () -> Array<String>
   def local_variables() end
   ##% loop<t> : () {() -> t} -> t
@@ -106,7 +106,7 @@ module Kernel
   def print(*rest) end
   ##% printf : (BaseIO, String, *[to_s : () -> String]) -> NilClass
   ##% printf : (String, *[to_s : () -> String]) -> NilClass
-  def printf(fmt, *rest) end 
+  def printf(fmt, *rest) end
   ##% proc<^t, u> : () {^t -> u} -> Proc<^t, u>
   def proc(&block) end
   ##% putc : Integer -> Integer
@@ -116,7 +116,7 @@ module Kernel
   def puts(*rest) end
   ##% raise<u> : (?String) -> u
   ##% raise<u> : ([exception : () -> Exception], ?String, ?Array) -> u
-  def raise(*rest) end 
+  def raise(*rest) end
   ##% rand : (?Numeric) -> Fixnum
   def rand(max=0) end
   ##% readline : (?String) -> String
@@ -124,7 +124,7 @@ module Kernel
   ##% readlines : (?String) -> Array<String>
   def readlines(sep=$/) end
   ##% require : String -> Boolean
-  def require(p0) end 
+  def require(p0) end
   ##% scan : Regexp or String -> Array
   ##% scan : (Regexp or String) {(*String) -> []} -> String
   def scan(p0, &block) end
@@ -139,7 +139,7 @@ module Kernel
   ##% split : (?String, ?Fixnum) -> Array<String>
   ##% split : (Regexp, ?Fixnum) -> Array<String>
   def split(pattern=$;, limit=0) end
-  ##% sprintf : (String, *[to_s : () -> String]) -> String 
+  ##% sprintf : (String, *[to_s : () -> String]) -> String
   def sprintf(fmt, *rest) end
   ##% srand : (?Numeric) -> Integer
   def srand(num=0) end
@@ -157,15 +157,15 @@ module Kernel
   def test(cmd, file1, file2="foo") end
   ## 2nd arg here is the return value of the catch block
   ##% throw<t> : (Symbol, ?t) -> NilClass
-  def throw(symb, *rest) end 
+  def throw(symb, *rest) end
   ##% trace_var : (Symbol, String or Proc) -> NilClass
   ##% trace_var<t> : (Symbol) {Object -> t} -> NilClass
-  def trace_var(*rest) end 
-  ##% trap : (String, Proc) -> Object 
+  def trace_var(*rest) end
+  ##% trap : (String, Proc) -> Object
   ##% trap<t> : (String) {() -> t} -> Object
-  def trap(*rest) end 
+  def trap(*rest) end
   ##% untrace_var : (Symbol, ?String) -> Array
-  def untrace_var(*rest) end 
+  def untrace_var(*rest) end
   ##% warn : String -> NilClass
   def warn(p0) end
 end
@@ -181,11 +181,11 @@ class Object
   def __id__() end
   ##% __send__ : (Symbol or String, *?) -> ?
   def __send__(*rest) end
-  ##% class : () -> Class 
+  ##% class : () -> Class
   def class() end
   ##% clone<self> : () -> self
   def clone() end
-  ##% display : (?BaseIO) -> NilClass 
+  ##% display : (?BaseIO) -> NilClass
   def display(port=$>) end
   ##% dup<self> : () -> self
   def dup() end
@@ -194,7 +194,7 @@ class Object
   ##% equal?<t> : t -> Boolean
   def equal?(p0) end
   ##% extend<self> : (*Module) -> self
-  def extend(*rest) end 
+  def extend(*rest) end
   ##% freeze<self> : () -> self
   def freeze() end
   ##% frozen? : () -> Boolean
@@ -209,13 +209,13 @@ class Object
   def inspect() end
   ##% instance_eval : (String, ?String, ?Fixnum) -> ?
   ##% instance_eval<t> : () {() -> t} -> t
-  def instance_eval(*rest) end 
+  def instance_eval(*rest) end
   ##% instance_of? : Module -> Boolean
   def instance_of?(p0) end
   ##% instance_variable_defined? : (Symbol or String) -> Boolean
   def instance_variable_defined?(p0) end
   ##% instance_variable_get : (Symbol or String) -> ?
-  def instance_variable_get(p0) end 
+  def instance_variable_get(p0) end
   ##% instance_variable_set : (Symbol or String, ?) -> ?
   def instance_variable_set(p0, p1) end
   ##% instance_variables : () -> Array
@@ -225,7 +225,7 @@ class Object
   ##% kind_of? : Module -> Boolean
   def kind_of?(p0) end
   ##% method : (Symbol or String) -> Method
-  def method(p0) end 
+  def method(p0) end
   ##% methods : () -> Array<String>
   def methods() end
   ##% nil? : () -> Boolean
@@ -241,7 +241,7 @@ class Object
   ##% respond_to? : (Symbol or String, ?Boolean) -> Boolean
   def respond_to?(symbol, include_private=false) end
   ##% send : (Symbol or String, *?) -> ?
-  def send(*rest) end 
+  def send(*rest) end
   ##% singleton_methods : (?Boolean) -> Array<String>
   def singleton_methods(all=true) end
   ##% taint<self> : () -> self
@@ -249,12 +249,12 @@ class Object
   ##% tainted? : () -> Boolean
   def tainted?() end
 
-  ## MikeF: This method is deprecated (Ruby gives a runtime warning), 
+  ## MikeF: This method is deprecated (Ruby gives a runtime warning),
   ## so I suggest we not include it for now.  Also, it is important that
   ## Ruby classes implement this themselves whenever they are used in for
   ## loops or parallel assignment
   # #% to_a : () -> Array<Object>
-  # def to_a() end 
+  # def to_a() end
 
   ##% to_s : () -> String
   def to_s() end
@@ -276,7 +276,7 @@ module ObjectSpace # FIXME
   def ObjectSpace.define_finalizer(*rest) end
 
   # DAVIDAN: a bit weird
-  ##% ObjectSpace.each_object<t, u>: (?Module) {t -> u} -> Fixnum 
+  ##% ObjectSpace.each_object<t, u>: (?Module) {t -> u} -> Fixnum
   def ObjectSpace.each_object(*p) end
 
   ##% ObjectSpace.finalizers : !FIXME -> !FIXME
@@ -394,7 +394,7 @@ class Thread # FIXME
   ### Same as Kernel#raise
   ##% raise<u> : (?String) -> u
   ##% raise<u> : ([exception : () -> Exception], ?String, ?Array) -> u
-  def raise(*rest) end 
+  def raise(*rest) end
   ##% run : () -> Thread
   def run() end
   ##% safe_level : !FIXME -> !FIXME
@@ -466,7 +466,7 @@ class Module
   ##% "<=" : Module -> Boolean
   def <=(p0) end
   ##% "<=>" : Module -> Fixnum
-  def <=>(p0) end 
+  def <=>(p0) end
   ##% "=="<t> : t -> Boolean
   def ==(p0) end
   ##% "==="<t> : t -> Boolean
@@ -499,9 +499,9 @@ class Module
   ##% class_variable_defined? : Symbol or String -> Boolean
   def class_variable_defined?(sym) end
   ##% class_variable_get : Symbol or String -> ?
-  def class_variable_get(sym) end 
+  def class_variable_get(sym) end
   ##% class_variable_set : (Symbol or String, ?) -> ?
-  def class_variable_set(sym,val) end 
+  def class_variable_set(sym,val) end
   ##% class_variables : () -> Array<String>
   def class_variables() end
   ##% const_defined? : Symbol or String -> Boolean
@@ -525,15 +525,15 @@ class Module
   ##% freeze<self> : () -> self
   def freeze() end
   ##% include : (Module, *Module) -> Module
-  def include(mod,*more) end 
+  def include(mod,*more) end
   ##% included<t> : Module -> t
   def included(othermod) end
   ##% include? : Module -> Boolean
   def include?(p0) end
-  ##% included_modules : () -> Array<Module> 
+  ##% included_modules : () -> Array<Module>
   def included_modules() end
-  ##% instance_method : (Symbol or String) -> UnboundMethod 
-  def instance_method(p0) end 
+  ##% instance_method : (Symbol or String) -> UnboundMethod
+  def instance_method(p0) end
   ##% instance_methods : (?Boolean) -> Array<String>
   def instance_methods(include_super=true) end
   ### XXX: not documented
@@ -543,43 +543,43 @@ class Module
   def method_defined?(p0) end
   ### XXX: not documented
   ##% method_removed : !FIXME -> !FIXME
-  def method_removed(*) end 
+  def method_removed(*) end
   ### XXX: not documented
   ##% method_undefined : !FIXME -> !FIXME
-  def method_undefined(*) end 
+  def method_undefined(*) end
   ##% module_eval : (String, ?String, ?Fixnum) -> Object
   ##% module_eval<t> : () {() -> t} -> Object
-  def module_eval(*rest) end 
+  def module_eval(*rest) end
   ##% module_function : (*Symbol) -> Module
-  def module_function(sym, *rest) end 
+  def module_function(sym, *rest) end
   ##% name : () -> String
   def name() end
   ##% nesting : () -> Array<Module>
   def nesting() end
-  ##% private : *(Symbol or String) -> Module 
-  def private(*syms) end 
-  ##% private_class_method : *(Symbol or String) -> Module 
-  def private_class_method(*rest) end  
+  ##% private : *(Symbol or String) -> Module
+  def private(*syms) end
+  ##% private_class_method : *(Symbol or String) -> Module
+  def private_class_method(*rest) end
   ##% private_instance_methods : (?Boolean) -> Array<String>
   def private_instance_methods(include_super=true) end
   ##% private_method_defined? : Symbol or String -> Boolean
   def private_method_defined?(p0) end
-  ##% protected : *(Symbol or String) -> Module 
-  def protected(*syms) end 
+  ##% protected : *(Symbol or String) -> Module
+  def protected(*syms) end
   ##% protected_instance_methods : (?Boolean) -> Array<String>
   def protected_instance_methods(include_super=true) end
   ##% protected_method_defined? : Symbol or String -> Boolean
   def protected_method_defined?(p0) end
   ##% public : *(Symbol or String) -> Module
-  def public(*syms) end 
-  ##% public_class_method : *(Symbol or String) -> Module 
-  def public_class_method(*rest) end  
+  def public(*syms) end
+  ##% public_class_method : *(Symbol or String) -> Module
+  def public_class_method(*rest) end
   ##% public_instance_methods : (?Boolean) -> Array<String>
   def public_instance_methods(include_super=true) end
   ##% public_method_defined? : Symbol or String -> Boolean
   def public_method_defined?(p0) end
   ##% remove_class_variable : Symbol or String -> Module
-  def remove_class_variable(sym) end 
+  def remove_class_variable(sym) end
   ##% remove_const : Symbol or String -> Module
   def remove_const(sym) end
   ##% remove_method : Symbol or String -> Module
@@ -587,7 +587,7 @@ class Module
   ##% to_s : () -> String
   def to_s() end
   ##% undef_method : Symbol or String -> Module
-  def undef_method (sym) end 
+  def undef_method (sym) end
 end
 
 class Class < Module ### DONE
@@ -595,7 +595,7 @@ class Class < Module ### DONE
   def allocate() end
   # # MikeF: Optional, dynamic arg (the superclass)
   ##% initialize : (??) -> []
-  def initialize(*) 
+  def initialize(*)
   end
   ##% superclass: () -> Class
   def superclass() end
@@ -655,8 +655,8 @@ class Numeric
   def <<(p0) end
   ##% "<=" : Numeric -> Boolean
   def <=(p0) end
-  ##% "<=>" : Numeric -> Fixnum 
-  def <=>(p0) end 
+  ##% "<=>" : Numeric -> Fixnum
+  def <=>(p0) end
   ##% "=="<t> : t -> Boolean # Numeric -> Boolean
   def ==(p0) end
   ##% ">" : Numeric -> Boolean
@@ -675,7 +675,7 @@ class Numeric
   def between?(x,y) end
   ##% ceil<self> : () -> self
   def ceil() end
-  ##% chr : () -> String 
+  ##% chr : () -> String
   def chr() end
   ##% coerce : Numeric -> Array<Numeric>
   def coerce(p0) end
@@ -731,10 +731,10 @@ class Numeric
   def rpower(n) end
   ##% singleton_method_added : !FIXME -> !FIXME
   def singleton_method_added(*) end
-  ##% size : () -> Fixnum 
+  ##% size : () -> Fixnum
   def size() end # Had better be a fixnum!
   ##% step<t,self> : (Numeric, Numeric) {Numeric -> t} -> self
-  def step(limit, step) end  
+  def step(limit, step) end
   ##% succ<self> : () -> self
   def succ() end
   ##% times<t> : () {Integer -> t} -> Integer
@@ -804,7 +804,7 @@ end
 class Symbol ### DONE
   ### XXX: documentation is confusing (=== or ==) ?
   ##% "===" : !FIXME -> !FIXME
-  def ===(*) end 
+  def ===(*) end
   ##% Symbol.all_symbols : () -> Array<Symbol>
   def Symbol.all_symbols() end
   ##% id2name : () -> String
@@ -866,7 +866,7 @@ class Regexp ### DONE
   def inspect() end
   ##% kcode : () -> String
   def kcode() end
-  ##% match : String -> MatchData 
+  ##% match : String -> MatchData
   def match(p0) end
   ##% options : () -> Fixnum
   def options() end
@@ -880,13 +880,13 @@ class Regexp ### DONE
   ##% Regexp.compile : (String, String) -> Regexp
   def Regexp.compile(p0, *rest) end
   ##% Regexp.escape : String -> String
-  def Regexp.escape(p0) end 
-  ##% Regexp.last_match : () -> MatchData 
+  def Regexp.escape(p0) end
+  ##% Regexp.last_match : () -> MatchData
   ##% Regexp.last_match : Fixnum -> String
   def Regexp.last_match(*rest) end
   ##% Regexp.quote : String -> String
-  def Regexp.quote(p0) end 
-  ##% Regexp.union : *(String or Regexp) -> Regexp 
+  def Regexp.quote(p0) end
+  ##% Regexp.union : *(String or Regexp) -> Regexp
   def Regexp.union(*rest) end
 end
 
@@ -902,7 +902,7 @@ class Boolean
 end
 
 class TrueClass < Boolean ### DONE
-  ##% "&" : TrueClass -> Boolean 
+  ##% "&" : TrueClass -> Boolean
   def &(p0) end
   ##% "^" : TrueClass -> Boolean
   def ^(p0) end
@@ -921,13 +921,13 @@ module Enumerable
   def any?() end
   ##% collect<u> : () {t -> u} -> Array<u>
   def collect() end
-  ##% detect<v> : () {t -> v} -> t 
+  ##% detect<v> : () {t -> v} -> t
   def detect() end
   ##% each_with_index<u> : () {(t, Fixnum) -> u } -> Enumerable<t>
   def each_with_index() end
   ##% entries : () -> Array<t>
   def entries() end
-  ##% find<v>: () {t -> v} -> t 
+  ##% find<v>: () {t -> v} -> t
   def find() end
   ##% find_all<v> : () {t -> v} -> Array<t>
   def find_all() end
@@ -936,8 +936,8 @@ module Enumerable
   def grep(p0) end
   ##% include? : t -> Boolean
   def include?(p0) end
-  ##% inject<self,v,u> ; self <= [each: () {v -> []} -> []] : (u) {(u, v) -> u} -> u 
-  def inject(*rest) end  
+  ##% inject<self,v,u> ; self <= [each: () {v -> []} -> []] : (u) {(u, v) -> u} -> u
+  def inject(*rest) end
   ##% map<u> : () {t -> u} -> Array<u>
   def map() end
   # #% max<self,u> ; self <= [each: () {["<=>" : t -> Fixnum] -> u} -> Enumerable<t>] \
@@ -945,7 +945,7 @@ module Enumerable
   ##% max : () -> t
   ##% max : () {(t, t) -> Fixnum} -> t
   def max() end
-  ##% member? : t -> Boolean 
+  ##% member? : t -> Boolean
   def member?(p0) end
   # #% min<self,u> ; self <= [each: () {["<=>" : t -> Fixnum] -> u} -> Enumerable<t>] \
   # #% : () -> t
@@ -963,12 +963,12 @@ module Enumerable
   ##% sort : () {(t, t) -> Fixnum} -> Array<t>
   ##% sort : () -> Array<t>
   def sort() end
-  ##% sort_by<u> ; u <= ["<=>" : t -> Fixnum] : () {t -> u} -> Array<t> 
+  ##% sort_by<u> ; u <= ["<=>" : t -> Fixnum] : () {t -> u} -> Array<t>
   def sort_by() end
   ##% to_a : () -> Array<t>
   def to_a() end
-  ##% zip : Array<Array<t> > -> Array<Array<t> > 
-  ##% zip<u> : (Array<Array<t> >) {Array<t> -> u} -> NilClass 
+  ##% zip : Array<Array<t> > -> Array<Array<t> >
+  ##% zip<u> : (Array<Array<t> >) {Array<t> -> u} -> NilClass
   def zip(*rest) end
 end
 
@@ -983,14 +983,14 @@ class FalseClass < Boolean
   def |(p0) end
 end
 
-##% Hash<k, v> 
+##% Hash<k, v>
 class Hash
   include Enumerable
-  ##% "=="<t> : t -> Boolean 
+  ##% "=="<t> : t -> Boolean
   def ==(p0) end
   ##% "[]" : k -> v
   def [](p0) end
-  ##% "[]="<v'> ; v' <= v : (k, v') -> v' 
+  ##% "[]="<v'> ; v' <= v : (k, v') -> v'
   def []=(p0, p1) end
   ##% clear : () -> Hash<k, v>
   def clear() end
@@ -998,7 +998,7 @@ class Hash
   def collect() end
   ##% default : (?k) -> v
   def default(key) end
-  ##% default= : v -> Hash<k, v> 
+  ##% default= : v -> Hash<k, v>
   def default=(p0) end
   # # should be (hash<k,v>,k) -> v
   ##% default_proc : () -> Proc<^(Hash<k, v>, k),v>
@@ -1031,15 +1031,15 @@ class Hash
   ##% index : v -> k
   def index(p0) end
   ##% indexes : (*k) -> Array<Array<k or v> >
-  def indexes(*rest) end 
+  def indexes(*rest) end
   ##% indices : (*k) -> Array<Array<k or v> >
-  def indices(*rest) end 
+  def indices(*rest) end
   ##% initialize : (?v) -> []
   ##% initialize : () {(Hash<k, v>, k) -> v} -> []
   def initialize(*rest, &block) end
   ##% inspect : () -> String
   def inspect() end
-  ##% invert : () -> Hash<v, k> 
+  ##% invert : () -> Hash<v, k>
   def invert() end
   ##% key? : k -> Boolean
   def key?(p0) end
@@ -1048,13 +1048,13 @@ class Hash
   ##% length : () -> Fixnum
   def length() end
   ##% member? : k -> Boolean
-  def member?(p0) end 
+  def member?(p0) end
   ### NOTE: this function has different type annotation than merge!
   ###       because it does not manipulate the contents of Hash object.
   ###       Thus, we can provide more precise type info. for return type.
   ##% merge<k', v'> ; k' <= k, v' <= v: Hash<k', v'> -> Hash<k' or k, v' or v>
   ##% merge<k', v', u> ; k' <= k, v' <= v : (Hash<k', v'>) {(k, v, v') -> u} -> \
-  ##%                    Hash<k, v or v' or u> 
+  ##%                    Hash<k, v or v' or u>
   def merge(p0) end
   ##% merge! : Hash<k, v> -> Hash<k, v>
   ##% merge! : (Hash<k, v>) {(k, v, v) -> v} -> Hash<k, v>
@@ -1065,20 +1065,20 @@ class Hash
   def reject() end
   ##% reject!<t> : () {(k, v) -> t} -> Hash<k, v>
   def reject!() end
-  ##% replace<k', v'> ; k' <= k, v' <= v : Hash<k', v'> -> Hash<k', v'> 
+  ##% replace<k', v'> ; k' <= k, v' <= v : Hash<k', v'> -> Hash<k', v'>
   def replace(p0) end
   ##% select<t> : () {(k, v) -> t} -> Hash<k, v>
-  def select() end 
+  def select() end
   ##% shift : () -> (k, v)
   def shift() end
   ##% size : () -> Fixnum
   def size() end
   ##% sort<self> ; self <= [each<u>: () {["<=>" : k -> Fixnum] -> u} -> Hash<k,v>] \
-  ##%            : () -> Array<Array<k or v> > 
+  ##%            : () -> Array<Array<k or v> >
   ##% sort : () {(Array<k or v>, Array<k or v>) -> Fixnum} -> \
   ##%        Array<Array<k or v>>
   def sort() end
-  ##% store<k', v'> ; k' <= k, v' <= v : (k', v') -> v' 
+  ##% store<k', v'> ; k' <= k, v' <= v : (k', v') -> v'
   def store(p0, p1) end
   ##% to_a : () -> Array<Array<Object> > # k or v> >
   def to_a() end
@@ -1095,10 +1095,10 @@ class Hash
   def values() end
   ##% values_at : (*k) -> Array<v>
   def values_at(*rest) end
-  ### MF: this is a little imprecise for the latter case since it 
+  ### MF: this is a little imprecise for the latter case since it
   ### requires alternating key/value pairs in the argument list
   ##% Hash."[]"<k',v'> : Hash<k',v'> -> Hash<k',v'>
-  ##% Hash."[]"<k',v',t> ; t <= k', t <= v' : (k',v', *t) -> Hash<k',v'> 
+  ##% Hash."[]"<k',v',t> ; t <= k', t <= v' : (k',v', *t) -> Hash<k',v'>
   def Hash.[](*rest) end
   ##% to_yaml: () -> String
   def to_yaml() end
@@ -1110,16 +1110,16 @@ class String
   include Enumerable
   ##% "%" : [to_s: () -> String] -> String
   ##% "%" : Array<[to_s : () -> String]>-> String
-  def %(p0) end 
+  def %(p0) end
   ##% "*" : Integer -> String
   def *(p0) end
   ##% "+" : [to_str:()->String] -> String
   def +(p0) end
   ##% "<<" : Fixnum -> String
-  ##% "<<" : [to_s : () -> String] -> String  
+  ##% "<<" : [to_s : () -> String] -> String
   def <<(p0) end
   ##% "<=>" : String -> Fixnum
-  def <=>(p0) end 
+  def <=>(p0) end
   ##% "=="<t> : t -> Boolean
   def ==(p0) end
   ##% "=~" : ["=~" : String -> Fixnum] -> Fixnum
@@ -1138,12 +1138,12 @@ class String
   ##% capitalize! : () -> String
   def capitalize!() end
   ##% casecmp : String -> Fixnum
-  def casecmp(p0) end 
+  def casecmp(p0) end
   ##% center : (Integer, ?String) -> String
   def center(p0, padstr="") end
   ##% chomp : (?String) -> String
   def chomp(sep=$/) end
-  ##% chomp! : (?String) -> String 
+  ##% chomp! : (?String) -> String
   def chomp!(sep=$/) end
   ##% chop! : () -> String
   def chop!() end
@@ -1206,7 +1206,7 @@ class String
   def lstrip() end
   ##% lstrip! : () -> String
   def lstrip!() end
-  ##% match : (Regexp or String) -> MatchData 
+  ##% match : (Regexp or String) -> MatchData
   def match(p0) end # todo
   ##% next : () -> String
   def next() end
@@ -1280,14 +1280,14 @@ class String
   def to_sym() end
   ##% tr : (String, String) -> String
   def tr(p0, p1) end
-  ##% tr! : (String, String) -> String 
+  ##% tr! : (String, String) -> String
   def tr!(p0, p1) end
   ##% tr_s : (String, String) -> String
   def tr_s(p0, p1) end
   ##% tr_s! : (String, String) -> String
   def tr_s!(p0, p1) end
   ##% unpack : String -> ?
-  def unpack(p0) end  
+  def unpack(p0) end
   ##% upcase : () -> String
   def upcase() end
   ##% upcase! : () -> String
@@ -1296,7 +1296,7 @@ class String
   def upto(p0) end
 end
 
-##% Range<t> # t is required to instantiate Enumerable 
+##% Range<t> # t is required to instantiate Enumerable
 class Range
   ### include Enumerable<t>
   include Enumerable
@@ -1322,7 +1322,7 @@ class Range
   ##% include? : t -> Boolean
   def include?(p0) end
   ##% initialize : (t, t, ?Boolean) -> []
-  def initialize(a, b) end  
+  def initialize(a, b) end
   ##% inspect : () -> String
   def inspect() end
   ##% last : () -> t
@@ -1343,7 +1343,7 @@ class Array ### DONE
   ##% "*" : Integer -> Array<t>
   ##% "*" : String -> String
   def *(p0) end
-  ##% "+"<u> : [to_ary:() -> Array<u>] -> Array<t or u> 
+  ##% "+"<u> : [to_ary:() -> Array<u>] -> Array<t or u>
   def +(p0) end
   ##% "-"<u> : Array<u> -> Array<t> # still t!
   def -(p0) end
@@ -1361,7 +1361,7 @@ class Array ### DONE
   ##% "[]=" <u> ; u <= t: (Fixnum, Fixnum, u) -> u
   ##% "[]=" <u> ; u <= t: (Fixnum, Fixnum, Array<u>) -> Array<u>
   ##% "[]=" <u> ; u <= t: (Range, u) -> u
-  ##% "[]=" <u> ; u <= t: (Range, Array<u>) -> Array<u> 
+  ##% "[]=" <u> ; u <= t: (Range, Array<u>) -> Array<u>
   def []=(p0, *rest) end
   ##% assoc<self,u> ; self <= Array<Array<u>> : u -> Array<u>
   def assoc(p0) nil end
@@ -1427,7 +1427,7 @@ class Array ### DONE
   ##% initialize : Array<t> -> []
   ##% initialize : (Fixnum) {Fixnum -> t} -> []
   def initialize(*rest) end
-  ##% insert<u> ; u <= t : (Fixnum, *u) -> Array<t> 
+  ##% insert<u> ; u <= t : (Fixnum, *u) -> Array<t>
   def insert(ind, *rest) end
   ##% inspect : () -> String
   def inspect() end
@@ -1438,7 +1438,7 @@ class Array ### DONE
   def last(*n) end
   ##% length : () -> Fixnum
   def length() end
-  ##% map<u> : () {t -> u} -> Array<u> 
+  ##% map<u> : () {t -> u} -> Array<u>
   def map() end
   ##% map!<u> ; u <= t : () {t -> u} -> Array<u>
   def map!() end
@@ -1450,11 +1450,11 @@ class Array ### DONE
   def pop() end
   ##% push<u> ; u <= t : (*u) -> Array<t>
   def push(*rest) end
-  ##% rassoc<u> : u -> t # ; t <= Array<u> 
+  ##% rassoc<u> : u -> t # ; t <= Array<u>
   def rassoc(p0) end
   ##% reject<u>: () {t -> u} -> Array<t>
   def reject() end
-  ##% reject!<u> : () {t -> u} -> Array<t> 
+  ##% reject!<u> : () {t -> u} -> Array<t>
   def reject!() end
   ##% replace<u> ; u <= t : Array<u> -> Array<u>
   def replace(p0) end
@@ -1467,7 +1467,7 @@ class Array ### DONE
   ##% rindex : t -> Fixnum
   def rindex(p0) end
   ##% select<u> : () {t -> u} -> Array<t>
-  def select() end 
+  def select() end
   ##% shift : () -> t
   def shift() end
   ##% size : () -> Fixnum
@@ -1482,12 +1482,12 @@ class Array ### DONE
   def slice!(p0, *rest) end
   # #% sort<self> ; self <= [each<u>: () {["<=>" : t -> Fixnum] -> u} -> Array<t>] \
   # #% : () -> Array<t>
-  # #% sort : () {(t, t) -> Fixnum} -> Array<t> 
+  # #% sort : () {(t, t) -> Fixnum} -> Array<t>
   # def sort() end
   # #% sort!<self> ; self <= [each<u>: () {["<=>" : t -> Fixnum] -> u} -> Array<t>] \
   # #% : () -> Array<t>
   # #% sort! : () -> Array<t>
-  ##% sort! : () {(t, t) -> Fixnum} -> Array<t> 
+  ##% sort! : () {(t, t) -> Fixnum} -> Array<t>
   def sort!() end
   ##% to_a : () -> Array<t>
   def to_a() end
@@ -1545,7 +1545,7 @@ class BaseIO
   def eof() end
   ##% eof?:() -> Boolean
   def eof?() end
-  ##% fcntl : (Numeric, Numeric or String) -> Integer 
+  ##% fcntl : (Numeric, Numeric or String) -> Integer
   def fcntl(*rest) end
   ##% fileno:() -> Fixnum
   def fileno() end
@@ -1579,7 +1579,7 @@ class BaseIO
   ##% puts : (*[to_s : () -> String]) -> NilClass
   def puts(*rest) end
   ##% read : (?Fixnum, ?String) -> String
-  def read(*rest) end 
+  def read(*rest) end
   ##% readchar:() -> Fixnum
   def readchar() end
   ##% readline: (?String) -> String
@@ -1593,7 +1593,7 @@ class BaseIO
   def rewind() end
   ##% seek : (Fixnum, Fixnum) -> Fixnum
   def seek(*rest) end
-  ##% sync:() -> Boolean 
+  ##% sync:() -> Boolean
   def sync() end
   ##% sync= : (Boolean) -> Boolean
   def sync=(p0) end
@@ -1604,7 +1604,7 @@ class BaseIO
   ##% tell:() -> Integer
   def tell() end
   ##% tty?: () -> Boolean
-  def tty?() end 
+  def tty?() end
   ##% ungetc: Integer -> NilClass
   def ungetc (p0) end
   ##% write: ([to_s: () -> String]) -> Integer
@@ -1617,7 +1617,7 @@ class IO
   IO::SEEK_SET=0
   IO::SEEK_CUR=1
   IO::SEEK_END=2
-  
+
   module Constants
     APPEND = 1024
     CREAT = 64
@@ -1664,7 +1664,7 @@ class IO
   def eof() end
   ##% eof? : () -> Boolean
   def eof?() end
-  ##% fcntl : (Numeric, Numeric or String) -> Integer 
+  ##% fcntl : (Numeric, Numeric or String) -> Integer
   def fcntl(integer_cmd, *rest) end
   ##% fileno : () -> Fixnum
   def fileno() end
@@ -1703,33 +1703,33 @@ class IO
   def putc(p0) end
   ##% puts : (*[to_s : () -> String]) -> NilClass
   def puts(*rest) end
-  ##% read : (?Fixnum, ?String) -> String 
+  ##% read : (?Fixnum, ?String) -> String
   def read(length=99, buf="buffer") end
   ##% read_nonblock : (Integer, ?String) -> String
   def read_nonblock(maxlen=99, buf="buffer") end
   ##% readchar : () -> Fixnum
   def readchar() end
   ##% readline : (?String) -> String
-  def readline(sep=$/) end 
+  def readline(sep=$/) end
   ##% readlines : (?String) -> Array<String>
   def readlines(sep=$/) end
   ##% readpartial : (Integer, ?String) -> String
   def readpartial(maxlen=99, buf="buffer") end
   ##% reopen<self> : (IO) -> self
   ##% reopen<self> : (String,String) -> self
-  def reopen(*rest) end 
+  def reopen(*rest) end
   ##% rewind : () -> Fixnum
   def rewind() end
   ##% seek : (Fixnum, Fixnum) -> Fixnum
   def seek(amount, whence=SEEK_SET) end
   ##% stat : () -> File::Stat
-  def stat() end 
+  def stat() end
   ##% sync : () -> Boolean
   def sync() end
   ##% sync= : Boolean -> Boolean
   def sync=(p0) end
   ##% sysread : Integer -> String
-  def sysread(amt=99) end 
+  def sysread(amt=99) end
   ##% sysseek : (Integer, ?Fixnum) -> Integer
   def sysseek(offset, whence=SEEK_SET) end
   ##% syswrite : ([to_s: () -> String]) -> Integer
@@ -1813,7 +1813,7 @@ class Dir
   ##% Dir.glob : (String, ?Fixnum) -> Array<String>
   ##% Dir.glob<t> : (Array<String>, ?Fixnum) {String -> t} -> NilClass
   ##% Dir.glob<t> : (String, ?Fixnum) {String -> t} -> NilClass
-  def Dir.glob(*rest) end 
+  def Dir.glob(*rest) end
   ##% Dir.mkdir : (String, ?Integer) -> Fixnum
   def Dir.mkdir(name, perm=42) end
   ##% Dir.open : String -> Dir
@@ -1963,7 +1963,7 @@ module Process
   def Process.abort(*) end
 
   ##% Process.detach : Fixnum -> Thread
-  def Process.detach(p0) end 
+  def Process.detach(p0) end
   ##% Process.egid : () -> Fixnum
   def Process.egid() end
   ##% Process.egid= : Fixnum -> Fixnum
@@ -1992,11 +1992,11 @@ module Process
   ##% Process.getpriority : (Fixnum, Integer) -> Fixnum
   def Process.getpriority(p0, p1) end
   ##% Process.getrlimit : Fixnum -> Array<Fixnum>
-  def Process.getrlimit(p0) end 
+  def Process.getrlimit(p0) end
   ##% Process.gid : () -> Fixnum
   def Process.gid() end
   ##% Process.gid= : Fixnum -> Fixnum
-  def Process.gid=(p0) end 
+  def Process.gid=(p0) end
   ##% Process.groups : () -> Array<Fixnum>
   def Process.groups() end
   ##% Process.groups= : Array<Fixnum> -> Array<Fixnum>
@@ -2020,11 +2020,11 @@ module Process
   ##% Process.setpriority : (Fixnum, Integer, Fixnum) -> Fixnum
   def Process.setpriority(p0, p1, p2) end
   ##% Process.setrlimit : (Fixnum, Fixnum, ?Fixnum) -> NilClass
-  def Process.setrlimit(*rest) end 
+  def Process.setrlimit(*rest) end
   ##% Process.setsid : () -> Fixnum
   def Process.setsid() end
-  ##% Process.times : () -> Array<Float> 
-  def Process.times() end 
+  ##% Process.times : () -> Array<Float>
+  def Process.times() end
   ##% Process.uid : () -> Fixnum
   def Process.uid() end
   ##% Process.uid= : Integer -> Integer
@@ -2041,7 +2041,7 @@ module Process
   def Process.waitpid2(pid=-1, flags=0) end
 end
 
-class File < IO 
+class File < IO
   include Enumerable
 
   ALT_SEPARATOR = nil
@@ -2144,7 +2144,7 @@ class File < IO
   ##% atime : () -> Time
   def atime() end
   ##% chmod : Integer -> Fixnum
-  def chmod(p0) end 
+  def chmod(p0) end
   ##% chown : (Integer, Integer) -> Fixnum
   def chown(p0, p1) end
   ##% ctime : () -> Time
@@ -2332,9 +2332,9 @@ class Proc
   ##% arity : () -> Fixnum
   def arity() end
   ##% binding : () -> Binding
-  def binding() end 
+  def binding() end
   ##% call : (^args) -> ret
-  def call() end 
+  def call() end
   ##% inspect : () -> String
   def inspect() end
   ##% to_proc : () -> Proc<^args, ret>
@@ -2353,7 +2353,7 @@ class Time
   ##% "-" : Numeric -> Time
   def -(p0) end
   ##% "<=>"<t> : t -> Fixnum
-  def <=>(p0) end 
+  def <=>(p0) end
   ##% _dump : () -> String
   def _dump() end # was *rest
   ##% asctime : () -> String
@@ -3122,7 +3122,7 @@ end
 # Non-class Object constants #
 ##############################
 
-ARGF = Object.new 
+ARGF = Object.new
 class << ARGF  #FIXME
 =begin
 From the rubinius definition of $< (same as ARGF):
@@ -3154,13 +3154,13 @@ RELEASE_DATE="2008-03-03"
 RUBY_PATCHLEVEL=114
 RUBY_PLATFORM="i486-linux"
 RUBY_RELEASE_DATE="2008-03-03"
-RUBY_VERSION="1.8.6"
+RUBY_VERSION="2.3.3"
 STDERR=IO.new 3
-STDIN=IO.new 1 
+STDIN=IO.new 1
 STDOUT=IO.new 2
 TOPLEVEL_BINDING=Binding.new
 TRUE=true
-VERSION="1.8.6"
+VERSION="2.3.3"
 
 # See http://ruby-doc.org/core/files/lib/English_rb.html for list of many of these
 #$! = nil # last error message - can't reliable produce; not sure of type
@@ -3207,10 +3207,10 @@ module YAML
   ##% YAML.load : [read : (?Fixnum, ?String) -> String] -> ?
   def YAML.load(*) end
   ##% YAML.load_documents<t> : (BaseIO) {? -> t} -> t
-  def YAML.load_documents(*) end 
+  def YAML.load_documents(*) end
   ##% YAML.quick_emit<t> : (Fixnum,?Hash) {YAML::Emitter -> t} -> String
   def YAML.quick_emit(obj_id, opts) end
-  
+
 end
 
 module DRuby
@@ -3220,7 +3220,7 @@ module DRuby
       def self.safe_require(p1,p2) end
       ##% Runtime.safe_load : (String,String,?Boolean) -> Boolean
       def self.safe_load(*) end
-      
+
       ##% Runtime.exn_require : (String) -> Boolean
       def self.exn_require(p1) end
       ##% Runtime.exn_load : (String,?Boolean) -> Boolean
@@ -3228,7 +3228,7 @@ module DRuby
 
       ##% Runtime.dead_require : (*?) -> Boolean
       def self.dead_require(*) end
-      
+
       class << self
         def dead_method(mname,*args) nil;nil end
       end

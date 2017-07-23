@@ -3,7 +3,7 @@ module NKF
   SJIS = 3
   NKF_VERSION = "2.0.7"
   UTF16 = 8
-  VERSION = "1.8.5"
+  VERSION = "2.3.3"
   ASCII = 5
   EUC = 2
   AUTO = 0
@@ -22,4 +22,3 @@ module NKF
   ##% NKF.nkf : (String,String) -> String
   def NKF.nkf(p0, p1) end
 end
-

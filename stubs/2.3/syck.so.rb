@@ -91,7 +91,7 @@ module YAML
       def name=(p0) end
     end
 
-    VERSION = "1.8.5"
+    VERSION = "2.3.3"
     class Map < YAML::Syck::Node
       ##% add : !FIXME -> !FIXME
       def add(p0, p1) end
@@ -129,7 +129,7 @@ module YAML
       def tags=(p0) end
       ##% tagurize : String -> String
       def tagurize(p0) end
-      ## MikeF: not quite sure what the type of the second argument 
+      ## MikeF: not quite sure what the type of the second argument
       ## is here, it seems to be determined dynamically
       ##% transfer : (String,?) -> YAML::DomainType
       def transfer(p0, p1) end
@@ -162,4 +162,3 @@ module YAML
   end
 
 end
-

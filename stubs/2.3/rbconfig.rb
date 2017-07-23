@@ -3,19 +3,19 @@
 # changes made to this file will be lost the next time ruby is built.
 
 module Config
-  RUBY_VERSION == "1.8.6" or
-    raise "ruby lib version (1.8.6) doesn't match executable version (#{RUBY_VERSION})"
+  RUBY_VERSION == "2.3.3" or
+    raise "ruby lib version (2.3.3) doesn't match executable version (#{RUBY_VERSION})"
 
-  TOPDIR = File.dirname(__FILE__).chomp!("/lib/ruby/1.8/x86_64-linux")
+  TOPDIR = File.dirname(__FILE__).chomp!("/lib/ruby/2.3/x86_64-linux")
   DESTDIR = '' unless defined? DESTDIR
   CONFIG = {}
   CONFIG["DESTDIR"] = DESTDIR
   CONFIG["INSTALL"] = '/usr/bin/install -c'
   CONFIG["prefix"] = (TOPDIR || DESTDIR + "/usr")
   CONFIG["EXEEXT"] = ""
-  CONFIG["ruby_install_name"] = "ruby1.8"
-  CONFIG["RUBY_INSTALL_NAME"] = "ruby1.8"
-  CONFIG["RUBY_SO_NAME"] = "ruby1.8"
+  CONFIG["ruby_install_name"] = "ruby2.3"
+  CONFIG["RUBY_INSTALL_NAME"] = "ruby2.3"
+  CONFIG["RUBY_SO_NAME"] = "ruby2.3"
   CONFIG["SHELL"] = "/bin/sh"
   CONFIG["PATH_SEPARATOR"] = ":"
   CONFIG["PACKAGE_NAME"] = ""
@@ -26,7 +26,7 @@ module Config
   CONFIG["exec_prefix"] = "$(prefix)"
   CONFIG["bindir"] = "$(exec_prefix)/bin"
   CONFIG["sbindir"] = "$(exec_prefix)/sbin"
-  CONFIG["libexecdir"] = "$(prefix)/lib/ruby1.8"
+  CONFIG["libexecdir"] = "$(prefix)/lib/ruby2.3"
   CONFIG["datarootdir"] = "$(prefix)/share"
   CONFIG["datadir"] = "$(datarootdir)"
   CONFIG["sysconfdir"] = "$(DESTDIR)/etc"
@@ -142,7 +142,7 @@ module Config
   CONFIG["arch"] = "x86_64-linux"
   CONFIG["sitearch"] = "x86_64-linux"
   CONFIG["sitedir"] = "$(DESTDIR)/usr/local/lib/site_ruby"
-  CONFIG["configure_args"] = " '--build=x86_64-linux-gnu' '--prefix=/usr' '--includedir=$(prefix)/include' '--mandir=$(prefix)/share/man' '--infodir=$(prefix)/share/info' '--sysconfdir=/etc' '--localstatedir=/var' '--libexecdir=$(prefix)/lib/ruby1.8' '--disable-maintainer-mode' '--disable-dependency-tracking' '--srcdir=.' '--program-suffix=1.8' '--enable-pthread' '--enable-shared' '--enable-ipv6' '--with-lookup-order-hack=INET' '--disable-rpath' '--disable-install-doc' '--with-sitedir=/usr/local/lib/site_ruby' '--with-default-kcode=none' '--with-dbm-type=gdbm_compat' '--with-tklib=tk8.4' '--with-tcllib=tcl8.4' '--with-tcl-include=/usr/include/tcl8.4' '--with-bundled-sha1' '--with-bundled-md5' '--with-bundled-rmd160' 'build_alias=x86_64-linux-gnu' 'CC=cc' 'CFLAGS=-fno-strict-aliasing -g -O2' 'LDFLAGS=' 'CPPFLAGS='"
+  CONFIG["configure_args"] = " '--build=x86_64-linux-gnu' '--prefix=/usr' '--includedir=$(prefix)/include' '--mandir=$(prefix)/share/man' '--infodir=$(prefix)/share/info' '--sysconfdir=/etc' '--localstatedir=/var' '--libexecdir=$(prefix)/lib/ruby2.3' '--disable-maintainer-mode' '--disable-dependency-tracking' '--srcdir=.' '--program-suffix=2.3' '--enable-pthread' '--enable-shared' '--enable-ipv6' '--with-lookup-order-hack=INET' '--disable-rpath' '--disable-install-doc' '--with-sitedir=/usr/local/lib/site_ruby' '--with-default-kcode=none' '--with-dbm-type=gdbm_compat' '--with-tklib=tk8.4' '--with-tcllib=tcl8.4' '--with-tcl-include=/usr/include/tcl8.4' '--with-bundled-sha1' '--with-bundled-md5' '--with-bundled-rmd160' 'build_alias=x86_64-linux-gnu' 'CC=cc' 'CFLAGS=-fno-strict-aliasing -g -O2' 'LDFLAGS=' 'CPPFLAGS='"
   CONFIG["NROFF"] = "/bin/false"
   CONFIG["MANTYPE"] = "man"
   CONFIG["ruby_version"] = "$(MAJOR).$(MINOR)"

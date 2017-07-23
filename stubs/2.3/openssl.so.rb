@@ -156,7 +156,7 @@ module OpenSSL
   end
 
   OPENSSL_VERSION_NUMBER = 9470079
-  VERSION = "1.8.6"
+  VERSION = "2.3.3"
   class HMAC
     ##% "<<" : (*!FIXME) -> !FIXME
     def <<(p0) end
@@ -1265,7 +1265,7 @@ module OpenSSL
   class BNError < OpenSSL::OpenSSLError
   end
 
-  class Digest 
+  class Digest
     class DigestError < OpenSSL::OpenSSLError
     end
 
@@ -1488,4 +1488,3 @@ module OpenSSL
   ##% OpenSSL.errors : (*!FIXME) -> !FIXME
   def OpenSSL.errors(*) end
 end
-

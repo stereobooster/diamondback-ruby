@@ -10,3 +10,6 @@
 **/*.so
 **/yamlsh
 **/*.opt
+gem_bin/*.real
+*.gem
+configure

@@ -1,7 +1,7 @@
 #!/bin/sh
 
 LIBDIR=`echo $1 | sed 's/--prefix=//'`
-STUBDIR=${LIBDIR}/../stubs/1.8
+STUBDIR=${LIBDIR}/../stubs/2.3
 
 sed "s|@DRUBYLIB@|${STUBDIR}|" druby.conf.in > druby.conf
 

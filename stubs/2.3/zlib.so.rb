@@ -60,7 +60,7 @@ module Zlib
   BEST_SPEED = 1
   OS_CPM = 9
   OS_RISCOS = 13
-  VERSION = "1.8.5"
+  VERSION = "2.3.3"
   ASCII = 1
   OS_AMIGA = 1
   MAX_WBITS = 15
@@ -222,7 +222,7 @@ module Zlib
     def lineno=(*) end
     ##% pos : (*!FIXME) -> !FIXME
     def pos(*) end
-    ##% read : (?Fixnum, ?String) -> String 
+    ##% read : (?Fixnum, ?String) -> String
     def read(*rest) end
     ##% readchar : (*!FIXME) -> !FIXME
     def readchar(*) end
@@ -254,4 +254,3 @@ module Zlib
   ##% Zlib.zlib_version : (*!FIXME) -> !FIXME
   def Zlib.zlib_version(*) end
 end
-
