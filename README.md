@@ -49,7 +49,7 @@ Then, restart your shell and install these additional libraries:
 
 ```
 opam update
-opam install -y ocamlfind ounit omake getopt ocamlgraph
+opam install -y ocamlfind ounit.1.1.2 omake getopt ocamlgraph
 ```
 
 DRuby uses the OMake build system to build it from source. OMake is a make-like build system that includes both configuration and build rules. Thus, the build is broken into three steps: configuration, compilation, and installation. However, these steps can also be combined into a single command:

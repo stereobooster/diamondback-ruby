@@ -13,3 +13,6 @@
 gem_bin/*.real
 *.gem
 configure
+*.cmt
+*.cmti
+tests/**/*.checked

@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-OPAM_DEPENDS="ocamlfind ounit omake getopt ocamlgraph"
+OPAM_DEPENDS="ocamlfind ounit.1.1.2 omake getopt ocamlgraph"
 
 TMP=${TMPDIR:-/tmp}
 

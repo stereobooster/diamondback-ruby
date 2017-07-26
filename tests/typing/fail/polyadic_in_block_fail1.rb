@@ -1,9 +1,9 @@
 
-g = proc do |x|
+g = lambda do |x|
   x + 2
 end
 
-h = proc do |x,y|
+h = lambda do |x,y|
   x.concat("hi")
 end
 

@@ -21,8 +21,7 @@ if $(defined BISECT)
 
 .PHONY: install uninstall clean config
 
-# .SUBDIRS: src tests dypgen-20070627 ocaml-syck-0.1.1
-.SUBDIRS: src dypgen-20070627 ocaml-syck-0.1.1
+.SUBDIRS: src tests dypgen-20070627 ocaml-syck-0.1.1
 
 druby.conf: druby.conf.in :value: $(DRUBYLIB)
 	sed "s|@DRUBYLIB@|$(DRUBYLIB)|" druby.conf.in > druby.conf

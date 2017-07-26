@@ -1,6 +1,6 @@
 def f()
 
-  a = proc {
+  a = lambda {
     return 3
   }
   a.call

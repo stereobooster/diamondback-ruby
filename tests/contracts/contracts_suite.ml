@@ -1,5 +1,5 @@
 
-open OUnit2
+open OUnit
 open Config
 open Printf
 
@@ -54,4 +54,5 @@ end
 module ContractTests = Prog_test.Make(ContractProgs)
 
 let suite = "Contracts Suite" >:::
-  [OUnit.ounit2_of_ounit1 ContractTests.suite;]
+  [ContractTests.suite;
+  ]
