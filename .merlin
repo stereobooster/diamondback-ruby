@@ -1,0 +1,6 @@
+S src/**
+S tests/**
+S dypgen-20070627/**
+S ocaml-syck-0.1.1/**
+
+PKG oUnit getopt ocamlgraph
