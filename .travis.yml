@@ -3,7 +3,12 @@ sudo: required
 
 language: ruby
 rvm:
-  - 2.3.3
+  - 2.3.4
+
+addons:
+  apt:
+    packages:
+    - aspcud
 
 matrix:
   include:
@@ -12,6 +17,7 @@ matrix:
 
     - os: osx
       env: OCAML_VERSION=4.03.0 OPAM_VERSION=1.2.2
+
   allow_failures:
     - os: linux
 

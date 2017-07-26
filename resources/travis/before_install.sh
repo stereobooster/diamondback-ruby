@@ -15,9 +15,14 @@ case "$TRAVIS_OS_NAME" in
     printf "travis_fold:end:brew_install\n"
     ;;
   linux)
-    printf "travis_fold:start:sudo_apt-get_update\nsudo apt-get update\n"
-    gem install syck
-    printf "travis_fold:end:sudo_apt-get_update\n"
+    printf "travis_fold:start:syck\nsyck install\n"
+    git clone https://github.com/indeyets/syck --depth 1
+    cd syck
+    ./bootstrap
+    ./configure
+    make
+    sudo make install
+    printf "travis_fold:end:syck\n"
     ;;
   *)
     ;;

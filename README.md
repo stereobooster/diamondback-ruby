@@ -8,17 +8,20 @@
 - Errors should be clear and helpful, [like in elm](http://elm-lang.org/blog/compiler-errors-for-humans).
 
 ## TODO
-- fix tests and add them back to make file
-- fix installation of syck on linux, maybe [ruby/sick](https://github.com/ruby/syck), because `libsyck0-dev` is deprecated. Or replace with other YAML implementation [camlyaml](https://github.com/Kakadu/camlyaml), [oyaml](https://github.com/mk270/oyaml).
+- fix tests
+- write installation instruction for syck on linux.
 - fix ruby parser to support ruby 2.3, it works with 1.8 now
+- setup appveyor
 - fix warnings and reverse `-warn-error` flag
 - install to local dir instead of global
-- update dypgen, use [opam package](http://opam.ocaml.org/packages/dypgen/) instead of embedded version
-- setup appveyor
 - setup distribution of gems from continuous integration, like Flow does
+- update dypgen, use [opam package](http://opam.ocaml.org/packages/dypgen/) instead of embedded version
+- update to use OUnit2
+- create opam package file
 - can we reuse [ruby/spec](ruby/spec) to generate type signatures?
 - can we get type signatures from [ActiveRecord schema file](http://api.rubyonrails.org/classes/ActiveRecord/Schema.html), or [virtus](https://github.com/solnic/virtus), or [dry-types](http://dry-rb.org/gems/dry-types/)?
 - can we reuse type signatures to improve speed by providing this info to JIT compiler?
+- Replace Syck with other YAML implementation [camlyaml](https://github.com/Kakadu/camlyaml), [oyaml](https://github.com/mk270/oyaml).
 
 ## 1 Introduction
 
@@ -32,7 +35,9 @@ For example, on Ubuntu 16.04 and similar systems:
 
 ```
 sudo apt-get install opam
+eval `opam config env` # and add it to ~/.bashrc or ~/.zshrc
 opam init --comp 4.03.0
+opam switch 4.03.0
 # TODO: fix this
 # sudo apt-get install libsyck0-dev
 ```
@@ -41,7 +46,9 @@ On OS X, using the [brew package manager](http://brew.sh/):
 
 ```
 brew install opam
+eval `opam config env` # and add it to ~/.bashrc or ~/.zshrc
 opam init --comp 4.03.0
+opam switch 4.03.0
 brew install syck
 ```
 
@@ -73,7 +80,7 @@ Here, we call `omake` with the `–config` flag to set the variables `VAR1` and 
 **Note**: if you need to change these variables after attempting to build DRuby, you must specify the command line argument: `–config`. As an example, a user on OS X with brew installed would build and install DRuby with:
 
 ```
-$ omake --config SYCK=`brew --cellar syck`/0.70 install
+$ omake --config SYCK=`brew --cellar syck`/0.70 build_gem
 ```
 
 DRuby has a couple of other useful targets:
