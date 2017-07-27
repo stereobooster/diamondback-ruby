@@ -12,8 +12,8 @@ module DRuby
       end
       @enabled = false
 
-      ## collector -- an instance of DRuby::Profile::Collector 
-      ## 
+      ## collector -- an instance of DRuby::Profile::Collector
+      ##
       ## name -- a string representing the name of the componenet
       ## which will be used as the key for any data stored in the
       ## collector
@@ -26,7 +26,7 @@ module DRuby
       end
 
       def Interceptor.const_name(e)
-        unless Class === e || Module === e 
+        unless Class === e || Module === e
           STDERR.puts "can't handle modifications to singleton class yet"
           exit(1)
         end
@@ -34,14 +34,14 @@ module DRuby
         name = e.name
 
         return [:class, name] if name != ""
-          
+
         case e.inspect
         when /^\#<Class:([^\d][^>]+)>$/
           [:singleton, $1]
         when /^\#<Class:0x.*>$/
           STDERR.puts "handle immeidate class object"
           exit(1)
-        else 
+        else
           STDERR.puts "unknown class kind: #{e.inspect}"
           exit(1)
         end
@@ -75,7 +75,7 @@ module DRuby
 
 #        new_meth = instrument_method(klass,mname,old_method,blk)
 #        klass.class_eval {define_method mname, &new_meth}
-        @klasses[klass] = {} unless @klasses.key? klass 
+        @klasses[klass] = {} unless @klasses.key? klass
         @klasses[klass][mname] = [old_method,blk]
         @frame_skips[klass] = {} unless @frame_skips.key? klass
         @frame_skips[klass][mname] = 1
@@ -93,13 +93,13 @@ module DRuby
         end
         mname = mname.to_sym
         unbound_method = klass.instance_method mname
-        
+
         wrap = lambda do |old,*args|
           record_loc(klass,mname,blk.call(*args))
           old.call(*args)
         end
 
-        @klasses[klass] = {} unless @klasses.key? klass 
+        @klasses[klass] = {} unless @klasses.key? klass
         @klasses[klass][mname] = [unbound_method,wrap]
 #        new_meth = instrument_method(klass,mname,unbound_method,wrap)
 #        klass.class_eval {define_method mname, &new_meth}
@@ -111,19 +111,19 @@ module DRuby
         if @col_hash.key? key then
           (@col_hash[key] << v) unless @col_hash[key].include? v
         else
-          @col_hash[key] = [v] 
+          @col_hash[key] = [v]
         end
       end
 
       def callee(skip,method)
-        callers = caller(1+skip)
+        callers = caller(skip) || []
         if callers.any? {|s| s =~ /\(eval\)/} then
           STDERR.puts "warning #{method} used inside of an eval"
           return
         end
         file,line = Utils.find_caller(callers)
       end
-      
+
       ## Add the data to the collector
       def record_loc(klass,method,v)
         skip = @frame_skips[klass][method]
@@ -142,7 +142,7 @@ module DRuby
       ## the arguments to the method.  It then stores the resulting
       ## data into the current instance's collector, and executes the
       ## continuation of the actual method
-      def instrument_method(klass,method_name,unbound_orig_method,inst_code)        
+      def instrument_method(klass,method_name,unbound_orig_method,inst_code)
         lambda do |*args|
           bound_method = unbound_orig_method.bind(self)
 #          if ::DRuby::Profile::Interceptor.enabled then
@@ -168,7 +168,7 @@ module DRuby
          end
         @enabled = true
        end
- 
+
       ## Restore the methods to their original state
       def disable()
         fail "#{self} already disabled" unless @enabled

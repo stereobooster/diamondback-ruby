@@ -61,9 +61,9 @@
 # === Example 3: Special features
 #
 #   p1 = Pathname.new("/usr/lib")   # Pathname:/usr/lib
-#   p2 = p1 + "ruby/1.8"            # Pathname:/usr/lib/ruby/1.8
+#   p2 = p1 + "ruby/2.3"            # Pathname:/usr/lib/ruby/2.3
 #   p3 = p1.parent                  # Pathname:/usr
-#   p4 = p2.relative_path_from(p3)  # Pathname:lib/ruby/1.8
+#   p4 = p2.relative_path_from(p3)  # Pathname:lib/ruby/2.3
 #   pwd = Pathname.pwd              # Pathname:/home/gavin
 #   pwd.absolute?                   # true
 #   p5 = Pathname.new "."           # Pathname:.
@@ -652,11 +652,11 @@ class Pathname
   # filename only.
   #
   # For example:
-  #   p = Pathname("/usr/lib/ruby/1.8")
+  #   p = Pathname("/usr/lib/ruby/2.3")
   #   p.children
-  #       # -> [ Pathname:/usr/lib/ruby/1.8/English.rb,
-  #              Pathname:/usr/lib/ruby/1.8/Env.rb,
-  #              Pathname:/usr/lib/ruby/1.8/abbrev.rb, ... ]
+  #       # -> [ Pathname:/usr/lib/ruby/2.3/English.rb,
+  #              Pathname:/usr/lib/ruby/2.3/Env.rb,
+  #              Pathname:/usr/lib/ruby/2.3/abbrev.rb, ... ]
   #   p.children(false)
   #       # -> [ Pathname:English.rb, Pathname:Env.rb, Pathname:abbrev.rb, ... ]
   #

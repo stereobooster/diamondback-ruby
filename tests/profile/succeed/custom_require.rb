@@ -13,6 +13,6 @@ module Kernel
 end
 
 
-$: << "../.."
+$: << File.expand_path("../../..", __FILE__)
 
 require "profile/some_filez"

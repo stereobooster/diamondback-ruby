@@ -1,6 +1,7 @@
 require 'open3'
 require 'yaml'
 require 'shell'
+require "continuation"
 require 'druby/utils'
 require 'druby/contract/wrap'
 
@@ -12,11 +13,12 @@ module DRuby
     SAFE_TBL = Hash.new do Self_tbl end
 
     CMD = begin
-            Shell.new.find_system_command "safe_eval"
+            safe_eval = File.expand_path("../../../gem_bin/safe_eval", __FILE__)
+            Shell.new.find_system_command safe_eval
           rescue Shell::Error::CommandNotFound
             fail "unable to locate safe_eval in your path"
           end
-    
+
     class << self
 
       def load_profile_data()
@@ -76,10 +78,10 @@ module DRuby
         return DRuby::Contract::Wrap.wrap(file,line,code,res)
       end
 
-      EVAL_WHITELIST = 
+      EVAL_WHITELIST =
         [ %r{druby/contract}
         ]
-         
+
       def real_eval(code,scope,file,line,call_file,call_line)
         if SAFE_TBL[file][line].has_key?(code) ||
             EVAL_WHITELIST.any? {|re| re =~ call_file}
@@ -117,41 +119,41 @@ module DRuby
           end
           set_trace_func(nil)
           eval_result = real_eval(string,binding,real_file,real_line,call_file,call_line)
-          cont.call
+          cont && cont.call
         }
         callcc {|c| cont = c}
         return eval_result
       end
 
-    end # << self 
+    end # << self
   end # Safe_eval
 end #DRuby
 
 module Kernel
   alias __druby_eval eval
-  def eval(*args) 
-    DRuby::Safe_eval::safe_eval(*args) 
+  def eval(*args)
+    DRuby::Safe_eval::safe_eval(*args)
   end
 end
 
 class Object
   alias __druby_instance_eval instance_eval
-  def instance_eval(*args,&blk) 
+  def instance_eval(*args,&blk)
     if blk
       __druby_instance_eval.call(*args,&blk)
     else
-      DRuby::Safe_eval::recv_eval(self,:__druby_instance_eval,*args) 
+      DRuby::Safe_eval::recv_eval(self,:__druby_instance_eval,*args)
     end
   end
 end
 
 class Module
   alias __druby_class_eval class_eval
-  def class_eval(*args,&blk) 
+  def class_eval(*args,&blk)
     if blk
       __druby_class_eval(*args,&blk)
     else
-      DRuby::Safe_eval::recv_eval(self,:__druby_class_eval,*args) 
+      DRuby::Safe_eval::recv_eval(self,:__druby_class_eval,*args)
     end
   end
   alias module_eval class_eval

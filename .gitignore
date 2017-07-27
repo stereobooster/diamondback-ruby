@@ -17,3 +17,4 @@ configure
 *.cmti
 tests/**/*.checked
 tests/*.results
+tmp

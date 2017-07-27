@@ -26,7 +26,7 @@ module ContractProgs = struct
     in read_lines ()
 
   let run_contract file expected =
-    let ic = Unix.open_process_in ("ruby -I../lib -rcasts " ^ file ^ " 2>&1") in
+    let ic = Unix.open_process_in ("ruby -I. -I../lib -rcasts " ^ file ^ " 2>&1") in
     let output = all_lines ic in
       match Unix.close_process_in ic with
         | Unix.WEXITED 0 -> ()

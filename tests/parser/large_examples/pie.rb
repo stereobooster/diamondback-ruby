@@ -39,7 +39,7 @@ priv = {
 pie.bind('ButtonPress-1', proc{|w, x, y|
              priv[:x] = x
              priv[:y] = y
-             priv[:pie_in] = (w.winfo_width/1.8 > x)
+             priv[:pie_in] = (w.winfo_width/2.3 > x)
              priv[:angle]  = w[:angle]
              priv[:origin] = w[:origin]
          }, '%W %x %y')

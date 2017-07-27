@@ -5,14 +5,14 @@ require 'druby/utils'
 module DRuby
   module Contract
 
-    ## 
+    ##
     # A class for wrapped immediate values such as fixnums
     #
     class Box
       attr_reader :val
 
-      def initialize(x) 
-        @val = x 
+      def initialize(x)
+        @val = x
 
         meta = (class << self;self;end)
 
@@ -41,26 +41,26 @@ module DRuby
         # class, but we do, and we need to expose this fact for the
         # Wrap class
         #
-        meths = x.methods - ["__id__","__send__","send","val", 
+        meths = x.methods - ["__id__","__send__","send","val",
                              "methods", "singleton_method_added"]
          meths.each do |m|
           new_m = "def #{m}(*args,&blk) @val.send(#{m.inspect},*args,&blk) end"
           if Box.respond_to? :__druby_class_eval
             Box.__druby_class_eval new_m
-          else 
+          else
             Box.class_eval new_m
           end
         end
       end
     end # Box
 
-    
+
     module Wrap
 
       def self.unwrap(x)
         if defined?((class << x;self;end)::DRuby_Box)
           return x.val
-        else 
+        else
           return x
         end
       end
@@ -72,7 +72,7 @@ module DRuby
           next wrap_with_ctx(ctx,res)
         end
       end
-      
+
       def self.wrap(file,line,code,x)
         ctx = Origin.new(file,line,code)
         wrap_with_ctx(ctx,x)
@@ -101,7 +101,7 @@ module DRuby
           ##
           # remove all of the original methods
           #
-          orig_methods.sort.each do |meth| 
+          orig_methods.sort.each do |meth|
             next if meth =~ /^__druby_/
             alias_method "__druby_#{meth.to_sym.to_i}", meth
             undef_method meth
@@ -113,18 +113,18 @@ module DRuby
 
           ##
           # add our new method missing handler, obviously this must occur
-          # *after* the above method removal          
+          # *after* the above method removal
           #
           def method_missing(mname,*args,&blk)
             meta = class << self; self; end
             meths = meta::DRuby_Wrapped
             ctx = meta::DRuby_ctx
             if meths.include?(mname.to_s)
-              wrapped_args = args.map {|arg| 
+              wrapped_args = args.map {|arg|
                 Wrap.wrap_with_ctx(ctx,arg)
               }
               wrapped_blk = Wrap.wrap_block(ctx,blk)
-              begin 
+              begin
                 send("__druby_#{mname.to_sym.to_i}",*wrapped_args,&wrapped_blk)
               rescue ArgumentError => exn
                 msg =  "calling #{mname} on #{self.inspect} threw an ArgumentError\n"
@@ -135,7 +135,7 @@ module DRuby
                 msg << args.map{|x|x.inspect}.join(', ')
                 msg << " raised a TypeError\n"
                 ctx.violation msg
-              end          
+              end
             else
               file,line = Utils.find_caller(Object.send(:caller,2))
               fname = File.basename(file)
@@ -234,7 +234,7 @@ end
 class Symbol
 
   %w{== === equal? eql?}.each do |meth|
-    old_meth = :"__druby_eq_#{meth.to_sym.to_i}"
+    old_meth = :"__druby_eq_#{meth}"
     alias_method old_meth, meth
     define_method meth do |other|
       send(old_meth,DRuby::Contract::Wrap.unwrap(other))
@@ -252,5 +252,3 @@ class Module
     __druby_const_set(DRuby::Contract::Wrap.unwrap(sym),val)
   end
 end
-
-

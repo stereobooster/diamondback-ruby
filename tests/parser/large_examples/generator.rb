@@ -55,7 +55,10 @@
 #   while g.next?
 #     puts g.next
 #   end
-#   
+#
+
+require "continuation"
+
 class Generator
   include Enumerable
 

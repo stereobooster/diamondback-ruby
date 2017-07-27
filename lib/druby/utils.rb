@@ -15,13 +15,13 @@ module DRuby
         [file, line]
       else
         $stderr.puts i_caller
-        $stderr.puts "[Error] an invalid call to find_caller() #{call_stack.inspect}"
+        $stderr.puts "[Error] an invalid call to find_caller(#{call_stack.inspect})"
         exit(1)
       end
     end
 
     # checks if recv#meth_name is a method of klass
-    def valid_recv?(klass, recv, meth_name) 
+    def valid_recv?(klass, recv, meth_name)
       meth = recv.method meth_name
       mod = nil
       case meth.inspect
@@ -37,11 +37,11 @@ module DRuby
         return false
       when /^#<Method: ([^#\(]+)#(.+)>$/
         cls = $1
-      else 
+      else
         fail "[FATAL] other #{meth.inspect}"
       end
-      mod = eval(cls) 
-      mod == klass 
+      mod = eval(cls)
+      mod == klass
     end
 
   end

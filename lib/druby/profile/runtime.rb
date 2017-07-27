@@ -1,5 +1,5 @@
 require "druby/utils"
-# require 'digest/md5' 
+# require 'digest/md5'
 
 ## This file contains helper methods that DRuby inserts during program
 ## transformations.  This code is trusted by DRuby and not analyzed
@@ -9,7 +9,7 @@ require "druby/utils"
 #
 # simualtes `...`
 #
-def __backtick(*args) 
+def __backtick(*args)
   return `#{args[0]}`
 end
 
@@ -38,11 +38,11 @@ module DRuby
         end
 
         # instrumented require
-        def safe_load(orig, *args) 
-          Load.call(*args) 
+        def safe_load(orig, *args)
+          Load.call(*args)
         end
-        
-        # instrumented require 
+
+        # instrumented require
         def safe_require(orig, mapped)
           if $".include? orig then false
           else
@@ -54,16 +54,16 @@ module DRuby
         end
 
         # A require statement that always throughs an exception
-        def exn_require(name) 
-          Require.call(name) 
+        def exn_require(name)
+          Require.call(name)
           STDERR.puts "exn_require was supposed to throw an exception"
           STDERR.puts "stack: #{caller()}"
           exit(1)
         end
 
         # A require statement that always throughs an exception
-        def exn_load(*args) 
-          Load.call(*args) 
+        def exn_load(*args)
+          Load.call(*args)
           STDERR.puts "exn_load was supposed to throw an exception"
           STDERR.puts "stack: #{caller()}"
           exit(1)
@@ -76,7 +76,7 @@ module DRuby
 
         def dead_require(recv, mname, *args)
 
-          if not Utils.is_recv_valid?(Kernel, recv, mname)
+          if not Utils.valid_recv?(Kernel, recv, mname)
             return recv.send(mname,*args)
           end
 
@@ -119,4 +119,3 @@ module Kernel
   end
 
 end
-
