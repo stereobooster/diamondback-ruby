@@ -1,23 +1,23 @@
 # DRuby [![Travis](https://img.shields.io/travis/stereobooster/diamondback-ruby.svg)](https://travis-ci.org/stereobooster/diamondback-ruby)
 
 ## Vision
-- It is suppose to be practical project rather than purely academical. To do this it should provide easy to install ruby gems (without requiring OCaml or C libs). This is doable, see how Flow compiles binaries for each platform and uploads to github and npm.
-- Everything that can be checked statically should be checked statically without dynamic check duplications. Statical type check should not have any negative impact on performance, like this happens in [rdl](https://github.com/plum-umd/rdl) without `wrap: false`.
-- Type-checker should be usable without modifying code, like Flow does. Thought it can be not that effective in finding type errors without provided type signatures.
-- There should be type signatures for standard libraries and top gems. Signatures should live in separate repository, so they can be reused by other projects, like [rdl](https://github.com/plum-umd/rdl) or [typed.rb](https://github.com/antoniogarrote/typed.rb) or [ruby 3 ;)](https://bugs.ruby-lang.org/issues/9999). Also we can hope that community will contribute type signature, like in [DefinitelyTyped](https://github.com/DefinitelyTyped/DefinitelyTyped).
+- It is supposed to be a practical project rather than purely academical. To do this it should provide easy to install ruby gems (without requiring OCaml or C libs). This is doable, see how Flow compiles binaries for each platform and uploads to GitHub and npm.
+- Everything that can be checked statically should be checked statically without dynamic check duplications. Statical type check should not have any negative impact on performance like this happens in [rdl](https://github.com/plum-umd/rdl) without `wrap: false`.
+- Type-checker should be usable without modifying code like Flow does. Thought it can be not that effective in finding type errors without provided type signatures.
+- There should be type signatures for standard libraries and top gems. Signatures should live in separate repository, so they can be reused by other projects, like [rdl](https://github.com/plum-umd/rdl) or [typed.rb](https://github.com/antoniogarrote/typed.rb) or [ruby 3 ;)](https://bugs.ruby-lang.org/issues/9999). Also, we can hope that community will contribute type signature, like in [DefinitelyTyped](https://github.com/DefinitelyTyped/DefinitelyTyped).
 - Errors should be clear and helpful, [like in elm](http://elm-lang.org/blog/compiler-errors-for-humans).
 
 ## TODO
 - fix tests
-- write installation instruction for syck on linux.
+- write installation instruction for syck on Linux.
 - fix ruby parser to support ruby 2.3, it works with 1.8 now
-- setup appveyor
+- setup Appveyor
 - fix warnings and reverse `-warn-error` flag
 - install to local dir instead of global
-- setup distribution of gems from continuous integration, like Flow does
+- setup distribution of gems from continuous integration, like Flow, does
 - update dypgen, use [opam package](http://opam.ocaml.org/packages/dypgen/) instead of embedded version
 - update to use OUnit2
-- create opam package file
+- create an opam package file
 - can we reuse [ruby/spec](ruby/spec) to generate type signatures?
 - can we get type signatures from [ActiveRecord schema file](http://api.rubyonrails.org/classes/ActiveRecord/Schema.html), or [virtus](https://github.com/solnic/virtus), or [dry-types](http://dry-rb.org/gems/dry-types/)?
 - can we reuse type signatures to improve speed by providing this info to JIT compiler?
@@ -25,7 +25,7 @@
 
 ## 1 Introduction
 
-Ruby is a dynamically typed, object oriented scripting language. Dynamic typing keeps the language flexible, allowing small, expressive programs to be written with little effort. However, software never stands still. As these programs evolve, the lack of static typing makes it increasingly difficult to maintain, extend, and reason about. Diamondback (DRuby) is a tool that augments Ruby with a static type system. DRuby’s type system was designed to handle common idioms used by Ruby programmers so that programs would not need to be changed in order to gain the benefits of static checks.
+Ruby is a dynamically typed, object-oriented scripting language. Dynamic typing keeps the language flexible, allowing small, expressive programs to be written with little effort. However, software never stands still. As these programs evolve, the lack of static typing makes it increasingly difficult to maintain, extend, and reason about. Diamondback (DRuby) is a tool that augments Ruby with a static type system. DRuby’s type system was designed to handle common idioms used by Ruby programmers so that programs would not need to be changed in order to gain the benefits of static checks.
 
 ## 2 Building DRuby
 
@@ -65,12 +65,12 @@ DRuby uses the OMake build system to build it from source. OMake is a make-like 
 $ omake –config VAR1=arg1 VAR2=arg2 install
 ```
 
-Here, we call `omake` with the `–config` flag to set the variables `VAR1` and `VAR2` and tell it to build the install target. The install target depends on the configuration and compilation targets and will therefore do all the necessary work. The call to sudo is needed if you do not have write permissions to your Ruby installation. Alternatively, druby can be installed outside of the system directories using the variables below. The current list of supported build variables are:
+Here, we call `omake` with the `–config` flag to set the variables `VAR1` and `VAR2` and tell it to build the install target. The install target depends on the configuration and compilation targets and will, therefore, do all the necessary work. The call to sudo is needed if you do not have write permissions to your Ruby installation. Alternatively, DRuby can be installed outside of the system directories using the variables below. The current list of supported build variables are:
 
-- `PREFIX` - The path used to provide defaults for other DRuby paths such as where to install the druby binary. Defaults to `/usr/local/`
-- `BINDIR` - The install location of the druby binary. Defaults to PREFIX/bin
-- `SYSCONFDIR` - The install location of the druby global configuration file, druby.conf. Defaults to `PREFIX`/etc
-- `DESTDIR` - A staging directory for building packages of DRuby. Any necessary paths will computed based on `PREFIX`, but the actual installation step will stage the installation into DESTDIR/PREFIX/....
+- `PREFIX` - The path used to provide defaults for other DRuby paths such as where to install the DRuby binary. Defaults to `/usr/local/`
+- `BINDIR` - The install location of the DRuby binary. Defaults to PREFIX/bin
+- `SYSCONFDIR` - The install location of the DRuby global configuration file, `druby.conf`. Defaults to `PREFIX`/etc
+- `DESTDIR` - A staging directory for building packages of DRuby. Any necessary paths will be computed based on `PREFIX`, but the actual installation step will stage the installation into DESTDIR/PREFIX/....
 - `RUBYLIB` - The location of your Ruby installation (library files). For example, `/usr/lib/ruby/`. You should not have to specify this under normal circumstances as it will be determined by the ’ruby’ executable found in your PATH.
 - `RUBYSITEDIR` - The location of your Ruby installation’s site-lib directory. For example `/usr/lib/ruby/site-lib`. Like `RUBYLIB`, this should be automatically computed for you.
 - `DRUBYSITELIB` - The install location for DRuby’s runtime ruby files. For example, `/usr/lib/ruby/site-lib/2.3/druby/`. Automatically computed based on `RUBYSITEDIR`
@@ -90,7 +90,7 @@ DRuby has a couple of other useful targets:
 
 ## 3 Running DRuby
 
-In order to make using DRuby as easy as possible, the druby binary can be used as a drop in replacement for the Ruby interpreter. However, instead of interpreting the ruby code, it performs its static analysis. DRuby accepts a superset of the command line arguments that Ruby accepts. For instance, one can invoke:
+In order to make using DRuby as easy as possible, the DRuby binary can be used as a drop-in replacement for the Ruby interpreter. However, instead of interpreting the ruby code, it performs its static analysis. DRuby accepts a superset of the command line arguments that Ruby accepts. For instance, one can invoke:
 
 ```
 $ druby -I my_dir -rmylib filename.rb
@@ -106,7 +106,7 @@ All of DRuby’s command line arguments are prefixed by `–dr-`. To ensure any 
 
 DRuby’s command line arguments are **FIXME**
 
-These arguments can also be specified via configuration files. DRuby looks for options in the following order. A latter declaration overrides a previous one:
+These arguments can also be specified via configuration files. DRuby looks for options in the following order. A later declaration overrides a previous one:
 
 - The global configuration file: `SYSCONFDIR/druby.conf`
 - A per-user configuration file: `$HOME/.druby.conf`
@@ -146,7 +146,7 @@ now running Ruby...
 ruby  first.rb  0
 ```
 
-The short description (the top most sentence) of the error message says, `“instance String used where Numeric expected,”` and the context information (filenames and line numbers) first points to `sum.+` method at line 4 of `first.rb`. By inspecting the code, we realize that the command line arguments stored in `ARGV` are strings not numbers and therefore trying to add a `String` to a `Fixnum` (sum) is the cause of the error. Change `sum += v` to `sum += v.to_i`, and run DRuby again. You will see that the program is now accepted. This program is now well-typed because to_i method converts the receiver to an integer.
+The short description (the top most sentence) of the error message says, `“instance String used where Numeric expected,”` and the context information (filenames and line numbers) first points to `sum.+` method at line 4 of `first.rb`. By inspecting the code, we realize that the command line arguments stored in `ARGV` are strings, not numbers and therefore trying to add a `String` to a `Fixnum` (sum) is the cause of the error. Change `sum += v` to `sum += v.to_i`, and run DRuby again. You will see that the program is now accepted. This program is now well-typed because to_i method converts the receiver to an integer.
 
 The long description of the message (the message beginning from “It does not....” to right before the first context information), tells us more details about the error. Since Ruby uses structural typing (duck typing), DRuby models types in a similar manner. Despite having different class names (`String` vs. `Numeric`), DRuby tries to treat a String as a `Numeric`. It is safe to use a String in place of a Numeric if and only if String responds to at least as many methods as `Numeric`. However, this is not the case, and so DRuby reports each missing method.
 
