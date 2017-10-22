@@ -1,5 +1,7 @@
 # Ruby static type checker - examples
 
+[![Hacker News](https://img.shields.io/badge/Hacker%20News-Y-orange.svg)](https://news.ycombinator.com/item?id=15526406)
+
 This is proof of concept of ruby a static typechecker. It is similar to what [Facebook Flow](https://github.com/facebook/flow) tries to do for JavaScript. This page shows some typical errors in Ruby which can be checked statically instead of guarding against them at runtime. Error messages look cryptic - this can be changed but needs more work.
 
 ## 1
