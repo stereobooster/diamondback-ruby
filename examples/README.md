@@ -1,6 +1,6 @@
-# Examples
+# Ruby static type checker - examples
 
-Many typical errors are caught by static type checker, though error messages are cryptic. Note: ruby error messages sometimes cryptic too.
+This is proof of concept of ruby a static typechecker. It is similar to what [Facebook Flow](https://github.com/facebook/flow) tries to do for JavaScript. This page shows some typical errors in Ruby which can be checked statically instead of guarding against them at runtime. Error messages look cryptic - this can be changed but needs more work.
 
 ## 1
 
