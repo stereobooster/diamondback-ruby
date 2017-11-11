@@ -25,6 +25,13 @@ gem_bin/druby examples/test1.rb
   at ./examples/test1.rb:1
 ```
 
+### steep
+
+```
+steep check test1.rb
+test1.rb:1:0: ArgumentTypeMismatch: type=String, method=+
+```
+
 ### Ruby
 
 ```
@@ -51,6 +58,13 @@ gem_bin/druby examples/test2.rb
   at ./examples/test2.rb:1
 ```
 
+### steep
+
+```
+steep check test2.rb
+test2.rb:1:0: NoMethodError: type=String, method=gsub
+```
+
 ### Ruby
 
 ```
@@ -71,6 +85,13 @@ gem_bin/druby examples/test3.rb
 [ERROR] subtype relation failed for all members of intersection type
   in intersection with rhs:
   in solving method: []
+```
+
+### steep
+
+```
+steep check test3.rb
+test3.rb:1:0: ArgumentTypeMismatch: type=Array<Integer>, method=[]
 ```
 
 ### Ruby
@@ -103,6 +124,16 @@ gem_bin/druby examples/test4.rb
   at ./examples/test4.rb:5
 ```
 
+### steep
+
+bug
+
+```
+steep check test4.rb
+#<NoMethodError: undefined method `type' for nil:NilClass>
+  2.4.0/gems/steep-0.1.0.pre/lib/steep/type_construction.rb:169:in `synthesize'
+```
+
 ### Ruby
 
 ```
@@ -125,6 +156,10 @@ DRuby analysis complete.
 [ERROR] This record contains no field named :"c"
 ```
 
+### steep
+
+nothing detected
+
 ### Ruby
 
 ```
@@ -145,6 +180,10 @@ gem_bin/druby examples/test6.rb
 [ERROR] Unable to statically locate scope B in namespace hierarchy at ::
   at ./examples/test6.rb:1
 ```
+
+### steep
+
+nothing detected
 
 ### Ruby
 
