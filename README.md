@@ -1,5 +1,9 @@
 # DRuby [![Travis](https://img.shields.io/travis/stereobooster/diamondback-ruby.svg)](https://travis-ci.org/stereobooster/diamondback-ruby)
 
+## Update
+
+If you are looking for static type checker checkout [steep](https://github.com/soutaro/steep). It is written in Ruby which makes it much more approachable for Ruby developers.
+
 ## Vision
 - It is supposed to be a practical project rather than purely academical. To do this it should provide easy to install ruby gems (without requiring OCaml or C libs). This is doable, see how Flow compiles binaries for each platform and uploads to GitHub and npm.
 - Everything that can be checked statically should be checked statically without dynamic check duplications. Statical type check should not have any negative impact on performance like this happens in [rdl](https://github.com/plum-umd/rdl) without `wrap: false`.
