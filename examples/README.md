@@ -191,3 +191,46 @@ nothing detected
 ruby examples/test6.rb
 examples/test6.rb:1:in `<main>': uninitialized constant B (NameError)
 ```
+
+## 7
+
+```ruby
+class ID
+  def id(x)
+    x
+  end
+end
+
+ID.new.id(3) + 3
+ID.new.id("foo") + "bar"
+
+```
+
+### DRuby
+
+DiamondbackRuby cannot infer polymorphic methods
+
+```
+gem_bin/druby examples/test7.rb
+[ERROR] instance Fixnum does not support methods to_str
+  in method call id
+  at ./examples/test7.rb:7
+  in creating instance of Fixnum
+  at ./examples/test7.rb:7
+  in typing expression 3
+  at ./examples/test7.rb:7
+  in typing actual argument 3
+  at ./examples/test7.rb:7
+  in method call +
+  at ./examples/test7.rb:7
+
+DRuby analysis complete.
+```
+
+### steep
+
+nothing detected - ok
+
+### Ruby
+
+nothing detected - ok
