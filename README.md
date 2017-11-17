@@ -4,7 +4,8 @@
 
 If you are looking for static type checker checkout [steep](https://github.com/soutaro/steep). It is written in Ruby which makes it much more approachable for Ruby developers.
 
-See also [Academic writing on the Ruby programming language](http://rubybib.org/)
+See also [Academic writing on the Ruby programming language](http://rubybib.org/), [
+Types and Ruby Programming Language](https://speakerdeck.com/soutaro/types-and-ruby-programming-language)
 
 ## Vision
 - It is supposed to be a practical project rather than purely academical. To do this it should provide easy to install ruby gems (without requiring OCaml or C libs). This is doable, see how Flow compiles binaries for each platform and uploads to GitHub and npm.
