@@ -4,6 +4,8 @@
 
 If you are looking for static type checker checkout [steep](https://github.com/soutaro/steep). It is written in Ruby which makes it much more approachable for Ruby developers.
 
+Update 2: checkout [sorbet](https://sorbet.run/), a project by Stripe.
+
 ### Other resources
 
 - [Academic writing on the Ruby programming language](http://rubybib.org/)
